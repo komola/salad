@@ -1,0 +1,52 @@
+{
+  "name": "salad",
+  "version": "0.0.1",
+  "description": "",
+  "homepage": "http://komola.github.com/prisma-box-app",
+  "main": "./salad.coffee",
+  "author": "Sebastian Hoitz <hoitz@komola.de>",
+  "keywords": [
+    "node"
+  ],
+  "maintainers": [
+    {
+      "name": "Sebastian Hoitz",
+      "email": "hoitz@komola.de"
+    }
+  ],
+  "contributors": [],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://mths.be/mit"
+    }
+  ],
+  "bugs": {
+    "url": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "engines": {
+    "node": ">= 0.4.0",
+    "npm": "1"
+  },
+  "dependencies": {
+    "underscore": ">= 0.0.1",
+    "underscore.string": ">= 0.0.1",
+    "coffee-script": ">= 1.3",
+    "express": ">= 3.0.0",
+    "mime": ">= 0.0.1",
+    "require-all": "0.0.5"
+  },
+  "devDependencies": {
+    "mocha": ">= 0.12.1",
+    "chai": ">= 0.3.3",
+    "sinon": ">= 1.3.1"
+  },
+  "scripts": {
+    "test": "mocha $(find test -name \"*Test.coffee\")",
+    "prepublish": "npm prune; rm -rf node_modules/*/{test,example,bench}*"
+  }
+}
