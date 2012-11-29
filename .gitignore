@@ -1,1 +1,24 @@
-./node_modules
+## MAC OS
+.DS_Store
+*.gem
+## TEXTMATE
+*.tmproj
+tmtags
+
+## EMACS
+*~
+\#*
+.\#*
+
+## VIM
+*.swp
+
+## PROJECT::GENERAL
+coverage
+rdoc
+pkg
+*.log
+
+/node_modules
+
+npm-debug.log

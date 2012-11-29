@@ -3,7 +3,7 @@
 Salad is supposed to be a very lightweight nodeJS framework, that brings the
 possibility to register routes and controllers and use popular ORM frameworks like
 
-* (http://www.sequelizejs.com/ "Sequelize")
+* [Sequelize] (http://www.sequelizejs.com/)
 
 ## Getting started
 
@@ -11,13 +11,13 @@ possibility to register routes and controllers and use popular ORM frameworks li
 
 This is the basic directory setup:
 
-  /app
-    /config
-      /routes.coffee
-    /controllers
-      ...
-  /public
-  /server.coffee
+    /app
+      /config
+        /routes.coffee
+      /controllers
+        ...
+    /public
+    /server.coffee
 
 ### Registering Routes
 
