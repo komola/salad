@@ -1,9 +1,12 @@
-class Salad.Bootstrap
+class Salad.Bootstrap extends Salad.Base
+  @extend "./mixins/Singleton"
+
   app: null
 
   options:
     routePath: "app/config/routes"
     controllerPath: "app/controllers"
+    publicPath: "public"
     port: 80
 
   run: (options) ->
@@ -43,6 +46,9 @@ class Salad.Bootstrap
 
     Salad.Router.applyToExpress @app
 
+    @configureExpress @app
+
     @app.listen @options.port
 
-_.extend Salad.Bootstrap, require "./mixins/Singleton"
+  configureExpress: (app) ->
+    app.use "static", "#{Salad.root}/#{@options.publicPath}"

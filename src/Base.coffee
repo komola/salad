@@ -1,3 +1,3 @@
 class Salad.Base
-  mixin: (name) ->
-    _.mixin require "name"
+  @extend: (name) ->
+    _.extend @, require name

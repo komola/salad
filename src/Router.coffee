@@ -1,4 +1,6 @@
-class Salad.Router
+class Salad.Router extends Salad.Base
+  @extend "./mixins/Singleton"
+
   routes: []
 
   @register: (cb) ->
@@ -76,5 +78,3 @@ class Salad.Router
 
     app[method] route.path, (req, res) ->
       Salad.Request.Http.dispatch req, res, controller, route.options.method
-
-_.extend Salad.Router, require "./mixins/Singleton"
