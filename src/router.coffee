@@ -1,11 +1,5 @@
 class Salad.Router
   routes: []
-  _instance: null
-
-  @instance: ->
-    @_instance = new Salad.Router unless @_instance
-
-    @_instance
 
   @register: (cb) ->
     cb.apply @instance()
@@ -82,3 +76,5 @@ class Salad.Router
 
     app[method] route.path, (req, res) ->
       Salad.Request.Http.dispatch req, res, controller, route.options.method
+
+_.extend Salad.Router, require "./mixins/Singleton"

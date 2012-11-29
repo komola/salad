@@ -1,12 +1,10 @@
 class Salad.Bootstrap
-  _instance: null
   app: null
 
   options:
     routePath: "app/config/routes"
     controllerPath: "app/controllers"
     port: 80
-
 
   run: (options) ->
     @options.port = options.port || 80
@@ -17,11 +15,6 @@ class Salad.Bootstrap
     @initModels()
 
     @start()
-
-  @instance: ->
-    @_instance = new Salad.Bootstrap unless @_instance
-
-    @_instance
 
   @run: (options) ->
     Salad.Bootstrap.instance().run options
@@ -51,3 +44,5 @@ class Salad.Bootstrap
     Salad.Router.applyToExpress @app
 
     @app.listen @options.port
+
+_.extend Salad.Bootstrap, require "./mixins/Singleton"
