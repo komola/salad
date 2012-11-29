@@ -47,7 +47,9 @@ class Salad.Router extends Salad.Base
       }
     ]
 
-    @add route.method, route.path, route.options for route in routes
+    for route in routes
+      @add route.method, route.path, route.options
+      @add route.method, "#{route.path}.:format", route.options
 
   add: (method, path, options) ->
     @routes.push
