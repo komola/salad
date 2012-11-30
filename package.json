@@ -2,7 +2,7 @@
   "name": "salad",
   "version": "0.0.1",
   "description": "",
-  "homepage": "http://komola.github.com/prisma-box-app",
+  "homepage": "http://github.com/komola/salad",
   "main": "./salad.coffee",
   "author": "Sebastian Hoitz <hoitz@komola.de>",
   "keywords": [
