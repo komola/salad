@@ -3,7 +3,7 @@
 Salad is supposed to be a very lightweight nodeJS framework, that brings the
 possibility to register routes and controllers and use popular ORM frameworks like
 
-* [Sequelize] (http://www.sequelizejs.com/)
+* [Sequelize](http://www.sequelizejs.com/)
 
 ## Getting started
 
@@ -11,13 +11,86 @@ possibility to register routes and controllers and use popular ORM frameworks li
 
 This is the basic directory setup:
 
+```
     /app
+      /collections
+        /server
+        /shared
+        /client
       /config
-        /routes.coffee
+        /server
+          /routes.coffee
+        /shared
+        /client
       /controllers
-        ...
+        /server
+        /shared
+        /client
+        /concerns
+          /server
+          /shared
+          /client
+      /helpers
+        /server
+        /shared
+        /client
+      /lib
+        /server
+        /shared
+        /client
+      /models
+        /server
+        /shared
+        /client
+        /concerns
+          /server
+          /shared
+          /client
+      /templates
+        /server
+        /shared
+        /client
+      /translations
+        /de_DE
+        /...
+      /views # Mostly for Backbone Views
+        /client
     /public
+      /assets
+        /img
+        /js
+        /css
+    /vendor
+
+    /components.json
+    /grunt.coffee
+    /package.json
     /server.coffee
+```
+
+Salad is composed of several libraries, that are used to bring together useful
+functionality.
+
+* BackboneJS
+* Sequelize
+* Connect
+  * Connect-Assets
+* Grunt
+* Bower
+
+The whole application should be instrumented using application configurations.
+Configurations should register routes and according controllers.
+
+![NodeJS Holy Grail](http://s3.amazonaws.com/files.posterous.com/temp-2012-10-01/kdFEIqbgcujohgnuzHGvqcJquloxdwBnkvejGFdiCnFuznwiiyHIzafebBhr/shared-js-app.png.scaled1000.png?AWSAccessKeyId=AKIAJFZAE65UYRT34AOQ&Expires=1360508957&Signature=tpGKAAlqOkQQcwBmirWURbcT4vI%3D)
+
+Our server side application won't talk to an API though, but to Sequelize as our ORM
+library that stores the data.
+
+```
+ +--------------+      +---------------+     +--------------------+
+ |Backbone Model|  --> |Storage Adapter| --> |Sequelize/Server API|
+ +--------------+      +---------------+     +--------------------+
+```
 
 ### Registering Routes
 
