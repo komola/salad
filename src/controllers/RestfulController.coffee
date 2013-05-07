@@ -1,10 +1,9 @@
 class Salad.RestfulController extends Salad.Controller
   resourceName: ""
 
-
   index: ->
     @respond
-      html: -> "Hi!"
+      html: -> "foo!"
       json: -> JSON.stringify foo: "bar"
 
   findResourceById: (cb) =>

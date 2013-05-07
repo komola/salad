@@ -10,8 +10,8 @@ class Salad.Controller extends Salad.Base
       callback err, object
 
   respond: (responders) ->
-    format = @params.format || "html"
+    format = @params.format or "html"
 
     format = "html" unless responders[format]
 
-    @response.send responders[format]()
+    responders[format].apply @
