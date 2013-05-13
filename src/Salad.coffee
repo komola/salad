@@ -11,9 +11,7 @@ require "./controllers/RestfulController"
 
 require "./Request"
 
-path = process.cwd().split("/")
-path = path.join "/"
-
+path = process.cwd()
 Salad.root = path
 
 module.exports = Salad
