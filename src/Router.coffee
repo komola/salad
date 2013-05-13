@@ -4,30 +4,36 @@ router = new Router
 class Salad.Router extends Salad.Base
   @extend "./mixins/Singleton"
 
-  # @match: (route, options) ->
-  #   route =
-  #     if options.via
-  #       router.match(route, options.via)
-  #     else
-  #       router.match(route)
-
-  #   route.to(options.to)
-
-
-  @register: (cb) ->
-    cb.apply @instance(), router
-
-  dispatch: (request) ->
-    console.log request
-
-    # Get the matching route
+  dispatch: (request, response) =>
     matching = router.first(request.path, request.method)
 
-    # Get the controller that is linked with this route
-    controller = @_getMatchingController matching.controller
+    # No matching route found
+    unless matching
+      matching =
+        controller: "error"
+        action: 404
+        method: request.method
 
-    # Create request object and let the controller handle the request
-    Salad.Request.Http.dispatch req, res, controller, matching.action
+    # Get the matching controller
+    controllerName = _s.capitalize matching.controller
+    controller = @_getMatchingController controllerName
+
+    # Could not find associated controller
+    unless controller
+      controller = App.ErrorContoller.instance()
+
+    unless controller[matching.action]
+      controller = App.ErrorController.instance()
+      matching.action = 404
+
+    controller.response = response
+    controller.params = _.extend request.query, request.body, matching
+
+    # Call the controller action
+    controller[matching.action]()
+
+  @register: (cb) ->
+    cb.apply @instance(), [router]
 
   _getMatchingController: (controllerName) ->
     controllerName = _s.capitalize controllerName

@@ -29,7 +29,7 @@
     "url": ""
   },
   "engines": {
-    "node": ">= 0.4.0",
+    "node": ">= 0.10.0",
     "npm": "1"
   },
   "dependencies": {
@@ -39,7 +39,9 @@
     "express": ">= 3.0.0",
     "mime": ">= 0.0.1",
     "require-all": "0.0.5",
-    "barista": "0.0.8"
+    "barista": "0.0.8",
+    "sequelize-sqlite": "~1.7.0-alpha1",
+    "async": "~0.2.8"
   },
   "devDependencies": {
     "mocha": ">= 0.12.1",
@@ -47,7 +49,9 @@
     "sinon": ">= 1.3.1",
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-nodeunit": "~0.1.2"
+    "grunt-contrib-nodeunit": "~0.1.2",
+    "should": "~1.2.2",
+    "superagent": "~0.14.2"
   },
   "scripts": {
     "test": "mocha $(find test -name \"*Test.coffee\")"
