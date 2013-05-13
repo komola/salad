@@ -8,7 +8,7 @@ class Salad.Bootstrap extends Salad.Base
   app: null
 
   options:
-    routePath: "app/config/routes"
+    routePath: "app/config/server/routes"
     controllerPath: "app/controllers/server"
     modelPath: "app/models/server"
     publicPath: "public"
