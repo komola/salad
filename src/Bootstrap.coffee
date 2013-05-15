@@ -1,6 +1,7 @@
 global.Sequelize = require("sequelize-sqlite").sequelize
 sqlite = require("sequelize-sqlite").sqlite
 async = require "async"
+winston = require "winston"
 
 class Salad.Bootstrap extends Salad.Base
   @extend "./mixins/Singleton"
@@ -19,6 +20,7 @@ class Salad.Bootstrap extends Salad.Base
     @options.port = options.port || 80
     @options.env = options.env || "production"
 
+    @initLogger()
     @initControllers()
     @initRoutes()
     @initHelpers()
@@ -33,6 +35,26 @@ class Salad.Bootstrap extends Salad.Base
     options or= {}
 
     Salad.Bootstrap.instance().run options
+
+  initLogger: ->
+    logger = new winston.Logger
+    logger.setLevels winston.config.syslog.levels
+
+    logger.add winston.transports.Console,
+      handleExceptions: true
+      prettyPrint: true
+      colorize: true
+      timestamp: true
+
+    App.Logger = {}
+
+    logger.extend App.Logger
+
+    App.Logger.log = ->
+      logger.info.apply @, arguments
+
+    console.log = App.Logger.log
+    console.error = App.Logger.error
 
   initRoutes: ->
     require "#{Salad.root}/#{@options.routePath}"

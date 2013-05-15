@@ -33,18 +33,18 @@
     "npm": "1"
   },
   "dependencies": {
-    "coffee-script": "~1.6.2",
+    "coffee-script": "~1.6.0",
     "source-map-support": "~0.1.5",
     "coffee-script-mapped": "~0.1.2",
     "underscore": ">= 0.0.1",
     "underscore.string": ">= 0.0.1",
-    "coffee-script": "~1.6.0",
     "express": ">= 3.0.0",
     "mime": ">= 0.0.1",
     "require-all": "0.0.5",
     "barista": "0.0.8",
     "sequelize-sqlite": "~1.7.0-alpha1",
-    "async": "~0.2.8"
+    "async": "~0.2.8",
+    "winston": "~0.7.1"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
