@@ -22,7 +22,7 @@ class Salad.Router extends Salad.Base
     unless controller
       controller = App.ErrorContoller.instance()
 
-    unless controller[matching.action]
+    if typeof controller[matching.action] is undefined
       controller = App.ErrorController.instance()
       matching.action = 404
 
