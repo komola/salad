@@ -15,7 +15,10 @@ before (done) ->
   Salad.Bootstrap.run
     port: 3001
     env: "testing"
-    cb: done
+    cb: =>
+      App.sequelize.sync().done done
+
+
 
 after (done) ->
   Salad.Bootstrap.destroy done

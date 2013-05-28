@@ -44,7 +44,8 @@
     "barista": "0.0.8",
     "async": "~0.2.8",
     "winston": "~0.7.1",
-    "sequelize-postgres": "~1.7.0-alpha2"
+    "sequelize-postgres": "~1.7.0-alpha2",
+    "longjohn": "~0.2.0"
   },
   "devDependencies": {
     "mocha": "~1.9.0",

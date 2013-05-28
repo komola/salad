@@ -1,7 +1,8 @@
-global.Sequelize = require("sequelize-sqlite").sequelize
-sqlite = require("sequelize-sqlite").sqlite
+global.Sequelize = require("sequelize-postgres").sequelize
+postgres = require("sequelize-postgres").postgres
 async = require "async"
 winston = require "winston"
+require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
   @extend "./mixins/Singleton"
@@ -12,13 +13,16 @@ class Salad.Bootstrap extends Salad.Base
     routePath: "app/config/server/routes"
     controllerPath: "app/controllers/server"
     modelPath: "app/models/server"
+    configPath: "app/config/server/config"
     publicPath: "public"
     port: 80
     env: "production"
 
-  run: (options) ->
+  init: (options) ->
     @options.port = options.port || 80
-    @options.env = options.env || "production"
+    @options.env = Salad.env = options.env || "production"
+
+    @initConfig()
 
     @initLogger()
     @initControllers()
@@ -29,12 +33,23 @@ class Salad.Bootstrap extends Salad.Base
 
     @initExpress()
 
+  run: (options) ->
+    @init options
+
     @start(options.cb)
 
   @run: (options) ->
     options or= {}
 
     Salad.Bootstrap.instance().run options
+
+  initConfig: ->
+    # Salad.Config = require("require-all")
+    #   dirname: "#{Salad.root}/#{@options.configPath}"
+
+    # TODO: Allow more than one file and external configuration, i.e.
+    # in the /etc folder
+    Salad.Config = require "#{Salad.root}/#{@options.configPath}"
 
   initLogger: ->
     logger = new winston.Logger
@@ -53,8 +68,9 @@ class Salad.Bootstrap extends Salad.Base
     App.Logger.log = ->
       logger.info.apply @, arguments
 
-    console.log = App.Logger.log
-    console.error = App.Logger.error
+    if Salad.env isnt "testing"
+      console.log = App.Logger.log
+      console.error = App.Logger.error
 
   initRoutes: ->
     require "#{Salad.root}/#{@options.routePath}"
@@ -69,10 +85,14 @@ class Salad.Bootstrap extends Salad.Base
       dirname: "#{Salad.root}/#{@options.modelPath}"
 
   initDatabase: ->
-    App.sequelize = new Sequelize "salad-example", "root", "",
-      dialect: "sqlite"
-      storage: "#{Salad.root}/db.sqlite"
-      logging: Salad.env is "development"
+    dbConfig = Salad.Config.database[Salad.env]
+
+    App.sequelize = new Sequelize dbConfig.database, dbConfig.username, dbConfig.password,
+      dialect: "postgres"
+      host: dbConfig.host
+      port: dbConfig.port
+      logging: if Salad.env is "development" then console.log else false
+      omitNull: true
 
   initMiddleware: ->
 
@@ -88,14 +108,11 @@ class Salad.Bootstrap extends Salad.Base
     @app.all "*", router.dispatch
 
   start: (callback) =>
-    syncSequelize = (cb) =>
-      App.sequelize.sync(force: true).done cb
-
-    listen = (cb) =>
+    startExpress = (cb) =>
       @expressServer = @app.listen @options.port
       cb()
 
-    async.series [syncSequelize, listen], =>
+    async.series [startExpress], =>
       callback.apply @ if callback
 
   @destroy: (callback) ->
