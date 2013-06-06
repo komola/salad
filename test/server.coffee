@@ -18,7 +18,10 @@ before (done) ->
     cb: =>
       App.sequelize.sync().done done
 
-
+beforeEach (done) ->
+  sync = App.sequelize.sync(force: true)
+  sync.on "success", =>
+    done()
 
 after (done) ->
   Salad.Bootstrap.destroy done

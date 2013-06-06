@@ -49,7 +49,7 @@ describe "Controller", ->
             done()
 
       it "should return the resource as json", (done) ->
-        App.Location.create(title: "Test").success (resource) ->
+        App.Location.create title: "Test", (err, resource) ->
           id = resource.id
           agent.get("http://localhost:3001/locations/#{id}.json")
             .end (res) ->
@@ -69,8 +69,8 @@ describe "Controller", ->
             done()
 
       it "should update records", (done) ->
-        App.Location.create(title: "Test").success (resource) ->
-          id = resource.id
+        App.Location.create title: "Test", (err, resource) ->
+          id = resource.attributes.id
           agent.put("http://localhost:3001/locations/#{id}.json")
             .send(location: title: "Foo")
             .end (res) ->
@@ -80,7 +80,7 @@ describe "Controller", ->
 
               done()
 
-    describe "#destroy", ->
+    describe.skip "#destroy", ->
       it "should return 404 for a non-existent resource", (done) ->
         agent.del("http://localhost:3001/locations/9999.json")
           .end (res) ->
@@ -89,7 +89,7 @@ describe "Controller", ->
             done()
 
       it "should return the deleted resource", (done) ->
-        App.Location.create(title: "Test").success (resource) ->
+        App.Location.create title: "Test", (err, resource) ->
           id = resource.id
           agent.del("http://localhost:3001/locations/#{id}.json")
             .end (res) ->

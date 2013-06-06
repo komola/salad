@@ -2,10 +2,10 @@ config = {}
 
 config.database =
   testing:
-    username: "postgres"
-    password: ""
+    username: "testing"
+    password: "testing"
     host: "localhost"
-    database: ""
+    database: "salad-testing"
     port: 5432
 
 module.exports = config

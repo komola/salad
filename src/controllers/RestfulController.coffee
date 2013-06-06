@@ -12,7 +12,7 @@ class Salad.RestfulController extends Salad.Controller
         json: -> @response.send resources
 
   _index: (callback) ->
-    @resource.findAll().success (resources) =>
+    @resource.all (err, resources) =>
       callback.apply @, [null, resources]
 
   show: ->
@@ -37,14 +37,12 @@ class Salad.RestfulController extends Salad.Controller
   _create: (callback) ->
     data = @params[@resourceName]
 
-    @resource.create(data)
-      .success (resource) =>
-        @response.status 201
+    @resource.create data, (err, resource) =>
+      if err
+        return callback.apply @, [err, null]
 
-        callback.apply @, [null, resource]
-
-      .error (error) =>
-        callback.apply @, [error, null]
+      @response.status 201
+      callback.apply @, [null, resource]
 
   update: ->
     @_update (err, resource) =>
@@ -59,20 +57,18 @@ class Salad.RestfulController extends Salad.Controller
 
       data = @params[@resourceName]
 
-      resource.updateAttributes(data)
-        .success =>
-          callback.apply @, [err, resource]
+      resource.updateAttributes data, (err, resource) =>
+        if err
+          return callback.apply @, [err]
 
-        .error (error) =>
-          callback.apply @, [err]
+        callback.apply @, [err, resource]
 
   destroy: ->
     @_destroy (err, resource) =>
-      resource.destroy()
-        .success =>
-          @respond
-            html: -> @response.send "Deleted"
-            json: -> @response.send resource
+      resource.destroy (err) =>
+        @respond
+          html: -> @response.send "Deleted"
+          json: -> @response.send resource
 
   _destroy: (callback) ->
     @findResource (err, resource) =>
@@ -82,12 +78,11 @@ class Salad.RestfulController extends Salad.Controller
       callback.apply @, [err, resource]
 
   findResource: (callback) ->
-    @resource.find(@params.id)
-      .success (resource) =>
-        callback.apply @, [null, resource]
+    @resource.find @params.id, (err, resource) =>
+      if err
+        return callback.apply @, [error]
 
-      .error (error) =>
-        callback.apply @, [error]
+      callback.apply @, [null, resource]
 
   _notFoundHandler: ->
     @response.status 404

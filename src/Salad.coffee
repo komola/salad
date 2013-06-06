@@ -9,6 +9,9 @@ require "./Router"
 require "./Controller"
 require "./controllers/RestfulController"
 
+require "./models/dao"
+require "./models/model"
+
 require "./Request"
 
 path = process.cwd()
