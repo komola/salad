@@ -9,6 +9,7 @@ require "./Router"
 require "./Controller"
 require "./controllers/RestfulController"
 
+require "./models/scope"
 require "./models/dao"
 require "./models/model"
 
