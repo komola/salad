@@ -71,8 +71,18 @@ class Salad.Model
 
   setAttributes: (attributes) ->
     for key, val of attributes
-      @attributes[key] = val
+      @set key, val
 
+  getAttributes: ->
+    @attributes
+
+  set: (key, value) ->
+    @_checkIfKeyExists key
+    @attributes[key] = value
+
+  get: (key) ->
+    @_checkIfKeyExists key
+    @attributes[key]
 
   ## DAO functionality #################################
   @dao: (options) ->
@@ -118,9 +128,9 @@ class Salad.Model
 
   save: (callback) =>
     if @isNew
-      return @daoInstance.create @attributes, callback
+      return @daoInstance.create @getAttributes(), callback
 
-    @daoInstance.update @, @attributes, callback
+    @daoInstance.update @, @getAttributes(), callback
 
   destroy: (callback) ->
     callback()
@@ -171,5 +181,8 @@ class Salad.Model
     return new Salad.Scope @daoInstance
 
   toJSON: ->
-    @attributes
+    @getAttributes()
 
+  _checkIfKeyExists: (key) ->
+    unless key of @attributes
+      throw new Error "#{key} not existent in @"

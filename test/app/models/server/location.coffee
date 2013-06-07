@@ -13,3 +13,5 @@ class App.Location extends Salad.Model
     title: undefined
     description: undefined
     messages: undefined
+    createdAt: undefined
+    updatedAt: undefined

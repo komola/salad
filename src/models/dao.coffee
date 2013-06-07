@@ -17,7 +17,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       callback null, resource
 
   update: (model, attributes, callback) ->
-    @daoModelInstance.find(model.attributes.id).success (sequelizeModel) =>
+    @daoModelInstance.find(model.get("id")).success (sequelizeModel) =>
       unless sequelizeModel
         error = new Error "Could not find model with id: #{model.attributes.id}"
         return callback error

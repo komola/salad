@@ -82,3 +82,16 @@ describe "Salad.Model", ->
             res.attributes.title.should.equal "Foo"
 
             done()
+
+  describe "attributes", ->
+    describe "#set", ->
+      it "sets an attribute to a specific value", ->
+        location = App.Location.build title: "Test"
+        location.set "title", "Foo"
+
+        location.attributes.title.should.equal "Foo"
+
+    describe "#get", ->
+      it "returns an attribute", ->
+        location = App.Location.build title: "Test"
+        location.get("title").should.equal "Test"
