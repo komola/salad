@@ -50,12 +50,12 @@ describe "Controller", ->
 
       it "should return the resource as json", (done) ->
         App.Location.create title: "Test", (err, resource) ->
-          id = resource.id
+          id = resource.attributes.id
           agent.get("http://localhost:3001/locations/#{id}.json")
             .end (res) ->
               res.ok.should.equal true
               res.body.should.have.property "title"
-              res.body.title.should.equal resource.title
+              res.body.title.should.equal resource.attributes.title
 
               done()
 
@@ -90,7 +90,7 @@ describe "Controller", ->
 
       it "should return the deleted resource", (done) ->
         App.Location.create title: "Test", (err, resource) ->
-          id = resource.id
+          id = resource.attributes.id
           agent.del("http://localhost:3001/locations/#{id}.json")
             .end (res) ->
               res.ok.should.equal true

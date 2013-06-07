@@ -59,7 +59,14 @@ class Salad.Model
   constructor: (attributes, options) ->
     @setAttributes attributes
 
-    @isNew = options.isNew or true
+    # overwrite default options with passed options
+    options = _.extend {isNew: true}, options
+
+    @isNew = options.isNew
+
+    unless options.daoInstance
+      throw new Error "No DAO instance set!"
+
     @daoInstance = options.daoInstance
 
   setAttributes: (attributes) ->
@@ -70,6 +77,17 @@ class Salad.Model
   ## DAO functionality #################################
   @dao: (options) ->
     @daoInstance = new Salad.DAO.Sequelize options.instance, @
+
+  @build: (attributes) ->
+    unless @daoInstance
+      return throw new Error "No DAO object is set!"
+
+    options =
+      daoInstance: @daoInstance
+
+    resource = new @(attributes, options)
+
+    resource
 
   @create: (attributes, callback) ->
     unless @daoInstance
@@ -102,7 +120,7 @@ class Salad.Model
     if @isNew
       return @daoInstance.create @attributes, callback
 
-    @daoInstance.update @attributes, callback
+    @daoInstance.update @, @attributes, callback
 
   destroy: (callback) ->
     callback()

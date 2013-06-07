@@ -6,6 +6,7 @@ require "./app/config/server/bootstrap"
 
 global.chai = require "chai"
 global.expect = chai.expect
+global.assert = chai.assert
 global.sinon = require "sinon"
 global.async = require "async"
 global.agent = require "superagent"

@@ -12,13 +12,19 @@ class Salad.DAO.Base
 
 class Salad.DAO.Sequelize extends Salad.DAO.Base
   create: (attributes, callback) ->
-    @daoModelInstance.create(attributes).success (resource) =>
+    @daoModelInstance.create(attributes).success (daoResource) =>
+      resource = @_buildModelInstance daoResource
       callback null, resource
 
   update: (model, attributes, callback) ->
-    @daoModelInstance.find(model.id).success (sequelizeModel) ->
-      sequelizeModel.set sequelizeModel.attributes
-      sequelizeModel.save callback
+    @daoModelInstance.find(model.attributes.id).success (sequelizeModel) =>
+      unless sequelizeModel
+        error = new Error "Could not find model with id: #{model.attributes.id}"
+        return callback error
+
+      sequelizeModel.updateAttributes(attributes).success (daoResource) =>
+        resource = @_buildModelInstance daoResource
+        callback null, resource
 
   findAll: (options, callback) ->
     params = {}
@@ -42,14 +48,18 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
         resources = []
 
         for res in rawResources
-          attributes = res.dataValues
-          options =
-            isNew: false
-            daoInstance: @
-
-          resources.push new @modelInstance attributes, options
+          resources.push @_buildModelInstance res
 
         callback null, resources
+
+  _buildModelInstance: (daoInstance) =>
+    attributes = daoInstance.dataValues
+    options =
+      isNew: false
+      daoInstance: @
+
+    return new @modelInstance attributes, options
+
 
 # class Salad.DAO.Memory
 #   store: {}
