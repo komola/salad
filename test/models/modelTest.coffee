@@ -26,6 +26,19 @@ describe "Salad.Model", ->
 
         done()
 
+      it "supports many instances", (done) ->
+        res.get("id").should.equal 1
+
+        App.Location.create title: "A", (err, a) ->
+          res.get("id").should.equal 1
+          a.get("id").should.equal 2
+
+          App.Location.create title: "B", (err, b) =>
+            a.get("id").should.equal 2
+            b.get("id").should.equal 3
+
+            done()
+
     describe "#updateAttributes", ->
       res = null
       params =
@@ -95,3 +108,98 @@ describe "Salad.Model", ->
       it "returns an attribute", ->
         location = App.Location.build title: "Test"
         location.get("title").should.equal "Test"
+
+  describe "associations", ->
+    describe "#hasMany", ->
+      it "creates getter method", ->
+        model = App.Location.build title: "test"
+
+        assert.ok model.getChildren
+
+      it "adds the correct conditions", ->
+        model = App.Location.build title: "test", id: 1
+
+        scope = model.getChildren()
+
+        assert.ok scope.data.conditions
+        assert.ok scope.data.conditions.parentId
+        scope.data.conditions.parentId.should.equal 1
+
+      it "returns the correct object", (done) ->
+        App.Location.create title: "Parent", (err, parent) ->
+          parent.get("id").should.equal 1, "parent has id 1"
+
+          App.Location.create title: "Child", parentId: parent.get("id"), (err, child) ->
+            child.get("id").should.equal 2, "child has id 2"
+
+            scope = parent.getChildren()
+
+            scope.data.conditions.parentId.should.equal 1, "scope has the correct parentId condition"
+
+            scope.all (err, resources) =>
+              assert.ok resources, "returned array of resources"
+
+              resources.length.should.equal 1, "returned 1 resource"
+              resources[0].get("id").should.equal child.get("id"), "resource id matches child id"
+
+              done()
+
+    describe "#belongsTo", ->
+      it "creates getter method", ->
+        model = App.Location.build title: "test"
+
+        assert.ok model.getParent
+
+      it "adds the correct conditions", ->
+        model = App.Location.build title: "test", parentId: 1
+
+        scope = model.getParent()
+
+        assert.ok scope.data.conditions
+        assert.ok scope.data.conditions.id
+
+        _.keys(scope.data.conditions).length.should.equal 1
+
+        scope.data.conditions.id.should.equal 1
+
+      it "returns the correct object", (done) ->
+        App.Location.create title: "Parent", (err, parent) ->
+          parent.get("id").should.equal 1, "parent has id 1"
+
+          App.Location.create title: "Child", parentId: parent.get("id"), (err, child) ->
+            child.get("id").should.equal 2, "child has id 2"
+
+            scope = child.getParent()
+
+            scope.all (err, res) ->
+              assert.ok res
+
+              res[0].get("id").should.equal parent.get("id")
+
+              done()
+
+      it "accepts additional conditions in the scope", (done) ->
+        App.Location.create title: "Parent", (err, parent) ->
+          parent.get("id").should.equal 1, "parent has id 1"
+
+          App.Location.create title: "Child", parentId: parent.get("id"), (err, child) ->
+            child.get("id").should.equal 2, "child has id 2"
+
+            scope = child.getParent().where(title: "Parent")
+
+            scope.all (err, res) ->
+              assert.ok res
+
+              res.length.should.equal 1
+
+              res[0].get("id").should.equal parent.get("id")
+
+              done()
+
+  describe "scope", ->
+    it "accepts chained conditions", ->
+      scope = App.Location.where(title: "Test").asc("title").limit(3)
+
+      _.keys(scope.data.conditions).length.should.equal 1
+      scope.data.sorting.length.should.equal 1
+      scope.data.limit.should.equal 3

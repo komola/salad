@@ -1,49 +1,50 @@
 class Salad.Scope
   context: undefined
-  conditions: {}
-  sorting: []
-  limit: -1
+  data:
+    conditions: {}
+    sorting: []
+    limit: -1
 
   constructor: (@context) ->
+    @data.conditions = {}
+    @data.sorting = []
+    @data.limit = -1
+
+    @
 
   where: (attributes) =>
     for key, val of attributes
-      @conditions[key] = val
+      @data.conditions[key] = val
 
     @
 
   asc: (field) =>
-    @sorting.push
+    @data.sorting.push
       field: field
       type: "asc"
 
     @
 
   desc: (field) =>
-    @sorting.push
+    @data.sorting.push
       field: field
       type: "desc"
 
     @
 
-  limit: (limit) ->
-    @limit = limit
+  limit: (limit) =>
+    @data.limit = limit
 
     @
 
   all: (callback) =>
-    options =
-      conditions: @conditions
-      sorting: @sorting
-      limit: @limit
+    options = @data
 
     @context.findAll options, callback
 
   first: (callback) =>
-    options =
-      conditions: @conditions
-      sorting: @sorting
-      limit: 1
+    options = @data
+    options.limit = 1
 
     @context.findAll options, (err, resources) =>
       if resources instanceof Array

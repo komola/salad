@@ -4,6 +4,9 @@ class Salad.Model
   isNew: true
 
   constructor: (attributes, options) ->
+    # pass the attributes from the static method on to our model
+    @attributes = _.clone @constructor.attributes
+
     @setAttributes attributes
 
     # overwrite default options with passed options
@@ -108,6 +111,49 @@ class Salad.Model
   @find: (id, callback) ->
     @scope().where(id: id).first callback
 
+  ## Associations ##########################################
+  # register a hasMany association for this mdoel
+  @hasMany: (targetModel, options) ->
+    # this is the method that we will create in this model
+    getterName = "get#{options.as}"
+
+    # this is the foreignKey field
+    foreignKey = options.foreignKey
+
+    # register attribute in targetModel
+    targetModel.attributes[foreignKey] = undefined
+
+    # register the method in this model
+    # Don't bind to this context, because we want the method to be run in the
+    # context of the instance
+    @::[getterName] = ->
+      conditions = {}
+      conditions[foreignKey] = @get "id"
+
+      scope = targetModel.scope()
+
+      scope.where(conditions)
+
+  # register a reverse-association in this model
+  @belongsTo: (targetModel, options) ->
+    # this is the method that we will create in this model
+    getterName = "get#{options.as}"
+
+    foreignKey = options.foreignKey
+
+    @attributes[foreignKey] = undefined
+
+    # register the method in this model.
+    # Don't bind to this context, because we want the method to be run in the
+    # context of the instance
+    @::[getterName] = ->
+      conditions =
+        id: @get foreignKey
+
+      scope = targetModel.scope()
+
+      scope.where(conditions)
+
   ## Trigger methods ###################################
 
   @before: (method, action) ->
@@ -130,6 +176,9 @@ class Salad.Model
   toJSON: ->
     @getAttributes()
 
+  toString: ->
+    @.constructor.name
+
   _checkIfKeyExists: (key) ->
     unless key of @attributes
-      throw new Error "#{key} not existent in @"
+      throw new Error "#{key} not existent in #{@}"

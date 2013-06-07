@@ -12,6 +12,7 @@ class Salad.DAO.Base
 
 class Salad.DAO.Sequelize extends Salad.DAO.Base
   create: (attributes, callback) ->
+    attributes = @_cleanAttributes attributes
     @daoModelInstance.create(attributes).success (daoResource) =>
       resource = @_buildModelInstance daoResource
       callback null, resource
@@ -29,7 +30,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
   findAll: (options, callback) ->
     params = {}
 
-    if options.conditions.length > 0
+    if _.keys(options.conditions).length > 0
       params.where = options.conditions
 
     if options.limit > 0
@@ -51,6 +52,12 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
           resources.push @_buildModelInstance res
 
         callback null, resources
+
+  _cleanAttributes: (rawAttributes) =>
+    attributes = {}
+    attributes[key] = val for key, val of rawAttributes when val isnt undefined
+
+    attributes
 
   _buildModelInstance: (daoInstance) =>
     attributes = daoInstance.dataValues
