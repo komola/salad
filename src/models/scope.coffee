@@ -6,6 +6,8 @@ class Salad.Scope
     limit: -1
 
   constructor: (@context) ->
+    @daoContext = @context.daoInstance
+
     @data.conditions = {}
     @data.sorting = []
     @data.limit = -1
@@ -40,14 +42,26 @@ class Salad.Scope
   all: (callback) =>
     options = @data
 
-    @context.findAll options, callback
+    @daoContext.findAll options, callback
 
   first: (callback) =>
     options = @data
     options.limit = 1
 
-    @context.findAll options, (err, resources) =>
+    @daoContext.findAll options, (err, resources) =>
       if resources instanceof Array
         resources = resources[0]
 
       return callback err, resources
+
+  ## Creation
+
+  create: (data, callback) =>
+    attributes = _.extend @data.conditions, data
+
+    @context.create attributes, callback
+
+  build: (data) =>
+    attributes = _.extend @data.conditions, data
+
+    @context.build attributes

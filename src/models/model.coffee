@@ -171,7 +171,7 @@ class Salad.Model
 
   # Builds a new scope with the current dao instance as context
   @scope: ->
-    return new Salad.Scope @daoInstance
+    return new Salad.Scope @
 
   toJSON: ->
     @getAttributes()

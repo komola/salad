@@ -203,3 +203,22 @@ describe "Salad.Model", ->
       _.keys(scope.data.conditions).length.should.equal 1
       scope.data.sorting.length.should.equal 1
       scope.data.limit.should.equal 3
+
+    describe "#create", ->
+      it "creates an object with association information", (done) ->
+        App.Location.create title: "Parent", (err, resource) =>
+          resource.getChildren().create title: "Child", (err, child) =>
+            assert.ok child
+            child.get("id").should.equal 2
+            child.get("parentId").should.equal 1
+
+            done()
+
+    describe "#build", ->
+      it "creates an instance with association information", (done) ->
+        App.Location.create title: "Parent", (err, resource) =>
+          child = resource.getChildren().build title: "Child"
+
+          child.get("parentId").should.equal 1
+
+          done()
