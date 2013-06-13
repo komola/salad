@@ -65,3 +65,14 @@ class Salad.Scope
     attributes = _.extend @data.conditions, data
 
     @context.build attributes
+
+  remove: (model, callback) =>
+    keys = _.keys @data.conditions
+
+    updateData = {}
+    for key in keys
+      updateData[key] = undefined
+
+    model.setAttributes updateData
+
+    model.save callback

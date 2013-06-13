@@ -222,3 +222,15 @@ describe "Salad.Model", ->
           child.get("parentId").should.equal 1
 
           done()
+
+    describe.only "#remove", ->
+      it "removes the association but does not delete the object", (done) ->
+        App.Location.create title: "Parent", (err, parent) =>
+          parent.getChildren().create title: "Child", (err, child) =>
+            child.get("parentId").should.equal parent.get("id")
+
+            parent.getChildren().remove child, (err) =>
+              App.Location.find child.get("id"), (err, newChildObject) =>
+                assert.equal newChildObject.get("parentId"), undefined
+
+                done()
