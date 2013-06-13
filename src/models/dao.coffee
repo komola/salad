@@ -44,6 +44,11 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if params.limit is -1
       delete params.limit
 
+    if options.includes?.length > 0
+      params.include = []
+      for model in options.includes
+        params.include.push model.daoModelInstance
+
     @daoModelInstance.findAll(params)
       .success (rawResources) =>
         resources = []
@@ -53,6 +58,9 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
         callback null, resources
 
+  lazyInstantiate: (daoInstance) =>
+    @_buildModelInstance daoInstance
+
   _cleanAttributes: (rawAttributes) =>
     attributes = {}
     attributes[key] = val for key, val of rawAttributes when val isnt undefined
@@ -60,10 +68,21 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     attributes
 
   _buildModelInstance: (daoInstance) =>
-    attributes = daoInstance.dataValues
     options =
       isNew: false
       daoInstance: @
+      eagerlyLoadedAssociations: {}
+
+    if daoInstance.__eagerlyLoadedAssociations?.length > 0
+
+      for key in daoInstance.__eagerlyLoadedAssociations
+        associationModel = @modelInstance::associations[key]
+
+        eagerLoadedModelInstance = associationModel.daoInstance.lazyInstantiate daoInstance[key]
+
+        options.eagerlyLoadedAssociations[key] = eagerLoadedModelInstance
+
+    attributes = daoInstance.dataValues
 
     return new @modelInstance attributes, options
 

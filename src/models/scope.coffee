@@ -2,6 +2,7 @@ class Salad.Scope
   context: undefined
   data:
     conditions: {}
+    includes: []
     sorting: []
     limit: -1
 
@@ -31,6 +32,15 @@ class Salad.Scope
     @data.sorting.push
       field: field
       type: "desc"
+
+    @
+
+  include: (models) =>
+    for model in models
+      unless model.daoInstance
+        throw new Error "Model has to be instance of Salad.Model! #{model}"
+
+      @data.includes.push model.daoInstance
 
     @
 

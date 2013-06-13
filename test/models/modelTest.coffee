@@ -223,7 +223,7 @@ describe "Salad.Model", ->
 
           done()
 
-    describe.only "#remove", ->
+    describe "#remove", ->
       it "removes the association but does not delete the object", (done) ->
         App.Location.create title: "Parent", (err, parent) =>
           parent.getChildren().create title: "Child", (err, child) =>
@@ -234,3 +234,19 @@ describe "Salad.Model", ->
                 assert.equal newChildObject.get("parentId"), undefined
 
                 done()
+
+    describe "#includes", ->
+      it "eager-loads associated objects", (done) ->
+        # console.log "ASDASD", App.Location.associations
+        App.Operator.create title: "Operator", (err, operator) =>
+          operator.getLocations().create title: "Location", (err, location) =>
+            App.Location.include([App.Operator]).all (err, locations) =>
+
+              locations.length.should.equal 1
+              _.keys(locations[0].getAssociations()).length.should.equal 1
+              locations[0].getAssociations().operator.get("id").should.equal operator.get("id")
+
+              assert.isDefined locations[0].toJSON().operator
+              locations[0].toJSON().operator.id.should.equal operator.get("id")
+
+              done()

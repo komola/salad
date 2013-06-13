@@ -1,6 +1,10 @@
+async = require "async"
+
 class Salad.Model
   daoInstance: undefined
   attributes: {}
+  eagerlyLoadedAssociations: {}
+  associations: {}
   isNew: true
 
   constructor: (attributes, options) ->
@@ -13,6 +17,8 @@ class Salad.Model
     options = _.extend {isNew: true}, options
 
     @isNew = options.isNew
+
+    @eagerlyLoadedAssociations = options.eagerlyLoadedAssociations
 
     unless options.daoInstance
       throw new Error "No DAO instance set!"
@@ -102,6 +108,9 @@ class Salad.Model
   @desc: ->
     @scope().desc.apply @, arguments
 
+  @include: ->
+    @scope().include.apply @, arguments
+
   @all: ->
     @scope().all.apply @, arguments
 
@@ -119,6 +128,9 @@ class Salad.Model
 
     # this is the foreignKey field
     foreignKey = options.foreignKey
+
+    # register the association
+    @_registerAssociation options.as, targetModel
 
     # register attribute in targetModel
     targetModel.attributes[foreignKey] = undefined
@@ -141,6 +153,9 @@ class Salad.Model
 
     foreignKey = options.foreignKey
 
+    # register the association
+    @_registerAssociation options.as, targetModel
+
     @attributes[foreignKey] = undefined
 
     # register the method in this model.
@@ -153,6 +168,10 @@ class Salad.Model
       scope = targetModel.scope()
 
       scope.where(conditions)
+
+  @_registerAssociation: (key, model) ->
+    key = key.toLowerCase()
+    @::associations[key] = model
 
   ## Trigger methods ###################################
 
@@ -174,7 +193,21 @@ class Salad.Model
     return new Salad.Scope @
 
   toJSON: ->
-    @getAttributes()
+    associations = @getAssociations()
+
+    for key of associations
+      if typeof(associations[key]) is Array
+        associations[key] = (model.toJSON() for model in associations[key])
+
+      else
+        associations[key] = associations[key].toJSON()
+
+    attributes = _.extend @getAttributes(), associations
+
+    attributes
+
+  getAssociations: ->
+    _.clone @eagerlyLoadedAssociations
 
   toString: ->
     @.constructor.name

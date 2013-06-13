@@ -1,15 +1,15 @@
-sequelizeLocation = App.sequelize.define "Location",
+App.SequelizeLocation = App.sequelize.define "Location",
   title: Sequelize.STRING
   description: Sequelize.TEXT
   messages: Sequelize.INTEGER
 
-sequelizeLocation.hasMany sequelizeLocation, as: "Children", foreignKey: "parentId"
-sequelizeLocation.belongsTo sequelizeLocation, as: "Parent", foreignKey: "parentId"
+App.SequelizeLocation.hasMany App.SequelizeLocation, as: "Children", foreignKey: "parentId"
+App.SequelizeLocation.belongsTo App.SequelizeLocation, as: "Parent", foreignKey: "parentId"
 
 class App.Location extends Salad.Model
   @dao
     type: "sequelize"
-    instance: sequelizeLocation
+    instance: App.SequelizeLocation
 
   @attributes:
     id: undefined
