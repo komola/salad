@@ -1,41 +1,33 @@
 class Salad.Scope
-  context: undefined
-  data:
-    conditions: {}
-    includes: []
-    sorting: []
-    limit: -1
-
   constructor: (@context) ->
     @daoContext = @context.daoInstance
+    @data =
+      conditions: {}
+      includes: []
+      sorting: []
+      limit: -1
 
-    @data.conditions = {}
-    @data.sorting = []
-    @data.limit = -1
-
-    @
-
-  where: (attributes) =>
+  where: (attributes) ->
     for key, val of attributes
       @data.conditions[key] = val
 
     @
 
-  asc: (field) =>
+  asc: (field) ->
     @data.sorting.push
       field: field
       type: "asc"
 
     @
 
-  desc: (field) =>
+  desc: (field) ->
     @data.sorting.push
       field: field
       type: "desc"
 
     @
 
-  include: (models) =>
+  include: (models) ->
     for model in models
       unless model.daoInstance
         throw new Error "Model has to be instance of Salad.Model! #{model}"
@@ -44,17 +36,17 @@ class Salad.Scope
 
     @
 
-  limit: (limit) =>
+  limit: (limit) ->
     @data.limit = limit
 
     @
 
-  all: (callback) =>
+  all: (callback) ->
     options = @data
 
     @daoContext.findAll options, callback
 
-  first: (callback) =>
+  first: (callback) ->
     options = @data
     options.limit = 1
 
@@ -66,17 +58,17 @@ class Salad.Scope
 
   ## Creation
 
-  create: (data, callback) =>
+  create: (data, callback) ->
     attributes = _.extend @data.conditions, data
 
     @context.create attributes, callback
 
-  build: (data) =>
+  build: (data) ->
     attributes = _.extend @data.conditions, data
 
     @context.build attributes
 
-  remove: (model, callback) =>
+  remove: (model, callback) ->
     keys = _.keys @data.conditions
 
     updateData = {}

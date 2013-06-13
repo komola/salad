@@ -204,6 +204,23 @@ describe "Salad.Model", ->
       scope.data.sorting.length.should.equal 1
       scope.data.limit.should.equal 3
 
+    it "does not interfere with other scopes", ->
+      scope = new Salad.Scope(daoInstance: undefined)
+      scope.where(field: "Test")
+
+      _.keys(scope.data.conditions).length.should.equal 1
+
+      newScope = new Salad.Scope(daoInstance: undefined)
+      newScope.limit(3)
+
+      assert.isFalse scope is newScope
+
+      _.keys(newScope.data.conditions).length.should.equal 0
+
+
+      newScope.data.limit.should.equal 3
+      _.keys(scope.data.conditions).length.should.equal 1, "first scope remains untouched"
+
     describe "#create", ->
       it "creates an object with association information", (done) ->
         App.Location.create title: "Parent", (err, resource) =>
@@ -236,8 +253,7 @@ describe "Salad.Model", ->
                 done()
 
     describe "#includes", ->
-      it "eager-loads associated objects", (done) ->
-        # console.log "ASDASD", App.Location.associations
+      it "eager-loads one associated objects", (done) ->
         App.Operator.create title: "Operator", (err, operator) =>
           operator.getLocations().create title: "Location", (err, location) =>
             App.Location.include([App.Operator]).all (err, locations) =>
@@ -248,5 +264,23 @@ describe "Salad.Model", ->
 
               assert.isDefined locations[0].toJSON().operator
               locations[0].toJSON().operator.id.should.equal operator.get("id")
+
+              done()
+
+      it "eager-loads many associated objects", (done) ->
+        App.Operator.create title: "Operator", (err, operator) =>
+          operator.getLocations().create title: "Location", (err, location) =>
+            App.Operator.include([App.Location]).all (err, operators) =>
+
+              operators.length.should.equal 1
+              _.keys(operators[0].getAssociations()).length.should.equal 1
+              operators[0].getAssociations().locations[0].get("id").should.equal location.get("id")
+
+              data = operators[0].toJSON()
+
+              assert.isTrue data.locations instanceof Array
+
+              data.locations.length.should.equal 1
+
 
               done()

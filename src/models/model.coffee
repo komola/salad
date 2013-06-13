@@ -96,26 +96,26 @@ class Salad.Model
   ## These are pretty much just proxy methods that insantiate a scope and pass the
   ## parameters on to the scope
 
-  @where: ->
-    @scope().where.apply @, arguments
+  @where: (attributes) ->
+    @scope().where attributes
 
-  @limit: ->
-    @scope().limit.apply @, arguments
+  @limit: (limit) ->
+    @scope().limit limit
 
-  @asc: ->
-    @scope().asc.apply @, arguments
+  @asc: (field) ->
+    @scope().asc field
 
-  @desc: ->
-    @scope().desc.apply @, arguments
+  @desc: (field) ->
+    @scope().desc field
 
-  @include: ->
-    @scope().include.apply @, arguments
+  @include: (models) ->
+    @scope().include models
 
-  @all: ->
-    @scope().all.apply @, arguments
+  @all: (callback) ->
+    @scope().all callback
 
-  @first: ->
-    @scope().first.apply @, arguments
+  @first: (callback) ->
+    @scope().first callback
 
   @find: (id, callback) ->
     @scope().where(id: id).first callback
@@ -196,7 +196,7 @@ class Salad.Model
     associations = @getAssociations()
 
     for key of associations
-      if typeof(associations[key]) is Array
+      if associations[key] instanceof Array
         associations[key] = (model.toJSON() for model in associations[key])
 
       else

@@ -4,7 +4,7 @@ class Salad.DAO.Base
   daoModelInstance: undefined
   modelInstance: undefined
 
-  constructor: (@daoModelInstance, @modelInstance) ->
+  constructor: (@daoModelInstance, @modelClass) ->
 
   create: (attributes, callback) ->
   update: (model, changes, callback) ->
@@ -63,7 +63,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
   _cleanAttributes: (rawAttributes) =>
     attributes = {}
-    attributes[key] = val for key, val of rawAttributes when val isnt undefined
+    attributes[key] = val for key, val of rawAttributes when val isnt null
 
     attributes
 
@@ -74,17 +74,33 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       eagerlyLoadedAssociations: {}
 
     if daoInstance.__eagerlyLoadedAssociations?.length > 0
-
       for key in daoInstance.__eagerlyLoadedAssociations
-        associationModel = @modelInstance::associations[key]
+        # fetch the association model class from the associations object
+        associationModelClass = @modelClass::associations[key]
 
-        eagerLoadedModelInstance = associationModel.daoInstance.lazyInstantiate daoInstance[key]
+        daoModels = daoInstance[key]
+        models = null
 
-        options.eagerlyLoadedAssociations[key] = eagerLoadedModelInstance
+        if daoModels is null
+          continue
+
+        # create an instance of the associated model passing along our dao model instance
+        if daoModels instanceof Array
+          models = []
+
+          for daoModel in daoModels
+            models.push associationModelClass.daoInstance.lazyInstantiate daoModel
+
+        else
+          models = associationModelClass.daoInstance.lazyInstantiate daoModels
+
+        # add the instance to the options, so the constructor of modelInstance
+        # model can pick them up
+        options.eagerlyLoadedAssociations[key] = models
 
     attributes = daoInstance.dataValues
 
-    return new @modelInstance attributes, options
+    return new @modelClass attributes, options
 
 
 # class Salad.DAO.Memory

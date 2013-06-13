@@ -2,7 +2,7 @@ class Salad.RestfulController extends Salad.Controller
   resourceName: ""
 
   constructor: ->
-    name = _s.capitalize @resourceName
+    name = _.capitalize @resourceName
     @resource = App[name]
 
   index: ->

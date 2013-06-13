@@ -15,7 +15,7 @@ class Salad.Router extends Salad.Base
         method: request.method
 
     # Get the matching controller
-    controllerName = _s.capitalize matching.controller
+    controllerName = _.capitalize matching.controller
     controller = @_getMatchingController controllerName
 
     # Could not find associated controller
@@ -36,7 +36,7 @@ class Salad.Router extends Salad.Base
     cb.apply @instance(), [router]
 
   _getMatchingController: (controllerName) ->
-    controllerName = _s.capitalize controllerName
+    controllerName = _.capitalize controllerName
     controller = App["#{controllerName}Controller"]
 
     unless controller
