@@ -10,10 +10,10 @@ class App.Operator extends Salad.Model
     instance: App.SequelizeOperator
 
   @attributes:
-    id: undefined
-    title: undefined
-    createdAt: undefined
-    updatedAt: undefined
+    id: null
+    title: null
+    createdAt: null
+    updatedAt: null
 
 App.Operator.hasMany App.Location, as: "Locations", foreignKey: "operatorId"
 App.Location.belongsTo App.Operator, as: "Operator", foreignKey: "operatorId"

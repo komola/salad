@@ -1,15 +1,3 @@
-Salad.DAO = {}
-
-class Salad.DAO.Base
-  daoModelInstance: undefined
-  modelInstance: undefined
-
-  constructor: (@daoModelInstance, @modelClass) ->
-
-  create: (attributes, callback) ->
-  update: (model, changes, callback) ->
-  findAll: (options, callback) ->
-
 class Salad.DAO.Sequelize extends Salad.DAO.Base
   create: (attributes, callback) ->
     attributes = @_cleanAttributes attributes
@@ -101,12 +89,4 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     attributes = daoInstance.dataValues
 
     return new @modelClass attributes, options
-
-
-# class Salad.DAO.Memory
-#   store: {}
-
-#   create: (attributes, callback) ->
-#     @store[@daoModelInstance] or= []
-#     @store[@daoModelInstance].push attributes
 

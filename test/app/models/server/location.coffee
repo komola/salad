@@ -12,12 +12,12 @@ class App.Location extends Salad.Model
     instance: App.SequelizeLocation
 
   @attributes:
-    id: undefined
-    title: undefined
-    description: undefined
-    messages: undefined
-    createdAt: undefined
-    updatedAt: undefined
+    id: null
+    title: null
+    description: null
+    messages: null
+    createdAt: null
+    updatedAt: null
 
 App.Location.hasMany App.Location, as: "Children", foreignKey: "parentId"
 App.Location.belongsTo App.Location, as: "Parent", foreignKey: "parentId"

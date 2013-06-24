@@ -10,7 +10,8 @@ require "./Controller"
 require "./controllers/RestfulController"
 
 require "./models/scope"
-require "./models/dao"
+require "./models/dao/dao"
+require "./models/dao/sequelize"
 require "./models/model"
 
 require "./Request"
