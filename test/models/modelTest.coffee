@@ -285,6 +285,14 @@ describe "Salad.Model", ->
 
               done()
 
+    describe "#where", ->
+      it "accepts normal fields", (done) ->
+        App.Shop.create otherField: "Test", (err, resource) ->
+          App.Shop.where(otherField: "Test").all (err, resource) ->
+            resource.length.should.equal 1
+
+            done()
+
     describe "#contains", ->
       it "searches in array fields", (done) ->
         App.Shop.create title: ["A", "B"], (err, resource) ->
@@ -294,12 +302,20 @@ describe "Salad.Model", ->
               resources.length.should.equal 1
               done()
 
+      it "allows camelCase in field title", (done) ->
+        App.Shop.create anotherTitle: ["A", "B"], (err, resource) ->
+          resource.set "anotherTitle", ["A", "B", "C"]
+          resource.save =>
+            App.Shop.contains("anotherTitle", "A").all (err, resources) =>
+              resources.length.should.equal 1
+              done()
+
       it.skip "works along where queries", (done) ->
         params =
           title: ["A", "B"]
-          foo: "Bar"
+          otherField: "Bar"
 
         App.Shop.create params, (err, resource) ->
-          App.Shop.where("foo": "ASD").contains("title", "A").all (err, resources) =>
+          App.Shop.where("otherField": "ASD").contains("title", "A").all (err, resources) =>
             resources.length.should.equal 0
             done()
