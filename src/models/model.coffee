@@ -6,12 +6,15 @@ class Salad.Model
   eagerlyLoadedAssociations: {}
   associations: {}
   isNew: true
+  triggerStack: {}
 
   constructor: (attributes, options) ->
     # pass the attributes from the static method on to our model
     @attributes = _.clone @constructor.attributes
 
     @setAttributes attributes
+
+    @triggerStack = _.clone @constructor.triggerStack
 
     # overwrite default options with passed options
     options = _.extend {isNew: true}, options
@@ -62,20 +65,21 @@ class Salad.Model
     err = undefined
     resource = undefined
 
-    calls = [
-      # (cb) => @runTriggers "before:create", cb
-      # (cb) => @runTriggers "before:save", cb
-      (cb) => @daoInstance.create attributes, (_err, _res) =>
-        err = _err
-        resource = _res
+    async.series [
+        (cb) =>
+          @runTriggers "before:create", cb
+        # (cb) => @runTriggers "before:save", cb
+        (cb) => @daoInstance.create attributes, (_err, _res) =>
+          err = _err
+          resource = _res
 
-        cb()
-      # (cb) => @runTriggers "after:save", cb
-      # (cb) => @runTriggers "after:create", cb
-    ]
+          cb()
+        # (cb) => @runTriggers "after:save", cb
+        (cb) => resource.runTriggers "after:create", cb
+      ],
 
-    async.series calls, =>
-      callback err, resource
+      =>
+        callback err, resource
 
   updateAttributes: (attributes, callback) ->
     @setAttributes attributes
@@ -180,14 +184,37 @@ class Salad.Model
 
   @before: (method, action) ->
     method = "before:#{method}"
+    @_registerTrigger method, action
+
+  @after: (method, action) ->
+    method = "after:#{method}"
+    @_registerTrigger method, action
+
+  @_registerTrigger: (method, action) ->
+    @triggerStack or= {}
+
     @triggerStack[method] or= []
+    @triggerStack[method].push (cb) =>
+      action.call @, cb
 
-    @triggerStack[methood].push action
-
-  runTriggers: (action, callback) =>
+  @runTriggers: (action, callback) ->
+    @triggerStack or= {}
     stack = @triggerStack[action] or []
 
-    async.series stack, callback
+    iterator = (action, cb) =>
+      action.call @, cb
+
+    async.eachSeries stack, iterator, callback
+
+  runTriggers: (action, callback) ->
+    @triggerStack or= {}
+    stack = @triggerStack[action] or []
+
+    iterator = (action, cb) =>
+      action.call @, cb
+
+    async.eachSeries stack, iterator, callback
+
 
   ## Misc stuff #########################################
 

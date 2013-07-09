@@ -319,3 +319,45 @@ describe "Salad.Model", ->
           App.Shop.where("otherField": "ASD").contains("title", "A").all (err, resources) =>
             resources.length.should.equal 0
             done()
+
+    describe "trigger", ->
+      beforeEach ->
+        App.Shop.triggerStack = {}
+
+      it "is registered on the static model", (done) ->
+        App.Shop.before "create", (cb) =>
+          cb()
+
+        assert.ok App.Shop.triggerStack["before:create"]
+        assert.ok App.Shop.triggerStack["before:create"].length > 0
+
+        done()
+
+      it "can be triggered statically", (done) ->
+        beforeFired = false
+        afterFired = false
+
+        App.Shop.before "create", (cb) =>
+          afterFired.should.equal false
+          beforeFired = true
+          cb()
+
+        App.Shop.after "create", (cb) =>
+          beforeFired.should.equal true
+          afterFired = true
+          cb()
+
+        App.Shop.create title: ["test"], (err, resource) =>
+          afterFired.should.equal true
+          beforeFired.should.equal true
+          done()
+
+      it.skip "gives the context of the resource", (done) ->
+        App.Shop.after "create", (cb) ->
+          console.log @
+          @get("id").should.equal 1
+
+          cb()
+
+        App.Shop.create title: ["test"], (err, resource) =>
+          done()
