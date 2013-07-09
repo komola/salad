@@ -26,7 +26,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     if options.sorting.length > 0
       # transform the sorting params into i.e. 'name DESC'
-      sorting = ("#{key} #{value.toUpperCase()}" for key, value of options.sorting)
+      sorting = ("#{sort.field} #{sort.type.toUpperCase()}" for sort in options.sorting)
       params.sorting = sorting.join ","
 
     if options.contains.length > 0
