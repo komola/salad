@@ -108,6 +108,9 @@ class Salad.Model
   @desc: (field) ->
     @scope().desc field
 
+  @contains: (field, value) ->
+    @scope().contains field, value
+
   @include: (models) ->
     @scope().include models
 

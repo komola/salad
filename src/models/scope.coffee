@@ -3,6 +3,7 @@ class Salad.Scope
     @daoContext = @context.daoInstance
     @data =
       conditions: {}
+      contains: []
       includes: []
       sorting: []
       limit: -1
@@ -24,6 +25,13 @@ class Salad.Scope
     @data.sorting.push
       field: field
       type: "desc"
+
+    @
+
+  contains: (field, value) ->
+    @data.contains.push
+      field: field
+      value: value
 
     @
 

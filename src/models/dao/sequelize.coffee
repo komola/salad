@@ -29,6 +29,14 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       sorting = ("#{key} #{value.toUpperCase()}" for key, value of options.sorting)
       params.sorting = sorting.join ","
 
+    if options.contains.length > 0
+      attribs = ("'#{contains.value}' = ANY(#{contains.field})" for contains in options.contains)
+
+      if params.where
+        throw new Error "Can not use #contains in combination with .where(). This is not supported yet!"
+
+      params.where = attribs.join ","
+
     if params.limit is -1
       delete params.limit
 

@@ -284,3 +284,22 @@ describe "Salad.Model", ->
 
 
               done()
+
+    describe "#contains", ->
+      it "searches in array fields", (done) ->
+        App.Shop.create title: ["A", "B"], (err, resource) ->
+          resource.set "title", ["A", "B", "C"]
+          resource.save =>
+            App.Shop.contains("title", "A").all (err, resources) =>
+              resources.length.should.equal 1
+              done()
+
+      it.skip "works along where queries", (done) ->
+        params =
+          title: ["A", "B"]
+          foo: "Bar"
+
+        App.Shop.create params, (err, resource) ->
+          App.Shop.where("foo": "ASD").contains("title", "A").all (err, resources) =>
+            resources.length.should.equal 0
+            done()
