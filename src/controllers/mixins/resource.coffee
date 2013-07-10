@@ -8,15 +8,15 @@ module.exports =
 
       if typeof(options) is "string"
         options =
-          resourceName: options
+          name: options
 
-      klass = _.capitalize options.resourceName
+      klass = _.capitalize options.name
 
       defaultOptions =
-        resourceName: options.resourceName
+        name: options.name
         resourceClass: klass
-        collectionName: _.pluralize options.resourceName
-        idParameter: options.resourceName+"Id"
+        collectionName: _.pluralize options.name
+        idParameter: options.name+"Id"
 
       options = _.extend defaultOptions, options
 
@@ -33,14 +33,14 @@ module.exports =
 
       if typeof(options) is "string"
         options =
-          resourceName: options
+          name: options
 
-      klass = _.capitalize options.resourceName
+      klass = _.capitalize options.name
 
       defaultOptions =
-        resourceName: options.resourceName
+        name: options.name
         resourceClass: klass
-        idParameter: options.resourceName+"Id"
+        idParameter: options.name+"Id"
 
       options = _.extend defaultOptions, options
 

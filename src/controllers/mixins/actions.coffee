@@ -31,7 +31,7 @@ module.exports =
           json: -> @response.send resource
 
     _create: (callback) ->
-      data = @params[@resourceOptions.resourceName]
+      data = @params[@resourceOptions.name]
 
       @resource().create data, (err, resource) =>
         if err
@@ -51,7 +51,7 @@ module.exports =
         unless resource
          return @_notFoundHandler()
 
-        data = @params[@resourceOptions.resourceName]
+        data = @params[@resourceOptions.name]
 
         resource.updateAttributes data, (err, resource) =>
           if err
