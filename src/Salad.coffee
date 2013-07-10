@@ -2,6 +2,7 @@ global.Salad = {}
 global.App = global.App || {}
 global._ = require "underscore"
 _.mixin require("underscore.string").exports()
+_.mixin require "underscore.inflections"
 
 require "./Base"
 require "./Bootstrap"

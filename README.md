@@ -5,6 +5,27 @@ possibility to register routes and controllers and use popular ORM frameworks li
 
 * [Sequelize](http://www.sequelizejs.com/)
 
+## Roadmap
+
+### Controllers
+[x] basic controllers
+[x] render JSON data
+[ ] allow to implement @before filters to execute special logic before an action is executed
+[ ] implement more robust rendering logic (replacable JSON and html renderers, other formats possible, too)
+[ ] develop better system for storing metadata in controllers, similar to towers `@metadata()` object
+[ ] support rendering HTML to the client
+
+
+### Models
+[x] implement model layer that will wrap other models (i.e. Sequelize, Mongoose or other stuff, like Facebook)
+[x] implement association support
+[ ] allow to implement `@before`/`@after` actions for hooking into actions
+[ ] refactor the way models define attributes, transitioning to an API like @field "name", "type"
+
+### General
+[ ] implement a modular construct, where modules provide custom models, controllers, etc.
+[ ] refactor bootstrap flow. Implement an event system, where a user can hook into the initialization `@after "init", (done) ->`
+
 ## Getting started
 
   npm install salad
@@ -97,8 +118,8 @@ library that stores the data.
 **/app/config/routes.coffee**
 
 ```coffeescript
-Salad.Router.register ->
-  @resource "/photo", controller: "photos"
+Salad.Router.register (router) ->
+  router.resource "/photos", "photos", "photo"
 ```
 
 ### Basic controller

@@ -1,14 +1,16 @@
 class Salad.Base
   # For static methods
-  @extend: (name) ->
-    _.extend @, require name
+  @extend: (obj) ->
+    _.extend @, obj
 
   # For instance methods
-  @include: (name) ->
-    obj = require name
-
+  @include: (obj) ->
     for key, value of obj
       # Assign properties to the prototype
       @::[key] = value
 
     @
+
+  @mixin: (obj) ->
+    @extend obj.ClassMethods if obj.ClassMethods
+    @include obj.InstanceMethods if obj.InstanceMethods

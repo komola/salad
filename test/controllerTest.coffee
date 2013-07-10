@@ -98,3 +98,46 @@ describe "Controller", ->
               res.body.title.should.equal "Test"
 
               done()
+
+
+    describe "#belongsTo", ->
+      it "allows nested access", (done) ->
+        App.Parent.create title: "Parent", (err, parent) =>
+          parent.getChildren().create title: "Child", (err, child) ->
+            agent.get("http://localhost:3001/parent/#{parent.get("id")}/children.json")
+              .end (res) ->
+                res.ok.should.equal true
+                res.body.length.should.equal 1
+
+                done()
+
+      it "returns only associated objects", (done) ->
+        App.Parent.create title: "Parent", (err, parent) =>
+          parent.getChildren().create title: "Child", (err, child) ->
+            App.Child.create title: "Foobar", (err, child2) ->
+              agent.get("http://localhost:3001/parent/#{parent.get("id")}/children.json")
+                .end (res) ->
+                  res.ok.should.equal true
+                  res.body.length.should.equal 1
+
+                  done()
+
+      it "returns empty array for no associated objects", (done) ->
+        App.Parent.create title: "Parent", (err, parent) =>
+          agent.get("http://localhost:3001/parent/#{parent.get("id")}/children.json")
+            .end (res) ->
+              res.ok.should.equal true
+              res.body.length.should.equal 0
+
+              done()
+
+      it "still returns all objects for normal index calls", (done) ->
+        App.Parent.create title: "Parent", (err, parent) =>
+          parent.getChildren().create title: "Child", (err, child) ->
+            App.Child.create title: "Foobar", (err, child2) ->
+              agent.get("http://localhost:3001/children.json")
+                .end (res) ->
+                  res.ok.should.equal true
+                  res.body.length.should.equal 2
+
+                  done()

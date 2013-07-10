@@ -5,7 +5,7 @@ winston = require "winston"
 require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
-  @extend "./mixins/Singleton"
+  @extend require "./mixins/Singleton"
 
   app: null
 

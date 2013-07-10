@@ -1,5 +1,5 @@
 class Salad.Controller extends Salad.Base
-  @extend "./mixins/Singleton"
+  @extend require "./mixins/Singleton"
 
   request: null
   response: null

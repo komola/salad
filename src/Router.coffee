@@ -1,8 +1,23 @@
 Router = require("barista").Router
 router = new Router
 
+# write our own salad-compatible resource method.
+# salad needs routes in this form: resources/:resourceId, barista
+# creates them in this format: resources/:id
+router.resource = (path, controller, resourceName) ->
+  # router.get("/"+controller).to(controller+".index")
+
+  router.get('/'+path+'(.:format)', 'GET').to(controller+'.index')
+  router.post('/'+path+'(.:format)', 'POST').to(controller+'.create')
+  router.get('/'+path+'/add(.:format)', 'GET').to(controller+'.add')
+
+  router.get('/'+path+'/:'+resourceName+'Id(.:format)', 'GET').to(controller+'.show')
+  router.get('/'+path+'/:'+resourceName+'Id/edit(.:format)', 'GET').to(controller+'.edit')
+  router.put('/'+path+'/:'+resourceName+'Id(.:format)', 'PUT').to(controller+'.update')
+  router.del('/'+path+'/:'+resourceName+'Id(.:format)', 'DELETE').to(controller+'.destroy')
+
 class Salad.Router extends Salad.Base
-  @extend "./mixins/Singleton"
+  @extend require "./mixins/Singleton"
 
   dispatch: (request, response) =>
     matching = router.first(request.path, request.method)
@@ -33,6 +48,7 @@ class Salad.Router extends Salad.Base
     controller[matching.action]()
 
   @register: (cb) ->
+
     cb.apply @instance(), [router]
 
   _getMatchingController: (controllerName) ->
