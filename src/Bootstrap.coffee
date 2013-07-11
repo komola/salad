@@ -1,8 +1,7 @@
-global.Sequelize = require("sequelize-postgres").sequelize
-postgres = require("sequelize-postgres").postgres
+global.Sequelize = require("sequelize")
 async = require "async"
 winston = require "winston"
-require "longjohn"
+# require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
   @extend require "./mixins/Singleton"

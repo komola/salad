@@ -1,6 +1,6 @@
 {
   "name": "salad",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "",
   "homepage": "http://github.com/komola/salad",
   "main": "./salad.coffee",
@@ -44,9 +44,10 @@
     "barista": "0.0.8",
     "async": "~0.2.8",
     "winston": "~0.7.1",
-    "sequelize-postgres": "~1.7.0-alpha2",
+    "sequelize": "~2.0.0-alpha2",
     "longjohn": "~0.2.0",
-    "underscore.inflections": "~0.1.5"
+    "underscore.inflections": "~0.1.5",
+    "pg": "~0.10.2"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
