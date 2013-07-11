@@ -2,9 +2,9 @@ module.exports =
   InstanceMethods:
     index: ->
       @_index (error, resources) =>
-        @respond
-          html: -> @response.send "Ich habe #{resources.length} Einträge"
-          json: -> @response.send resources
+        @respondWith
+          html: -> "Ich habe #{resources.length} Einträge"
+          json: -> @render json: resources
 
     _index: (callback) ->
       @scoped (err, scope) =>
@@ -13,9 +13,9 @@ module.exports =
 
     show: ->
       @_show (err, resource) =>
-        @respond
-          html: -> @response.send "Name: #{resource.get("name")}"
-          json: -> @response.send resource
+        @respondWith
+          html: -> "Name: #{resource.get("name")}"
+          json: -> @render json: resource
 
     _show: (callback) ->
       @findResource (err, resource) =>
@@ -26,9 +26,9 @@ module.exports =
 
     create: ->
       @_create (error, resource) =>
-        @respond
-          html: -> @response.send "Created!"
-          json: -> @response.send resource
+        @respondWith
+          html: -> "Created!"
+          json: -> @render json: resource
 
     _create: (callback) ->
       data = @params[@resourceOptions.name]
@@ -42,9 +42,9 @@ module.exports =
 
     update: ->
       @_update (err, resource) =>
-        @respond
-          html: -> @response.send "Yo success"
-          json: -> @response.send resource
+        @respondWith
+          html: -> "Yo success"
+          json: -> @render json: resource
 
     _update: (callback) ->
       @findResource (err, resource) =>
@@ -62,9 +62,9 @@ module.exports =
     destroy: ->
       @_destroy (err, resource) =>
         resource.destroy (err) =>
-          @respond
-            html: -> @response.send "Deleted"
-            json: -> @response.send resource
+          @respondWith
+            html: -> "Deleted"
+            json: -> @render json: resource
 
     _destroy: (callback) ->
       @findResource (err, resource) =>
