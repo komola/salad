@@ -9,7 +9,14 @@ module.exports =
     render: (options) ->
       unless typeof(options) is "object"
         options =
-          status: 200
+          template: ""
+
+      defaultOptions =
+        status: 200
+
+      options = _.extend defaultOptions, options
+
+      @response.status options.status
 
       # Render JSON response
       if options.json

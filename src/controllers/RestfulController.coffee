@@ -6,9 +6,3 @@ class Salad.RestfulController extends Salad.Controller
   constructor: ->
     @resourceOptions = @__proto__.constructor.resourceOptions
 
-  _notFoundHandler: ->
-    @response.status 404
-
-    return @respondWith
-      html: => "Not found"
-      json: => @render json: {}, status: 404

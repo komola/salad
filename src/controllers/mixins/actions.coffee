@@ -73,3 +73,7 @@ module.exports =
 
         callback.apply @, [err, resource]
 
+    _notFoundHandler: ->
+      @respondWith
+        html: => "Not found"
+        json: => @render json: {}, status: 404
