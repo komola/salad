@@ -28,17 +28,17 @@ module.exports =
       @_create (error, resource) =>
         @respondWith
           html: -> "Created!"
-          json: -> @render json: resource
+          json: -> @render json: resource, status: 201
 
     _create: (callback) ->
       data = @params[@resourceOptions.name]
 
-      @resource().create data, (err, resource) =>
-        if err
-          return callback.apply @, [err, null]
+      @scoped (err, scope) =>
+        scope.create data, (err, resource) =>
+          if err
+            return callback.apply @, [err, null]
 
-        @response.status 201
-        callback.apply @, [null, resource]
+          callback.apply @, [null, resource]
 
     update: ->
       @_update (err, resource) =>
