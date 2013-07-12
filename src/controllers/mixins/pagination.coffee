@@ -15,23 +15,26 @@ module.exports =
               callback.apply @, [err, result.rows]
 
         json: (data) ->
-          if @params.action isnt "index"
-            return _json.call @, data
+          if @params.action is "index"
+            data = @_buildPaginationResult data
 
-          totalPages = Math.ceil(@paginationTotal / @params.limit)
-          currentPage = Math.ceil(@params.offset / @params.limit)
-
-          response =
-            total: @paginationTotal
-            page: currentPage
-            totalPages: totalPages
-            limit: @params.limit
-            offset: @params.offset
-            items: data
-
-          _json.call @, response
+          _json.call @, data
 
   InstanceMethods:
+    _buildPaginationResult: (data) ->
+      totalPages = Math.ceil(@paginationTotal / @params.limit)
+      currentPage = Math.ceil(@params.offset / @params.limit)
+
+      response =
+        total: @paginationTotal
+        page: currentPage
+        totalPages: totalPages
+        limit: @params.limit
+        offset: @params.offset
+        items: data
+
+      response
+
     applyPaginationDefaults: ->
       @params.limit or= 20
       @params.limit = parseInt @params.limit, 10
