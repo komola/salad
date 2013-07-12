@@ -34,8 +34,12 @@ module.exports =
   InstanceMethods:
     applyPaginationDefaults: ->
       @params.limit or= 20
+      @params.limit = parseInt @params.limit, 10
 
       if @params.limit < 1
         @params.limit = 20
 
       @params.offset or= 0
+      @params.offset = parseInt @params.offset, 10
+      if @params.offset < 1
+        @params.offset = 0

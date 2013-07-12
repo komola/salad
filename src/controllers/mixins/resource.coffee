@@ -97,8 +97,7 @@ module.exports =
           collectionGetter = "get#{_.capitalize(@resourceOptions.collectionName)}"
           scope = parent[collectionGetter]()
 
-          callback.call @, null, scope
-
         else
           scope = @resource()
-          callback.call @, null, scope
+
+        callback.call @, null, scope

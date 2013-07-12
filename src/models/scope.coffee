@@ -60,6 +60,9 @@ class Salad.Scope
     if options.offset
       delete options.offset
 
+    if options.includes
+      delete options.includes
+
     @daoContext.count options, callback
 
   all: (callback) ->
