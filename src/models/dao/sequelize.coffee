@@ -16,34 +16,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
         callback null, resource
 
   findAll: (options, callback) ->
-    params = {}
-
-    if _.keys(options.conditions).length > 0
-      params.where = options.conditions
-
-    if options.limit > 0
-      params.limit = options.limit
-
-    if options.sorting.length > 0
-      # transform the sorting params into i.e. 'name DESC'
-      sorting = ("#{sort.field} #{sort.type.toUpperCase()}" for sort in options.sorting)
-      params.sorting = sorting.join ","
-
-    if options.contains.length > 0
-      attribs = ("'#{contains.value}' = ANY(\"#{contains.field}\")" for contains in options.contains)
-
-      if params.where
-        throw new Error "Can not use #contains in combination with .where(). This is not supported yet!"
-
-      params.where = attribs.join ","
-
-    if params.limit is -1
-      delete params.limit
-
-    if options.includes?.length > 0
-      params.include = []
-      for model in options.includes
-        params.include.push model.daoModelInstance
+    params = @_buildOptions options
 
     @daoModelInstance.findAll(params)
       .success (rawResources) =>
@@ -53,6 +26,13 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
           resources.push @_buildModelInstance res
 
         callback null, resources
+
+  count: (options, callback) ->
+    params = @_buildOptions options
+
+    @daoModelInstance.count(params)
+      .success (count) =>
+        callback null, count
 
   lazyInstantiate: (daoInstance) =>
     @_buildModelInstance daoInstance
@@ -98,3 +78,37 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     return new @modelClass attributes, options
 
+  _buildOptions: (options) ->
+    params = {}
+
+    if _.keys(options.conditions).length > 0
+      params.where = options.conditions
+
+    if options.limit > 0
+      params.limit = options.limit
+
+    if options.offset > 0
+      params.offset = options.offset
+
+    if options.sorting.length > 0
+      # transform the sorting params into i.e. 'name DESC'
+      sorting = ("#{sort.field} #{sort.type.toUpperCase()}" for sort in options.sorting)
+      params.sorting = sorting.join ","
+
+    if options.contains.length > 0
+      attribs = ("'#{contains.value}' = ANY(\"#{contains.field}\")" for contains in options.contains)
+
+      if params.where
+        throw new Error "Can not use #contains in combination with .where(). This is not supported yet!"
+
+      params.where = attribs.join ","
+
+    if params.limit is -1
+      delete params.limit
+
+    if options.includes?.length > 0
+      params.include = []
+      for model in options.includes
+        params.include.push model.daoModelInstance
+
+    params

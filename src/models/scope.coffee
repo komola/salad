@@ -7,6 +7,7 @@ class Salad.Scope
       includes: []
       sorting: []
       limit: -1
+      offset: 0
 
   where: (attributes) ->
     for key, val of attributes
@@ -45,9 +46,21 @@ class Salad.Scope
     @
 
   limit: (limit) ->
-    @data.limit = limit
+    @data.limit = parseInt limit, 10
 
     @
+
+  offset: (offset) ->
+    @data.offset = parseInt offset, 10
+
+    @
+
+  count: (callback) ->
+    options = _.clone @data
+    if options.offset
+      delete options.offset
+
+    @daoContext.count options, callback
 
   all: (callback) ->
     options = @data
@@ -66,6 +79,16 @@ class Salad.Scope
 
   find: (id, callback) ->
     @where(id: id).first callback
+
+  findAndCountAll: (callback) ->
+
+    @all (err, resources) =>
+      @count (err, count) =>
+        result =
+          count: count
+          rows: resources
+
+        callback err, result
 
   ## Creation
 

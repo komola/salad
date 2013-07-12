@@ -106,6 +106,9 @@ class Salad.Model
   @limit: (limit) ->
     @scope().limit limit
 
+  @offset: (offset) ->
+    @scope().offset offset
+
   @asc: (field) ->
     @scope().asc field
 
@@ -126,6 +129,9 @@ class Salad.Model
 
   @find: (id, callback) ->
     @scope().find id, callback
+
+  @findAndCountAll: (callback) ->
+    @scope().findAndCountAll callback
 
   ## Associations ##########################################
   # register a hasMany association for this mdoel

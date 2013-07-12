@@ -9,7 +9,7 @@ class Salad.DAO.Base
   create: (attributes, callback) ->
   update: (model, changes, callback) ->
   findAll: (options, callback) ->
-
+  count: (options, callback) ->
 
 # class Salad.DAO.Memory
 #   store: {}

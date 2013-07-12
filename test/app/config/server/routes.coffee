@@ -6,3 +6,5 @@ Salad.Router.register (router) ->
 
   router.get("/parent/:parentId/children(.:format)").to("childs.index")
   router.get("/children(.:format)").to("childs.index")
+
+  router.resource("paginations", "pagination", "location")
