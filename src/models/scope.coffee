@@ -64,6 +64,9 @@ class Salad.Scope
 
       return callback err, resources
 
+  find: (id, callback) ->
+    @where(id: id).first callback
+
   ## Creation
 
   create: (data, callback) ->

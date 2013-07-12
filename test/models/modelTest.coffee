@@ -39,6 +39,15 @@ describe "Salad.Model", ->
 
             done()
 
+      it "supports enum values", (done) ->
+        App.Enum.create title: "A", (err, resource) =>
+          resource.get("title").should.equal "A"
+
+          App.Enum.first (err, resource2) =>
+            resource2.get("title").should.equal "A"
+
+            done()
+
     describe "#updateAttributes", ->
       res = null
       params =

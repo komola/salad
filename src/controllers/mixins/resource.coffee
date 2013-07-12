@@ -84,11 +84,12 @@ module.exports =
 
     findResource: (callback) ->
       paramKey = @resourceOptions.idParameter
-      @resource().find @params[paramKey], (err, resource) =>
-        if err
-          return callback.apply @, [error]
+      @scoped (err, scope) =>
+        scope.find @params[paramKey], (err, resource) =>
+          if err
+            return callback.apply @, [error]
 
-        callback.apply @, [null, resource]
+          callback.apply @, [null, resource]
 
     scoped: (callback) ->
       @findParent (err, parent) =>

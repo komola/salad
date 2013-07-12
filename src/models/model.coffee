@@ -125,7 +125,7 @@ class Salad.Model
     @scope().first callback
 
   @find: (id, callback) ->
-    @scope().where(id: id).first callback
+    @scope().find id, callback
 
   ## Associations ##########################################
   # register a hasMany association for this mdoel
