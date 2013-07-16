@@ -47,7 +47,8 @@
     "sequelize": "~2.0.0-alpha2",
     "longjohn": "~0.2.0",
     "underscore.inflections": "~0.1.5",
-    "pg": "~0.10.2"
+    "pg": "~0.10.2",
+    "handlebars": "~1.0.12"
   },
   "devDependencies": {
     "mocha": "~1.9.0",
