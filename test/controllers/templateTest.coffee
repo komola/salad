@@ -17,3 +17,12 @@ describe "#render()", ->
           res.text.should.equal "Hi Seb"
 
           done()
+
+    it "wraps output in layout", (done) ->
+      agent.get(":3001/rendering/layoutTest")
+        .end (res) ->
+          res.ok.should.equal true
+
+          res.text.should.equal "<body><h1>Hello World!</h1></body>"
+
+          done()
