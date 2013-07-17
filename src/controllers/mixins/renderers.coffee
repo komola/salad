@@ -28,4 +28,5 @@ module.exports =
       @response.send "Rendering HTML"
 
     json: (data) ->
+      @response.set "Content-Type", "application/json; charset=utf-8"
       @response.send data

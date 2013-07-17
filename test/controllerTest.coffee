@@ -9,6 +9,15 @@ describe "Controller", ->
 
             done()
 
+      it "has correct content-type header", (done) ->
+        agent.get("http://localhost:3001/locations.json")
+          .end (res) ->
+            res.ok.should.equal(true)
+            res.type.should.equal("application/json")
+            res.charset.should.equal "utf-8"
+
+            done()
+
     describe "#create", ->
       it "should return the newly created resource", (done) ->
         agent.post("http://localhost:3001/locations.json")

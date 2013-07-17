@@ -12,14 +12,14 @@ global.async = require "async"
 global.agent = require "superagent"
 
 cleanupDatabase = (cb) =>
-  App.sequelize.query('DROP TABLE "Enums"')
-    .success =>
-      sync = App.sequelize.sync(force: true)
-      sync.on "success", =>
-        cb()
+  done = =>
+    sync = App.sequelize.sync(force: true)
+    sync.on "success", =>
+      cb()
 
-    .error =>
-      console.log "Error", arguments
+  App.sequelize.query('DROP TABLE "Enums"')
+    .success(done)
+    .error(done)
 
 before (done) ->
   Salad.root += "/test"
