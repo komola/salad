@@ -63,18 +63,15 @@ class Salad.Model
       return throw new Error "No DAO object is set!"
 
     err = undefined
-    resource = undefined
+    resource = @build attributes
 
     async.series [
-        (cb) =>
-          @runTriggers "before:create", cb
-        # (cb) => @runTriggers "before:save", cb
-        (cb) => @daoInstance.create attributes, (_err, _res) =>
+        (cb) => resource.runTriggers "before:create", cb
+        (cb) => resource.save (_err, _res) =>
           err = _err
           resource = _res
 
           cb()
-        # (cb) => @runTriggers "after:save", cb
         (cb) => resource.runTriggers "after:create", cb
       ],
 
@@ -87,10 +84,29 @@ class Salad.Model
     @save callback
 
   save: (callback) =>
-    if @isNew
-      return @daoInstance.create @getAttributes(), callback
+    err = null
+    resource = null
 
-    @daoInstance.update @, @getAttributes(), callback
+    action = (cb) =>
+      if @isNew
+        return @daoInstance.create @getAttributes(), (_err, _res) =>
+          err = _err
+          resource = _res
+          cb()
+
+      @daoInstance.update @, @getAttributes(), (_err, _res) =>
+        err = _err
+        resource = _res
+        cb()
+
+    async.series [
+        (cb) => @runTriggers "before:save", cb
+        action
+        (cb) => resource.runTriggers "after:save", cb
+      ],
+
+      =>
+        callback err, resource
 
   destroy: (callback) ->
     callback()
@@ -200,8 +216,7 @@ class Salad.Model
     @triggerStack or= {}
 
     @triggerStack[method] or= []
-    @triggerStack[method].push (cb) =>
-      action.call @, cb
+    @triggerStack[method].push action
 
   @runTriggers: (action, callback) ->
     @triggerStack or= {}

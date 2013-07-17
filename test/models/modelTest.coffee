@@ -361,12 +361,36 @@ describe "Salad.Model", ->
           beforeFired.should.equal true
           done()
 
-      it.skip "gives the context of the resource", (done) ->
+      it "gives the context of the resource", (done) ->
         App.Shop.after "create", (cb) ->
-          console.log @
           @get("id").should.equal 1
 
           cb()
 
         App.Shop.create title: ["test"], (err, resource) =>
+          done()
+
+      it "is triggered on save", (done) ->
+        triggered = false
+
+        App.Shop.after "save", (cb) ->
+          triggered = true
+          cb()
+
+        App.Shop.create title: ["test"], (err, resource) =>
+          triggered.should.equal true
+          done()
+
+      # TODO: Do we want to allow adding after events to instances of a model?
+      it.skip "can be added to instances", (done) ->
+        triggered = false
+
+        shop = App.Shop.build title: ["test"]
+
+        shop.after "save", (cb) ->
+          triggered = true
+          cb()
+
+        shop.save ->
+          triggered.should.equal true
           done()

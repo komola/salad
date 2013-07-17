@@ -8,3 +8,7 @@ Salad.Router.register (router) ->
   router.get("/children(.:format)").to("childs.index")
 
   router.resource("paginations", "pagination", "location")
+
+  router.get("/rendering/test").to("rendering.test")
+  router.get("/rendering/arguments").to("rendering.arguments")
+  router.get("/rendering/layoutTest").to("rendering.layoutTest")
