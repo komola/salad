@@ -12,16 +12,16 @@ possibility to register routes and controllers and use popular ORM frameworks li
 * ✓ basic controllers
 * ✓ render JSON data
 * allow to implement @before filters to execute special logic before an action is executed
-* implement more robust rendering logic (replacable JSON and html renderers, other formats possible, too)
+* ✓ implement more robust rendering logic (replacable JSON and html renderers, other formats possible, too)
 * develop better system for storing metadata in controllers, similar to towers `@metadata()` object
-* support rendering HTML to the client
+* ✓ support rendering HTML to the client
 
 
 ### Models
 
 * ✓ implement model layer that will wrap other models (i.e. Sequelize, Mongoose or other stuff, like Facebook)
 * ✓ implement association support
-* allow to implement `@before`/`@after` actions for hooking into actions
+* ✓ allow to implement `@before`/`@after` actions for hooking into actions
 * refactor the way models define attributes, transitioning to an API like @field "name", "type"
 
 
