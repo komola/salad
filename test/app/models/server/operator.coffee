@@ -9,11 +9,10 @@ class App.Operator extends Salad.Model
     type: "sequelize"
     instance: App.SequelizeOperator
 
-  @attributes:
-    id: null
-    title: null
-    createdAt: null
-    updatedAt: null
+  @attribute "id"
+  @attribute "title"
+  @attribute "createdAt"
+  @attribute "updatedAt"
 
 App.Operator.hasMany App.Location, as: "Locations", foreignKey: "operatorId"
 App.Location.belongsTo App.Operator, as: "Operator", foreignKey: "operatorId"

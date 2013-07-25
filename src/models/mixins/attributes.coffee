@@ -1,9 +1,12 @@
 module.exports =
   ClassMethods:
-    attribute: (name, type) ->
+    attribute: (name, options) ->
       @metadata().attributes or= {}
 
-      type or= "String"
+      defaultOptions =
+        type: "String"
+
+      options = _.extend defaultOptions, options
 
       @metadata().attributes[name] = null
 

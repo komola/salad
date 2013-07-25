@@ -8,10 +8,9 @@ class App.Shop extends Salad.Model
     type: "sequelize"
     instance: App.SequelizeShop
 
-  @attributes:
-    id: null
-    title: null
-    anotherTitle: null
-    otherField: null
-    createdAt: null
-    updatedAt: null
+  @attribute "id"
+  @attribute "title"
+  @attribute "anotherTitle"
+  @attribute "otherField"
+  @attribute "createdAt"
+  @attribute "updatedAt"

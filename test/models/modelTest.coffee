@@ -65,8 +65,6 @@ describe.only "Salad.Model", ->
         done()
 
       it "saves the item in the database", (done) ->
-        expect(res.attributes).to.exist
-
         res.get("id").should.equal 1
         res.get("title").should.equal "Foo"
         res.get("description").should.equal params.description
