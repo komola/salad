@@ -143,6 +143,9 @@ class Salad.Model
   @first: (callback) ->
     @scope().first callback
 
+  @count: (callback) ->
+    @scope().count callback
+
   @find: (id, callback) ->
     @scope().find id, callback
 

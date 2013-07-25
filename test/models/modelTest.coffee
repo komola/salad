@@ -240,6 +240,15 @@ describe "Salad.Model", ->
 
             done()
 
+    describe "#count", ->
+      it "returns the correct count", (done) ->
+        App.Location.create title: "Test", (err, res) =>
+          App.Location.count (err, count) =>
+            count.should.equal 1
+
+            done()
+
+
     describe "#build", ->
       it "creates an instance with association information", (done) ->
         App.Location.create title: "Parent", (err, resource) =>
