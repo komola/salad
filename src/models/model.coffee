@@ -4,6 +4,8 @@ class Salad.Model extends Salad.Base
   @mixin require "../mixins/metadata"
   @mixin require "./mixins/triggers"
   @mixin require "./mixins/attributes"
+  @mixin require "./mixins/associations"
+  @mixin require "./mixins/scope"
 
   daoInstance: undefined
   eagerlyLoadedAssociations: {}
@@ -12,9 +14,6 @@ class Salad.Model extends Salad.Base
   triggerStack: {}
 
   constructor: (attributes, options) ->
-    # pass the attributes from the static method on to our model
-    # @metadata.attributes = _.clone @metadata().attributes
-
     @setAttributes attributes
 
     # overwrite default options with passed options
@@ -97,109 +96,7 @@ class Salad.Model extends Salad.Base
   destroy: (callback) ->
     callback()
 
-
-  ## Data retrieval #####################################
-  ## These are pretty much just proxy methods that insantiate a scope and pass the
-  ## parameters on to the scope
-
-  @where: (attributes) ->
-    @scope().where attributes
-
-  @limit: (limit) ->
-    @scope().limit limit
-
-  @offset: (offset) ->
-    @scope().offset offset
-
-  @asc: (field) ->
-    @scope().asc field
-
-  @desc: (field) ->
-    @scope().desc field
-
-  @contains: (field, value) ->
-    @scope().contains field, value
-
-  @include: (models) ->
-    @scope().include models
-
-  @all: (callback) ->
-    @scope().all callback
-
-  @first: (callback) ->
-    @scope().first callback
-
-  @count: (callback) ->
-    @scope().count callback
-
-  @find: (id, callback) ->
-    @scope().find id, callback
-
-  @findAndCountAll: (callback) ->
-    @scope().findAndCountAll callback
-
-  ## Associations ##########################################
-  # register a hasMany association for this mdoel
-  @hasMany: (targetModel, options) ->
-    # this is the method that we will create in this model
-    getterName = "get#{options.as}"
-
-    # this is the foreignKey field
-    foreignKey = options.foreignKey
-
-    # register the association
-    @_registerAssociation options.as, targetModel
-
-    # register attribute in targetModel
-    targetModel.attribute foreignKey
-
-    # register the method in this model
-    # Don't bind to this context, because we want the method to be run in the
-    # context of the instance
-    @::[getterName] = ->
-      conditions = {}
-      conditions[foreignKey] = @get "id"
-
-      scope = targetModel.scope()
-
-      scope.where(conditions)
-
-  # register a reverse-association in this model
-  @belongsTo: (targetModel, options) ->
-    # this is the method that we will create in this model
-    getterName = "get#{options.as}"
-
-    foreignKey = options.foreignKey
-
-    # register the association
-    @_registerAssociation options.as, targetModel
-
-    # @attributes[foreignKey] = undefined
-    @attribute foreignKey
-
-    # register the method in this model.
-    # Don't bind to this context, because we want the method to be run in the
-    # context of the instance
-    @::[getterName] = ->
-      conditions =
-        id: @get foreignKey
-
-      scope = targetModel.scope()
-
-      scope.where(conditions)
-
-  @_registerAssociation: (key, model) ->
-    key = key.toLowerCase()
-    @::associations[key] = model
-
-  ## Trigger methods ###################################
-
   ## Misc stuff #########################################
-
-  # Builds a new scope with the current dao instance as context
-  @scope: ->
-    return new Salad.Scope @
-
   toJSON: ->
     associations = @getAssociations()
 
@@ -214,8 +111,5 @@ class Salad.Model extends Salad.Base
 
     attributes
 
-  getAssociations: ->
-    _.clone @eagerlyLoadedAssociations
-
   toString: ->
-    @.constructor.name
+    @constructor.name

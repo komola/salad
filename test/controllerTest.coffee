@@ -59,12 +59,12 @@ describe "Controller", ->
 
       it "should return the resource as json", (done) ->
         App.Location.create title: "Test", (err, resource) ->
-          id = resource.attributes.id
+          id = resource.get("id")
           agent.get("http://localhost:3001/locations/#{id}.json")
             .end (res) ->
               res.ok.should.equal true
               res.body.should.have.property "title"
-              res.body.title.should.equal resource.attributes.title
+              res.body.title.should.equal resource.get("title")
 
               done()
 
@@ -79,7 +79,7 @@ describe "Controller", ->
 
       it "should update records", (done) ->
         App.Location.create title: "Test", (err, resource) ->
-          id = resource.attributes.id
+          id = resource.get("id")
           agent.put("http://localhost:3001/locations/#{id}.json")
             .send(location: title: "Foo")
             .end (res) ->
@@ -99,7 +99,7 @@ describe "Controller", ->
 
       it "should return the deleted resource", (done) ->
         App.Location.create title: "Test", (err, resource) ->
-          id = resource.attributes.id
+          id = resource.get("id")
           agent.del("http://localhost:3001/locations/#{id}.json")
             .end (res) ->
               res.ok.should.equal true

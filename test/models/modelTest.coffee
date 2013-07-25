@@ -1,4 +1,4 @@
-describe.only "Salad.Model", ->
+describe "Salad.Model", ->
   describe "DAO", ->
     describe "#create", ->
       res = null

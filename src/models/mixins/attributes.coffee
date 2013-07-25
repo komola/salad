@@ -4,11 +4,12 @@ module.exports =
       @metadata().attributes or= {}
 
       defaultOptions =
+        name: name
         type: "String"
 
       options = _.extend defaultOptions, options
 
-      @metadata().attributes[name] = null
+      @metadata().attributes[name] = options
 
   InstanceMethods:
 
