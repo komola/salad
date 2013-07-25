@@ -4,7 +4,7 @@ fs = require "fs"
 module.exports =
   ClassMethods:
     layout: (name) ->
-      @layout = name
+      @metadata().layout = name
 
   InstanceMethods:
     respondWith: (formats) ->
@@ -27,7 +27,7 @@ module.exports =
 
       defaultOptions =
         status: 200
-        layout: @__proto__.constructor.layout
+        layout: @metadata().layout
 
       options = _.extend defaultOptions, options
 

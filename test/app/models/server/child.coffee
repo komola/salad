@@ -12,11 +12,10 @@ class App.Child extends Salad.Model
     type: "sequelize"
     instance: App.SequelizeChild
 
-  @attributes:
-    id: null
-    title: null
-    createdAt: null
-    updatedAt: null
+  @attribute "id"
+  @attribute "title"
+  @attribute "createdAt"
+  @attribute "updatedAt"
 
 App.Child.belongsTo App.Parent, as: "Parent", foreignKey: "parentId"
 App.Parent.hasMany App.Child, as: "Children", foreignKey: "parentId"

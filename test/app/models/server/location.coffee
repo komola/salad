@@ -11,13 +11,12 @@ class App.Location extends Salad.Model
     type: "sequelize"
     instance: App.SequelizeLocation
 
-  @attributes:
-    id: null
-    title: null
-    description: null
-    messages: null
-    createdAt: null
-    updatedAt: null
+  @attribute "id"
+  @attribute "title"
+  @attribute "description"
+  @attribute "messages"
+  @attribute "createdAt"
+  @attribute "updatedAt"
 
 App.Location.hasMany App.Location, as: "Children", foreignKey: "parentId"
 App.Location.belongsTo App.Location, as: "Parent", foreignKey: "parentId"

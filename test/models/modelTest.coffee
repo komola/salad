@@ -1,4 +1,4 @@
-describe "Salad.Model", ->
+describe.only "Salad.Model", ->
   describe "DAO", ->
     describe "#create", ->
       res = null
@@ -18,11 +18,9 @@ describe "Salad.Model", ->
         done()
 
       it "saves the item in the database", (done) ->
-        expect(res.attributes).to.exist
-
-        res.attributes.id.should.equal 1
-        res.attributes.title.should.equal params.title
-        res.attributes.description.should.equal params.description
+        res.get("id").should.equal 1
+        res.get("title").should.equal params.title
+        res.get("description").should.equal params.description
 
         done()
 
@@ -69,9 +67,9 @@ describe "Salad.Model", ->
       it "saves the item in the database", (done) ->
         expect(res.attributes).to.exist
 
-        res.attributes.id.should.equal 1
-        res.attributes.title.should.equal "Foo"
-        res.attributes.description.should.equal params.description
+        res.get("id").should.equal 1
+        res.get("title").should.equal "Foo"
+        res.get("description").should.equal params.description
 
         done()
 
@@ -79,29 +77,29 @@ describe "Salad.Model", ->
       it "creates a record when it is new", (done) ->
         resource = App.Location.build title: "Test"
 
-        resource.attributes.title.should.equal "Test"
+        resource.get("title").should.equal "Test"
 
         assert.isTrue resource.isNew
 
         resource.save (err, res) =>
           assert.ok res
-          assert.ok res.attributes.id
+          assert.ok res.get("id")
+
           res.isNew.should.equal false
 
-          res.attributes.title.should.equal resource.attributes.title
-
+          res.get("title").should.equal resource.get("title")
           done()
 
       it "updates a record when it is not new", (done) ->
         App.Location.create title: "Test", (err, res) =>
 
-          res.attributes.title = "Foo"
+          res.set "title", "Foo"
           res.save (err, res) =>
             assert.ok res
-            assert.ok res.attributes.id
+            assert.ok res.get("id")
             res.isNew.should.equal false
 
-            res.attributes.title.should.equal "Foo"
+            res.get("title").should.equal "Foo"
 
             done()
 
@@ -111,7 +109,7 @@ describe "Salad.Model", ->
         location = App.Location.build title: "Test"
         location.set "title", "Foo"
 
-        location.attributes.title.should.equal "Foo"
+        location.get("title").should.equal "Foo"
 
     describe "#get", ->
       it "returns an attribute", ->
@@ -340,14 +338,14 @@ describe "Salad.Model", ->
 
     describe "trigger", ->
       beforeEach ->
-        App.Shop.triggerStack = {}
+        App.Shop.metadata().triggerStack = {}
 
       it "is registered on the static model", (done) ->
         App.Shop.before "create", (cb) =>
           cb()
 
-        assert.ok App.Shop.triggerStack["before:create"]
-        assert.ok App.Shop.triggerStack["before:create"].length > 0
+        assert.ok App.Shop.metadata().triggerStack["before:create"]
+        assert.ok App.Shop.metadata().triggerStack["before:create"].length > 0
 
         done()
 

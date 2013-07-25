@@ -6,8 +6,8 @@ class App.Enum extends Salad.Model
     type: "sequelize"
     instance: App.SequelizeEnum
 
-  @attributes:
-    id: null
-    title: null
-    createdAt: null
-    updatedAt: null
+
+  @attribute "id"
+  @attribute "title"
+  @attribute "createdAt"
+  @attribute "updatedAt"

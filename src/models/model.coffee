@@ -1,8 +1,11 @@
 async = require "async"
 
-class Salad.Model
+class Salad.Model extends Salad.Base
+  @mixin require "../mixins/metadata"
+  @mixin require "./mixins/triggers"
+  @mixin require "./mixins/attributes"
+
   daoInstance: undefined
-  attributes: {}
   eagerlyLoadedAssociations: {}
   associations: {}
   isNew: true
@@ -10,11 +13,9 @@ class Salad.Model
 
   constructor: (attributes, options) ->
     # pass the attributes from the static method on to our model
-    @attributes = _.clone @constructor.attributes
+    # @metadata.attributes = _.clone @metadata().attributes
 
     @setAttributes attributes
-
-    @triggerStack = _.clone @constructor.triggerStack
 
     # overwrite default options with passed options
     options = _.extend {isNew: true}, options
@@ -27,21 +28,6 @@ class Salad.Model
       throw new Error "No DAO instance set!"
 
     @daoInstance = options.daoInstance
-
-  setAttributes: (attributes) ->
-    for key, val of attributes
-      @set key, val
-
-  getAttributes: ->
-    @attributes
-
-  set: (key, value) ->
-    @_checkIfKeyExists key
-    @attributes[key] = value
-
-  get: (key) ->
-    @_checkIfKeyExists key
-    @attributes[key]
 
   ## DAO functionality #################################
   @dao: (options) ->
@@ -165,7 +151,7 @@ class Salad.Model
     @_registerAssociation options.as, targetModel
 
     # register attribute in targetModel
-    targetModel.attributes[foreignKey] = undefined
+    targetModel.attribute foreignKey
 
     # register the method in this model
     # Don't bind to this context, because we want the method to be run in the
@@ -188,7 +174,8 @@ class Salad.Model
     # register the association
     @_registerAssociation options.as, targetModel
 
-    @attributes[foreignKey] = undefined
+    # @attributes[foreignKey] = undefined
+    @attribute foreignKey
 
     # register the method in this model.
     # Don't bind to this context, because we want the method to be run in the
@@ -206,39 +193,6 @@ class Salad.Model
     @::associations[key] = model
 
   ## Trigger methods ###################################
-
-  @before: (method, action) ->
-    method = "before:#{method}"
-    @_registerTrigger method, action
-
-  @after: (method, action) ->
-    method = "after:#{method}"
-    @_registerTrigger method, action
-
-  @_registerTrigger: (method, action) ->
-    @triggerStack or= {}
-
-    @triggerStack[method] or= []
-    @triggerStack[method].push action
-
-  @runTriggers: (action, callback) ->
-    @triggerStack or= {}
-    stack = @triggerStack[action] or []
-
-    iterator = (action, cb) =>
-      action.call @, cb
-
-    async.eachSeries stack, iterator, callback
-
-  runTriggers: (action, callback) ->
-    @triggerStack or= {}
-    stack = @triggerStack[action] or []
-
-    iterator = (action, cb) =>
-      action.call @, cb
-
-    async.eachSeries stack, iterator, callback
-
 
   ## Misc stuff #########################################
 
@@ -265,7 +219,3 @@ class Salad.Model
 
   toString: ->
     @.constructor.name
-
-  _checkIfKeyExists: (key) ->
-    unless key of @attributes
-      throw new Error "#{key} not existent in #{@}"
