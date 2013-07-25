@@ -12,7 +12,6 @@ module.exports =
       @metadata().attributes[name] = options
 
   InstanceMethods:
-
     setAttributes: (attributes) ->
       for key, val of attributes
         @set key, val

@@ -52,7 +52,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if daoInstance.__eagerlyLoadedAssociations?.length > 0
       for key in daoInstance.__eagerlyLoadedAssociations
         # fetch the association model class from the associations object
-        associationModelClass = @modelClass::associations[key]
+        associationModelClass = @modelClass.getAssociation key
 
         daoModels = daoInstance[key]
         models = null

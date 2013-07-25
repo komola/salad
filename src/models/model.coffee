@@ -9,7 +9,6 @@ class Salad.Model extends Salad.Base
 
   daoInstance: undefined
   eagerlyLoadedAssociations: {}
-  associations: {}
   isNew: true
   triggerStack: {}
 

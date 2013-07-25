@@ -53,7 +53,12 @@ module.exports =
 
         scope.where(conditions)
 
+    # return the model class for the association key name
+    getAssociation: (key) ->
+      @metadata().associations[key]
+
     _registerAssociation: (key, model) ->
       key = key.toLowerCase()
-      @::associations[key] = model
 
+      @metadata().associations or= {}
+      @metadata().associations[key] = model
