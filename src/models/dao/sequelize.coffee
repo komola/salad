@@ -99,9 +99,16 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       attribs = ("'#{contains.value}' = ANY(\"#{contains.field}\")" for contains in options.contains)
 
       if params.where
-        throw new Error "Can not use #contains in combination with .where(). This is not supported yet!"
+        for key, val of params.where
+          queryGenerator = @daoModelInstance.daoFactoryManager.sequelize.queryInterface.QueryGenerator
+          # quote column
+          key = queryGenerator.quoteIdentifier key
+          # make sure to escape the value
+          val = queryGenerator.escape val
 
-      params.where = attribs.join ","
+          attribs.push "#{key} = #{val}"
+
+      params.where = attribs.join " AND "
 
     if params.limit is -1
       delete params.limit

@@ -324,7 +324,7 @@ describe "Salad.Model", ->
               resources.length.should.equal 1
               done()
 
-      it.skip "works along where queries", (done) ->
+      it "works along where queries", (done) ->
         params =
           title: ["A", "B"]
           otherField: "Bar"

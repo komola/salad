@@ -10,6 +10,9 @@ class Salad.Scope
       offset: 0
 
   where: (attributes) ->
+    unless typeof(attributes) is "object"
+      throw new Error "where() only accepts an object as argument!"
+
     for key, val of attributes
       @data.conditions[key] = val
 

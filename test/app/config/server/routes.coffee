@@ -12,3 +12,4 @@ Salad.Router.register (router) ->
   router.get("/rendering/test").to("rendering.test")
   router.get("/rendering/arguments").to("rendering.arguments")
   router.get("/rendering/layoutTest").to("rendering.layoutTest")
+  router.get("/rendering/env").to("rendering.env")

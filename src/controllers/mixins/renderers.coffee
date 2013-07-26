@@ -41,12 +41,20 @@ module.exports =
 
     html: (data) ->
       template = @_renderHandlebars data.template
+      options =
+        env: Salad.env
+
+      data.options = _.extend options, data.options
       content = template(data.options)
 
       if data.layout
         layout = @_renderHandlebars "layouts/#{data.layout}"
 
-        content = layout content: content
+        options =
+          content: content
+          env: Salad.env
+
+        content = layout options
 
       @response.send content
 

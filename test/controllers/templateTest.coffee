@@ -26,3 +26,10 @@ describe "#render()", ->
           res.text.should.equal "<body><h1>Hello World!</h1></body>"
 
           done()
+
+    it "receives the global env object", (done) ->
+      agent.get(":3001/rendering/env")
+        .end (res) ->
+          res.ok.should.equal true
+          res.text.should.equal Salad.env
+          done()
