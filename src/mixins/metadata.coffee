@@ -1,13 +1,12 @@
 module.exports =
   InstanceMethods:
     metadata: ->
-      @__proto__.constructor.metadata or= {}
+      @__proto__.constructor._metadata or= {}
 
-      @__proto__.constructor.metadata
+      @__proto__.constructor._metadata
 
   ClassMethods:
     metadata: ->
-      @metadata or= {}
+      @_metadata or= {}
 
-      @metadata
-
+      @_metadata

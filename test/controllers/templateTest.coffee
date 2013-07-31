@@ -33,3 +33,12 @@ describe "#render()", ->
           res.ok.should.equal true
           res.text.should.equal Salad.env
           done()
+
+
+describe "#layout()", ->
+  it "sets the layout of the controller", ->
+    App.RenderingController.metadata().layout.should.equal "test"
+
+  it "can be set per controller", ->
+    App.RenderingController.metadata().layout.should.equal "test"
+    App.AnotherLayoutController.metadata().layout.should.equal "foo"
