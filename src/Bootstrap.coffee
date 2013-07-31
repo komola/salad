@@ -1,10 +1,14 @@
 global.Sequelize = require("sequelize")
 global.async = require "async"
 winston = require "winston"
+findit = require "findit"
+fs = require "fs"
 # require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
   @extend require "./mixins/Singleton"
+  @mixin require "./mixins/metadata"
+  @mixin require "./mixins/triggers"
 
   app: null
 
@@ -13,36 +17,45 @@ class Salad.Bootstrap extends Salad.Base
     controllerPath: "app/controllers/server"
     modelPath: "app/models/server"
     configPath: "app/config/server/config"
+    templatePath: "app/templates"
     publicPath: "public"
     port: 80
     env: "production"
 
-  init: (options) ->
-    @options.port = options.port || 80
-    @options.env = Salad.env = options.env || "production"
+  init: (options, callback) ->
+    @constructor.after "init", @initConfig
+    @constructor.after "init", @initLogger
+    @constructor.after "init", @initControllers
+    @constructor.after "init", @initRoutes
+    @constructor.after "init", @initHelpers
+    @constructor.after "init", @initDatabase
+    @constructor.after "init", @initModels
+    @constructor.after "init", @initTemplates
+    @constructor.after "init", @initAssets
+    @constructor.after "init", @initExpress
 
-    @initConfig()
+    async.series [
+      (cb) => @runTriggers "before:init", cb
+      (cb) =>
+        @options.port = options.port || 80
+        @options.env = Salad.env = options.env || "production"
 
-    @initLogger()
-    @initControllers()
-    @initRoutes()
-    @initHelpers()
-    @initDatabase()
-    @initModels()
+        cb()
 
-    @initExpress()
+      (cb) => @runTriggers "after:init", cb
+    ], (err) =>
+      callback()
 
   run: (options) ->
-    @init options
-
-    @start(options.cb)
+    @init options, =>
+      @start options.cb
 
   @run: (options) ->
     options or= {}
 
     Salad.Bootstrap.instance().run options
 
-  initConfig: ->
+  initConfig: (cb) ->
     # Salad.Config = require("require-all")
     #   dirname: "#{Salad.root}/#{@options.configPath}"
 
@@ -50,11 +63,13 @@ class Salad.Bootstrap extends Salad.Base
     # in the /etc folder
     Salad.Config = require "#{Salad.root}/#{@options.configPath}"
 
-  initLogger: ->
-    logger = new winston.Logger
-    logger.setLevels winston.config.syslog.levels
+    cb()
 
-    logger.add winston.transports.Console,
+  initLogger: (cb) ->
+    @metadata().logger = new winston.Logger
+    @metadata().logger.setLevels winston.config.syslog.levels
+
+    @metadata().logger.add winston.transports.Console,
       handleExceptions: true
       prettyPrint: true
       colorize: true
@@ -62,28 +77,96 @@ class Salad.Bootstrap extends Salad.Base
 
     App.Logger = {}
 
-    logger.extend App.Logger
+    @metadata().logger.extend App.Logger
 
     App.Logger.log = ->
-      logger.info.apply @, arguments
+      @metadata().logger.info.apply @, arguments
 
     if Salad.env isnt "testing"
       console.log = App.Logger.log
       console.error = App.Logger.error
 
-  initRoutes: ->
+    cb()
+
+  initRoutes: (cb) ->
     require "#{Salad.root}/#{@options.routePath}"
 
-  initControllers: ->
+    cb()
+
+  initControllers: (cb) ->
     require("require-all")
       dirname: "#{Salad.root}/#{@options.controllerPath}"
 
-  initHelpers: ->
-  initModels: ->
+    cb()
+
+  initHelpers: (cb) ->
+    cb()
+
+  initModels: (cb) ->
     require("require-all")
       dirname: "#{Salad.root}/#{@options.modelPath}"
 
-  initDatabase: ->
+    cb()
+
+  initTemplates: (cb) ->
+    # TODO Implement possibility for development environment to auto-load changes using gaze
+
+    # find all templates and save their content in a hash
+    files = []
+    @metadata().templates = {}
+
+    dirname = "#{Salad.root}/#{@options.templatePath}"
+
+    finder = findit dirname
+
+    # we received a file
+    finder.on "file", (file, stat) =>
+      files.push file
+
+    # we received all files.
+    finder.on "end", =>
+      async.eachSeries files,
+        readFile = (file, done) =>
+          fs.readFile file, (err, content) =>
+            index = file.replace(dirname, "").replace(/\/(server|shared)\//, "")
+            @metadata().templates[index] = content.toString()
+
+            done()
+
+        # we are done!
+        finished = (err) =>
+          cb()
+
+  initAssets: (cb) ->
+    files = []
+    folders = []
+    @metadata().assets = []
+
+    for folder in ["controllers", "models", "config", "templates"]
+      folders.push "#{Salad.root}/app/#{folder}/client"
+      folders.push "#{Salad.root}/app/#{folder}/shared"
+
+    async.eachSeries folders,
+      findFilesInFolder = (dirname, done) =>
+        # don't parse when the folder does not exist
+        unless fs.existsSync dirname
+          return done()
+
+        finder = findit dirname
+
+        # we received a file
+        finder.on "file", (file, stat) =>
+          files.push file
+
+        # we received all files.
+        finder.on "end", =>
+          done()
+
+      done = (err) =>
+        @metadata().assets = files
+        cb()
+
+  initDatabase: (cb) ->
     dbConfig = Salad.Config.database[Salad.env]
 
     App.sequelize = new Sequelize dbConfig.database, dbConfig.username, dbConfig.password,
@@ -93,33 +176,43 @@ class Salad.Bootstrap extends Salad.Base
       logging: if Salad.env is "development" then console.log else false
       omitNull: true
 
-  initMiddleware: ->
+    cb()
 
-  initExpress: ->
+  initExpress: (cb) ->
     express = require "express"
-    @app = express()
+    @metadata().app = express()
 
-    @app.use express.bodyParser()
-    @app.use express.methodOverride()
-    @app.use express.static("#{Salad.root}/public")
+    @metadata().app.use express.bodyParser()
+    @metadata().app.use express.methodOverride()
+    @metadata().app.use express.static("#{Salad.root}/public")
 
     router = new Salad.Router
-    @app.all "*", router.dispatch
+    @metadata().app.all "*", router.dispatch
+
+    cb()
 
   start: (callback) =>
-    startExpress = (cb) =>
-      @expressServer = @app.listen @options.port
-      cb()
 
-    async.series [startExpress], =>
+    async.series [
+      (cb) => @runTriggers "before:start", cb
+      (cb) =>
+        @metadata().expressServer = @metadata().app.listen @options.port
+        cb()
+
+      (cb) => @runTriggers "after:start", cb
+    ], (err) =>
       callback.apply @ if callback
 
   @destroy: (callback) ->
     @instance().destroy callback
 
   destroy: (callback) ->
-    stopExpress = (cb) =>
-      @expressServer.close cb
+    async.series [
+      (cb) => @runTriggers "before:destroy", cb
+      (cb) =>
+        @metadata().expressServer.close cb
+        cb()
 
-    async.series [stopExpress], =>
+      (cb) => @runTriggers "after:destroy", cb
+    ], (err) =>
       callback.apply @ if callback

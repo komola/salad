@@ -12,3 +12,9 @@ class App.RenderingController extends Salad.Controller
 
   env: ->
     @render "rendering/env", layout: false
+
+  partial: ->
+    @render "rendering/partial", layout: false
+
+  applicationLayout: ->
+    @render "rendering/test", layout: "application"

@@ -34,6 +34,13 @@ describe "#render()", ->
           res.text.should.equal Salad.env
           done()
 
+    it "supports partials", (done) ->
+      agent.get(":3001/rendering/partial")
+        .end (res) ->
+          res.ok.should.equal true
+          res.text.should.equal "partial"
+          done()
+
 
 describe "#layout()", ->
   it "sets the layout of the controller", ->
@@ -42,3 +49,13 @@ describe "#layout()", ->
   it "can be set per controller", ->
     App.RenderingController.metadata().layout.should.equal "test"
     App.AnotherLayoutController.metadata().layout.should.equal "foo"
+
+  it "supports partials", (done) ->
+    agent.get(":3001/rendering/applicationLayout")
+      .end (res) ->
+        res.ok.should.equal true
+        res.text.should.equal """
+head
+foot
+"""
+        done()

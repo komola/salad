@@ -13,3 +13,5 @@ Salad.Router.register (router) ->
   router.get("/rendering/arguments").to("rendering.arguments")
   router.get("/rendering/layoutTest").to("rendering.layoutTest")
   router.get("/rendering/env").to("rendering.env")
+  router.get("/rendering/partial").to("rendering.partial")
+  router.get("/rendering/applicationLayout").to("rendering.applicationLayout")

@@ -1,6 +1,6 @@
 {
   "name": "salad",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "",
   "homepage": "http://github.com/komola/salad",
   "main": "./salad.coffee",
@@ -48,7 +48,8 @@
     "longjohn": "~0.2.0",
     "underscore.inflections": "~0.1.5",
     "pg": "~0.10.2",
-    "handlebars": "~1.0.12"
+    "handlebars": "~1.0.12",
+    "findit": "~0.1.2"
   },
   "devDependencies": {
     "mocha": "~1.9.0",

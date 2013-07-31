@@ -2,7 +2,7 @@ async = require "async"
 
 class Salad.Model extends Salad.Base
   @mixin require "../mixins/metadata"
-  @mixin require "./mixins/triggers"
+  @mixin require "../mixins/triggers"
   @mixin require "./mixins/attributes"
   @mixin require "./mixins/associations"
   @mixin require "./mixins/scope"
