@@ -1,0 +1,9 @@
+services: postgresql
+before_script:
+ - psql -c "create user testing password 'testing';" -U postgres
+ - psql -c 'create database salad-testing owner testing;' -U postgres
+language: node_js
+ node_js:
+  - "0.11"
+  - "0.10"
+  - "0.8"
