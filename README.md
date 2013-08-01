@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/komola/salad.png?branch=master)](https://travis-ci.org/komola/salad)
 
+[![Dependency status](https://david-dm.org/komola/salad.png)](https://david-dm.org/komola/salad)
+
 # Salad
 
 Salad is supposed to be a very lightweight nodeJS framework, that brings the
