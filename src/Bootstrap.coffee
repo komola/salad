@@ -195,11 +195,12 @@ class Salad.Bootstrap extends Salad.Base
     cb()
 
   start: (callback) =>
-
     async.series [
       (cb) => @runTriggers "before:start", cb
       (cb) =>
         @metadata().expressServer = @metadata().app.listen @options.port
+
+        console.log "Started salad. Environment: #{Salad.env}"
         cb()
 
       (cb) => @runTriggers "after:start", cb
