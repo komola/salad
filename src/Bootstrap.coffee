@@ -44,7 +44,7 @@ class Salad.Bootstrap extends Salad.Base
 
       (cb) => @runTriggers "after:init", cb
     ], (err) =>
-      callback()
+      callback() if callback
 
   run: (options) ->
     @init options, =>
@@ -79,7 +79,7 @@ class Salad.Bootstrap extends Salad.Base
 
     @metadata().logger.extend App.Logger
 
-    App.Logger.log = ->
+    App.Logger.log = =>
       @metadata().logger.info.apply @, arguments
 
     if Salad.env isnt "testing"
@@ -116,6 +116,9 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().templates = {}
 
     dirname = "#{Salad.root}/#{@options.templatePath}"
+
+    unless fs.existsSync dirname
+      throw new Error "Templates folder does not exist! #{dirname}"
 
     finder = findit dirname
 
