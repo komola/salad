@@ -149,7 +149,7 @@ class Salad.Bootstrap extends Salad.Base
 
     # watch for changes and automatically reload files
     if Salad.env is "development"
-      gaze "**/*.hbs", (err, watcher) =>
+      gaze "#{dirname}/*/*/*.hbs", (err, watcher) =>
         watcher.on "changed", (file) =>
           loadTemplateFile file, (index) =>
             App.Logger.info "Template #{index} reloaded"
