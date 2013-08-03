@@ -1,7 +1,7 @@
 global.Sequelize = require("sequelize")
 global.async = require "async"
 winston = require "winston"
-findit = require "findit"
+findit = require "findit2"
 fs = require "fs"
 # require "longjohn"
 
