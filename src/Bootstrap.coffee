@@ -141,16 +141,22 @@ class Salad.Bootstrap extends Salad.Base
           cb()
 
   initAssets: (cb) ->
-    files = []
+    files = {}
     folders = []
-    @metadata().assets = []
+    @metadata().assets = {}
 
     for folder in ["controllers", "models", "config", "templates"]
-      folders.push "#{Salad.root}/app/#{folder}/client"
-      folders.push "#{Salad.root}/app/#{folder}/shared"
+      folders.push
+        type: "app"
+        folder: "#{Salad.root}/app/#{folder}/client"
+
+      folders.push
+        type: "app"
+        folder: "#{Salad.root}/app/#{folder}/shared"
 
     async.eachSeries folders,
-      findFilesInFolder = (dirname, done) =>
+      findFilesInFolder = (folder, done) =>
+        dirname = folder.folder
         # don't parse when the folder does not exist
         unless fs.existsSync dirname
           return done()
@@ -159,7 +165,8 @@ class Salad.Bootstrap extends Salad.Base
 
         # we received a file
         finder.on "file", (file, stat) =>
-          files.push file
+          files[folder.type] or= []
+          files[folder.type].push file
 
         # we received all files.
         finder.on "end", =>

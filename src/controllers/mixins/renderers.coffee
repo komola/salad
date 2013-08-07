@@ -1,13 +1,17 @@
 handlebars = require "handlebars"
 fs = require "fs"
 
-handlebars.registerHelper "assets", ->
-  assets = [
-    "/assets/application.js"
-  ]
+handlebars.registerHelper "assets", (type) ->
+
+  type or= "app"
+
+  assets = switch type
+    when "vendor" then ["/assets/vendor.js"]
+    when "app" then ["/assets/application.js"]
+    else throw new Error "Could not find assets"
 
   if Salad.env isnt "production"
-    assets = Salad.Bootstrap.metadata().assets
+    assets = Salad.Bootstrap.metadata().assets[type] or []
 
     assets = assets.map (e) ->
       e = e.replace(Salad.root, "").replace(".coffee", ".js").replace("/app", "").replace(/\/(shared|client)/, "")
