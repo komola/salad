@@ -127,7 +127,7 @@ module.exports =
       template += ".hbs"
 
       unless template of Salad.Bootstrap.metadata().templates
-        throw new Error "Template #{template}.hbs does not exist!"
+        throw new Error "Template #{template} does not exist!"
 
       templateContent = Salad.Bootstrap.metadata().templates[template]
 

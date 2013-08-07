@@ -1,8 +1,10 @@
 global.Sequelize = require("sequelize")
 global.async = require "async"
 winston = require "winston"
-findit = require "findit"
+findit = require "findit2"
 fs = require "fs"
+gaze = require "gaze"
+path = require "path"
 # require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
@@ -120,6 +122,13 @@ class Salad.Bootstrap extends Salad.Base
     unless fs.existsSync dirname
       throw new Error "Templates folder does not exist! #{dirname}"
 
+    loadTemplateFile = (file, cb) =>
+      fs.readFile file, (err, content) =>
+        file = path.normalize(file)
+        index = file.replace(path.normalize(dirname), "").replace(/\\/g, "/").replace(/\/(server|shared)\//, "")
+        @metadata().templates[index] = content.toString()
+        cb index
+
     finder = findit dirname
 
     # we received a file
@@ -130,15 +139,21 @@ class Salad.Bootstrap extends Salad.Base
     finder.on "end", =>
       async.eachSeries files,
         readFile = (file, done) =>
-          fs.readFile file, (err, content) =>
-            index = file.replace(dirname, "").replace(/\/(server|shared)\//, "")
-            @metadata().templates[index] = content.toString()
-
+          loadTemplateFile file, (index) =>
+            App.Logger.info "Template #{index} loaded"
             done()
 
         # we are done!
         finished = (err) =>
           cb()
+
+    # watch for changes and automatically reload files
+    if Salad.env is "development"
+      gaze "#{dirname}/*/*/*.hbs", (err, watcher) =>
+        watcher.on "changed", (file) =>
+          loadTemplateFile file, (index) =>
+            App.Logger.info "Template #{index} reloaded"
+
 
   initAssets: (cb) ->
     files = {}
