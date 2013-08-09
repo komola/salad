@@ -33,7 +33,6 @@ class Salad.Bootstrap extends Salad.Base
     @constructor.after "init", @initDatabase
     @constructor.after "init", @initModels
     @constructor.after "init", @initTemplates
-    @constructor.after "init", @initAssets
     @constructor.after "init", @initExpress
 
     async.series [
@@ -127,7 +126,7 @@ class Salad.Bootstrap extends Salad.Base
         file = path.normalize(file)
         index = file
           .replace(path.normalize(dirname), "")
-          .replace(/\\/g, "/")
+          .replace("\\", "/")
           .replace(/\/(server|shared)\//, "")
 
         @metadata().templates[index] = content.toString()
@@ -157,51 +156,6 @@ class Salad.Bootstrap extends Salad.Base
         watcher.on "changed", (file) =>
           loadTemplateFile file, (index) =>
             App.Logger.info "Template #{index} reloaded"
-
-
-  initAssets: (cb) ->
-    files = {}
-    folders = []
-    @metadata().assets = {}
-
-    for folder in ["models", "controllers"]
-      folders.push
-        type: "app"
-        folder: "#{Salad.root}/app/#{folder}/client"
-
-      folders.push
-        type: "app"
-        folder: "#{Salad.root}/app/#{folder}/shared"
-
-    folders.push
-      type: "vendor"
-      folder: "#{Salad.root}/public/javascripts/vendor"
-
-    folders.push
-      type: "head"
-      folder: "#{Salad.root}/app/config/client/"
-
-    async.eachSeries folders,
-      findFilesInFolder = (folder, done) =>
-        dirname = folder.folder
-        # don't parse when the folder does not exist
-        unless fs.existsSync dirname
-          return done()
-
-        finder = findit dirname
-
-        # we received a file
-        finder.on "file", (file, stat) =>
-          files[folder.type] or= []
-          files[folder.type].push file
-
-        # we received all files.
-        finder.on "end", =>
-          done()
-
-      done = (err) =>
-        @metadata().assets = files
-        cb()
 
   initDatabase: (cb) ->
     dbConfig = Salad.Config.database[Salad.env]
