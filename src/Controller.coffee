@@ -1,5 +1,4 @@
 class Salad.Controller extends Salad.Base
-  @extend require "./mixins/Singleton"
   @mixin require "./mixins/metadata"
   @mixin require "./controllers/mixins/renderers"
 

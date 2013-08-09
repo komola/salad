@@ -41,6 +41,10 @@ class Salad.Router extends Salad.Base
       controller = App.ErrorController.instance()
       matching.action = 404
 
+    if acceptHeader = request.headers.accept
+      if acceptHeader.indexOf("application/json") isnt -1
+        matching.format = "json"
+
     controller.response = response
     controller.params = _.extend request.query, request.body, matching
 
@@ -58,6 +62,6 @@ class Salad.Router extends Salad.Base
     unless controller
       throw new Error "Could not find 'App.#{controllerName}Controller'"
 
-    controller = controller.instance()
+    controller = new controller
 
     controller

@@ -5,7 +5,7 @@ class Salad.Scope
       conditions: {}
       contains: []
       includes: []
-      sorting: []
+      order: []
       limit: -1
       offset: 0
 
@@ -19,14 +19,14 @@ class Salad.Scope
     @
 
   asc: (field) ->
-    @data.sorting.push
+    @data.order.push
       field: field
       type: "asc"
 
     @
 
   desc: (field) ->
-    @data.sorting.push
+    @data.order.push
       field: field
       type: "desc"
 

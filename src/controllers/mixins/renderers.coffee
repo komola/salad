@@ -1,28 +1,44 @@
 handlebars = require "handlebars"
 fs = require "fs"
 
-handlebars.registerHelper "assets", (type) ->
 
-  type or= "app"
+handlebars.registerHelper "stylesheets", (type) ->
+  assets = require "#{Salad.root}/app/config/server/assets"
 
-  assets = switch type
-    when "vendor" then ["/assets/vendor.js"]
-    when "app" then ["/assets/application.js"]
-    else throw new Error "Could not find assets"
+  stylesheets = assets.stylesheets[type] or []
+  files = []
 
-  if Salad.env isnt "production"
-    assets = Salad.Bootstrap.metadata().assets[type] or []
+  if Salad.env is "production"
+    files.push "/assets/#{type}.css"
 
-    assets = assets.map (e) ->
-      e = e.replace(Salad.root, "").replace(".coffee", ".js").replace("/app", "").replace(/\/(shared|client)/, "")
+  else
+    for stylesheet in stylesheets
+      files.push "/stylesheets/#{stylesheet}.css"
 
-      "/javascripts#{e}"
+  tags = []
+  for stylesheet in files
+    tags.push '<link href="'+stylesheet+'" rel="stylesheet">'
+
+  new handlebars.SafeString(tags.join("\n"))
+
+handlebars.registerHelper "javascripts", (type) ->
+  assets = require "#{Salad.root}/app/config/server/assets"
+
+  javascripts = assets.javascripts[type] or []
+  files = []
+
+  if Salad.env is "production"
+    files.push "/assets/#{type}.js"
+
+  else
+    for javascript in javascripts
+      files.push "/javascripts/#{javascript}.js"
 
   links = []
-  for asset in assets
+  for asset in files
     links.push '<script src="'+asset+'" type="text/javascript"></script>'
 
-  links.join "\n"
+  new handlebars.SafeString(links.join("\n"))
 
 registeredPartials = false
 

@@ -125,7 +125,11 @@ class Salad.Bootstrap extends Salad.Base
     loadTemplateFile = (file, cb) =>
       fs.readFile file, (err, content) =>
         file = path.normalize(file)
-        index = file.replace(path.normalize(dirname), "").replace(/\\/g, "/").replace(/\/(server|shared)\//, "")
+        index = file
+          .replace(path.normalize(dirname), "")
+          .replace(/\\/g, "/")
+          .replace(/\/(server|shared)\//, "")
+
         @metadata().templates[index] = content.toString()
         cb index
 
@@ -140,7 +144,7 @@ class Salad.Bootstrap extends Salad.Base
       async.eachSeries files,
         readFile = (file, done) =>
           loadTemplateFile file, (index) =>
-            App.Logger.info "Template #{index} loaded"
+            App.Logger.info "Template #{index} loaded" if Salad.env is "development"
             done()
 
         # we are done!
@@ -160,7 +164,7 @@ class Salad.Bootstrap extends Salad.Base
     folders = []
     @metadata().assets = {}
 
-    for folder in ["controllers", "models", "config", "templates"]
+    for folder in ["models", "controllers"]
       folders.push
         type: "app"
         folder: "#{Salad.root}/app/#{folder}/client"
@@ -168,6 +172,14 @@ class Salad.Bootstrap extends Salad.Base
       folders.push
         type: "app"
         folder: "#{Salad.root}/app/#{folder}/shared"
+
+    folders.push
+      type: "vendor"
+      folder: "#{Salad.root}/public/javascripts/vendor"
+
+    folders.push
+      type: "head"
+      folder: "#{Salad.root}/app/config/client/"
 
     async.eachSeries folders,
       findFilesInFolder = (folder, done) =>
@@ -199,7 +211,6 @@ class Salad.Bootstrap extends Salad.Base
       host: dbConfig.host
       port: dbConfig.port
       logging: if Salad.env is "development" then console.log else false
-      omitNull: true
 
     cb()
 
@@ -214,7 +225,16 @@ class Salad.Bootstrap extends Salad.Base
     router = new Salad.Router
     @metadata().app.all "*", router.dispatch
 
-    cb()
+    # TODO: Hack for this issue: https://github.com/sequelize/sequelize/issues/815
+    # May need to think of a better way to handle this.
+    # ATM, this will only try to create the tables, fail because they are already
+    # created, but by trying will learn about the table structure.
+    App.sequelize.sync()
+      .success =>
+        cb()
+
+      .error =>
+        cb()
 
   start: (callback) =>
     async.series [
@@ -222,7 +242,7 @@ class Salad.Bootstrap extends Salad.Base
       (cb) =>
         @metadata().expressServer = @metadata().app.listen @options.port
 
-        console.log "Started salad. Environment: #{Salad.env}"
+        console.log "Started salad. Environment: #{Salad.env}" if Salad.env isnt "testing"
         cb()
 
       (cb) => @runTriggers "after:start", cb

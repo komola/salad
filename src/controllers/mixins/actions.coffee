@@ -52,7 +52,6 @@ module.exports =
          return @_notFoundHandler()
 
         data = @params[@resourceOptions.name]
-
         resource.updateAttributes data, (err, resource) =>
           if err
             return callback.apply @, [err]

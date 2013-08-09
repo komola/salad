@@ -46,6 +46,15 @@ describe "Salad.Model", ->
 
             done()
 
+      # TODO See https://github.com/sequelize/sequelize/issues/815
+      it.skip "does not break when id is set to null", (done) ->
+        attribs =
+          title: "Test"
+        App.Todo.create attribs, (err, resource) =>
+          assert.ok resource.get("id")
+
+          done()
+
     describe "#updateAttributes", ->
       res = null
       params =
@@ -70,6 +79,14 @@ describe "Salad.Model", ->
         res.get("description").should.equal params.description
 
         done()
+
+      it "can set attributes to null values", (done) ->
+        res.get("title").should.equal "Foo"
+
+        res.updateAttributes title: null, (err, newResource) ->
+          assert.equal newResource.get("title"), null
+
+          done()
 
     describe "#save", ->
       it "creates a record when it is new", (done) ->
@@ -206,7 +223,7 @@ describe "Salad.Model", ->
       scope = App.Location.where(title: "Test").asc("title").limit(3)
 
       _.keys(scope.data.conditions).length.should.equal 1
-      scope.data.sorting.length.should.equal 1
+      scope.data.order.length.should.equal 1
       scope.data.limit.should.equal 3
 
     it "does not interfere with other scopes", ->

@@ -5,6 +5,9 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       resource = @_buildModelInstance daoResource
       callback null, resource
 
+  # TODO: Optimize this. Right now this would create an additional select and update
+  # query for each update operation.
+  # We could use a instance hash of all daoModel objects and then just update those
   update: (model, attributes, callback) ->
     @daoModelInstance.find(model.get("id")).success (sequelizeModel) =>
       unless sequelizeModel
@@ -90,10 +93,10 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if options.offset > 0
       params.offset = options.offset
 
-    if options.sorting.length > 0
-      # transform the sorting params into i.e. 'name DESC'
-      sorting = ("#{sort.field} #{sort.type.toUpperCase()}" for sort in options.sorting)
-      params.sorting = sorting.join ","
+    if options.order.length > 0
+      # transform the order params into i.e. 'name DESC'
+      order = ("#{elm.field} #{elm.type.toUpperCase()}" for elm in options.order)
+      params.order = order.join ","
 
     if options.contains.length > 0
       attribs = ("'#{contains.value}' = ANY(\"#{contains.field}\")" for contains in options.contains)

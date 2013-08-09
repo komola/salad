@@ -150,3 +150,26 @@ describe "Controller", ->
                   res.body.length.should.equal 2
 
                   done()
+
+  describe "Performance", ->
+    it "can handle two simultaneous requests", (done) ->
+      async.parallel
+        one: (cb) ->
+          agent.get(":3001/performance?param=1")
+            .end (res) ->
+              res.ok.should.equal true
+              # res.text.should.equal 1
+
+              cb()
+
+        two: (cb) ->
+          agent.get(":3001/performance?param=2")
+            .end (res) ->
+              res.ok.should.equal true
+              # res.text.should.equal 2
+
+              cb()
+
+
+        finished = (err) =>
+          done()
