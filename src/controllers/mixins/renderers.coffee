@@ -1,6 +1,15 @@
 handlebars = require "handlebars"
 fs = require "fs"
 
+handlebars.registerHelper "debug", (optionalValue) ->
+  console.log "\nCurrent Context"
+  console.log "===================="
+  console.log @
+
+  if  arguments.length > 1
+    console.log "Value"
+    console.log "===================="
+    console.log optionalValue
 
 handlebars.registerHelper "stylesheets", (type) ->
   assets = require "#{Salad.root}/app/config/server/assets"
@@ -116,6 +125,7 @@ module.exports =
       template = @_renderHandlebars data.template
       options =
         env: Salad.env
+        request: @request
 
       data.options = _.extend options, data.options
       content = template(data.options)
@@ -123,9 +133,7 @@ module.exports =
       if data.layout
         layout = @_renderHandlebars "layouts/#{data.layout}"
 
-        options =
-          content: content
-          env: Salad.env
+        options.content = content
 
         content = layout options
 
