@@ -215,6 +215,12 @@ App.Todo.find 1, (err, resource) =>
   resource.save (err, savedResource) =>
     # we now saved our changes
 
+
+    # but instead of using `model.set` and `model.save` we could do this:
+
+    resource.updateAttributes title: "my new title", (err, savedResource) =>
+      # this also saved our changes
+
 ```
 
 ### Querying models
@@ -238,7 +244,7 @@ As you can see, you can chain different operators on the scope.
 
 Possible operators are:
 
-```coffeescipt
+```coffeescript
 model = App.Todo
 
 # options is a hash object containing specific conditions
@@ -272,7 +278,7 @@ model.offset(10)
 ```
 
 When you are done calling all the operators, you may finalize the scope.
-You do this by calling the actual method that query the data:
+You do this by calling the actual method that queries the data:
 
 ```coffeescript
 model.where(completed: false).count (err, count) =>
@@ -295,7 +301,7 @@ model.findAndCountAll (err, data) =>
 # License
 (MIT License)
 
-Copyright (C) 2012 komola GmbH, Germany (Sebastian Hoitz <hoitz@komola.de>)
+Copyright (C) 2012, 2013 komola GmbH, Germany (Sebastian Hoitz <hoitz@komola.de>)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
