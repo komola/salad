@@ -46,6 +46,7 @@ class Salad.Router extends Salad.Base
         matching.format = "json"
 
     controller.response = response
+    controller.request = request
     controller.params = _.extend request.query, request.body, matching
 
     # Call the controller action
