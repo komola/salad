@@ -110,8 +110,6 @@ class Salad.Bootstrap extends Salad.Base
     cb()
 
   initTemplates: (cb) ->
-    # TODO Implement possibility for development environment to auto-load changes using gaze
-
     # find all templates and save their content in a hash
     files = []
     @metadata().templates = {}
