@@ -181,6 +181,9 @@ class Salad.Bootstrap extends Salad.Base
     # May need to think of a better way to handle this.
     # ATM, this will only try to create the tables, fail because they are already
     # created, but by trying will learn about the table structure.
+    if Salad.env is "testing"
+      return cb()
+
     App.sequelize.sync()
       .success =>
         cb()
