@@ -6,6 +6,9 @@ class Salad.Controller extends Salad.Base
   response: null
   params: null
 
+  redirectTo: (path) ->
+    @response.redirect path
+
   findResource: (id, callback) =>
     @service.find id, (err, object) =>
       callback err, object

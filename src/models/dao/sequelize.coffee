@@ -8,15 +8,28 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
   # TODO: Optimize this. Right now this would create an additional select and update
   # query for each update operation.
   # We could use a instance hash of all daoModel objects and then just update those
-  update: (model, attributes, callback) ->
+  _getSequelizeModelBySaladModel: (model, callback) ->
     @daoModelInstance.find(model.get("id")).success (sequelizeModel) =>
       unless sequelizeModel
         error = new Error "Could not find model with id: #{model.attributes.id}"
         return callback error
 
+      callback null, sequelizeModel
+
+  update: (model, attributes, callback) ->
+    @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
+      return callback err if err
+
       sequelizeModel.updateAttributes(attributes).success (daoResource) =>
         resource = @_buildModelInstance daoResource
         callback null, resource
+
+  destroy: (model, callback) ->
+    @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
+      return callback err if err
+
+      sequelizeModel.destroy().success =>
+        callback null
 
   findAll: (options, callback) ->
     params = @_buildOptions options

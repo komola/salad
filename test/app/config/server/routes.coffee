@@ -17,3 +17,6 @@ Salad.Router.register (router) ->
   router.get("/rendering/applicationLayout").to("rendering.applicationLayout")
 
   router.get("/performance").to("performance.test")
+
+
+  router.resource("todos", "todos", "todo")

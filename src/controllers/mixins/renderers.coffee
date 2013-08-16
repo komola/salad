@@ -93,6 +93,9 @@ module.exports =
           template: options
           options: templateOptions
 
+        if templateOptions.status
+          options.status = templateOptions.status
+
         if templateOptions.layout isnt undefined
           options.layout = templateOptions.layout
           delete options.options.layout
@@ -100,6 +103,7 @@ module.exports =
       defaultOptions =
         status: 200
         layout: @metadata().layout
+
 
       options = _.extend defaultOptions, options
 
@@ -116,6 +120,12 @@ module.exports =
       template = @_renderHandlebars data.template
       options =
         env: Salad.env
+
+      # transform class representations of models to JSON data
+      # otherwise handlebars can't handle them
+      for key, val of data.options
+        if val.toJSON
+          data.options[key] = val.toJSON()
 
       data.options = _.extend options, data.options
       content = template(data.options)

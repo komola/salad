@@ -3,7 +3,7 @@ module.exports =
     index: ->
       @_index (error, resources) =>
         @respondWith
-          html: -> "Ich habe #{resources.length} Einträge"
+          html: -> @render "#{@resourceOptions.name}/index", collection: resources
           json: -> @render json: resources
 
     _index: (callback) ->
@@ -14,7 +14,7 @@ module.exports =
     show: ->
       @_show (err, resource) =>
         @respondWith
-          html: -> "Name: #{resource.get("name")}"
+          html: -> @render "#{@resourceOptions.name}/show", model: resource
           json: -> @render json: resource
 
     _show: (callback) ->
@@ -27,7 +27,9 @@ module.exports =
     create: ->
       @_create (error, resource) =>
         @respondWith
-          html: -> "Created!"
+          html: ->
+            name = _.pluralize @resourceOptions.name
+            @redirectTo "/#{name}/#{resource.get("id")}"
           json: -> @render json: resource, status: 201
 
     _create: (callback) ->
@@ -43,8 +45,10 @@ module.exports =
     update: ->
       @_update (err, resource) =>
         @respondWith
-          html: -> "Yo success"
-          json: -> @render json: resource
+          html: ->
+            name = _.pluralize @resourceOptions.name
+            @redirectTo "/#{name}/#{resource.get("id")}"
+          json: -> @render json: resource, status: 200
 
     _update: (callback) ->
       @findResource (err, resource) =>
@@ -62,8 +66,10 @@ module.exports =
       @_destroy (err, resource) =>
         resource.destroy (err) =>
           @respondWith
-            html: -> "Deleted"
-            json: -> @render json: resource
+            html: ->
+              name = _.pluralize @resourceOptions.name
+              @redirectTo "/#{name}"
+            json: -> @render json: {}, status: 204
 
     _destroy: (callback) ->
       @findResource (err, resource) =>
@@ -74,5 +80,5 @@ module.exports =
 
     _notFoundHandler: ->
       @respondWith
-        html: => "Not found"
-        json: => @render json: {}, status: 404
+        html: => @render "error/404", status: 404
+        json: => @render json: {error: "not found"}, status: 404

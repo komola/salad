@@ -10,6 +10,7 @@ class Salad.DAO.Base
   update: (model, changes, callback) ->
   findAll: (options, callback) ->
   count: (options, callback) ->
+  destroy: (model, callback) ->
 
 # class Salad.DAO.Memory
 #   store: {}

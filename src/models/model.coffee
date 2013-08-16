@@ -93,7 +93,7 @@ class Salad.Model extends Salad.Base
         callback err, resource
 
   destroy: (callback) ->
-    callback()
+    @daoInstance.destroy @, callback
 
   ## Misc stuff #########################################
   toJSON: ->
