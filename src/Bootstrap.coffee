@@ -19,7 +19,7 @@ class Salad.Bootstrap extends Salad.Base
     controllerPath: "app/controllers/server"
     modelPath: "app/models/server"
     configPath: "app/config/server/config"
-    templatePath: "app/templates"
+    templatePath: ["app", "templates"].join(path.sep)
     publicPath: "public"
     port: 80
     env: "production"
@@ -116,7 +116,7 @@ class Salad.Bootstrap extends Salad.Base
     files = []
     @metadata().templates = {}
 
-    dirname = "#{Salad.root}/#{@options.templatePath}"
+    dirname = [Salad.root, @options.templatePath].join(path.sep)
 
     unless fs.existsSync dirname
       throw new Error "Templates folder does not exist! #{dirname}"
@@ -126,7 +126,7 @@ class Salad.Bootstrap extends Salad.Base
         file = path.normalize(file)
         index = file
           .replace(path.normalize(dirname), "")
-          .replace("\\", "/")
+          .replace(/\\/g, "/")
           .replace(/\/(server|shared)\//, "")
 
         @metadata().templates[index] = content.toString()
