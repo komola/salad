@@ -20,3 +20,7 @@ Salad.Router.register (router) ->
 
 
   router.resource("todos", "todos", "todo")
+
+  router.get("/triggers/test").to("trigger.test")
+  router.get("/triggers/afterTest").to("trigger.afterTest")
+  router.get("/triggers/afterActionTest").to("trigger.afterActionTest")

@@ -19,7 +19,9 @@ router.resource = (path, controller, resourceName) ->
 class Salad.Router extends Salad.Base
   @extend require "./mixins/Singleton"
 
+  # Dispatch the request to the associated controller
   dispatch: (request, response) =>
+    # Get the first matching route
     matching = router.first(request.path, request.method)
 
     # No matching route found
@@ -35,26 +37,41 @@ class Salad.Router extends Salad.Base
 
     # Could not find associated controller
     unless controller
+      unless App.ErrorContoller
+        throw new Error "Tried to use App.ErrorController but it does not exist. Please create an ErrorController to show error messages!"
       controller = App.ErrorContoller.instance()
 
+    # Action does not exist in the controller
     if typeof controller[matching.action] is undefined
       controller = App.ErrorController.instance()
       matching.action = 404
 
+    # Parse Accept header to determine which response format to use
     if acceptHeader = request.headers.accept
       if acceptHeader.indexOf("application/json") isnt -1
         matching.format = "json"
 
+    # Pass request and response objects on to the controller instance
     controller.response = response
     controller.request = request
     controller.params = _.extend request.query, request.body, matching
 
     # Call the controller action
-    controller[matching.action]()
+    async.series [
+        (cb) => controller.runTriggers "beforeAction", cb
+        (cb) => controller.runTriggers "before:#{matching.action}", cb
+        (cb) =>
+          # call the action on our controller
+          controller[matching.action]()
+          cb()
+        # wait for the request to finish, so that we can trigger the after actions
+        (cb) => request.once "end", cb
+        (cb) => controller.runTriggers "after:#{matching.action}", cb
+        (cb) => controller.runTriggers "afterAction", cb
+      ],
 
-  @register: (cb) ->
-
-    cb.apply @instance(), [router]
+      # finished dispatching the request
+      (err) =>
 
   _getMatchingController: (controllerName) ->
     controllerName = _.capitalize controllerName
@@ -66,3 +83,12 @@ class Salad.Router extends Salad.Base
     controller = new controller
 
     controller
+
+  ###
+  Usage:
+    Salad.Router.register (router) ->
+      router.match("/path").to("controller.action")
+
+  ###
+  @register: (cb) ->
+    cb.apply @instance(), [router]
