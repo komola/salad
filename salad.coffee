@@ -1,1 +1,1 @@
-module.exports = require "./src/Salad"
+module.exports = require "./src/salad"

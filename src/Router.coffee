@@ -17,7 +17,7 @@ router.resource = (path, controller, resourceName) ->
   router.del('/'+path+'/:'+resourceName+'Id(.:format)', 'DELETE').to(controller+'.destroy')
 
 class Salad.Router extends Salad.Base
-  @extend require "./mixins/Singleton"
+  @extend require "./mixins/singleton"
 
   # Dispatch the request to the associated controller
   dispatch: (request, response) =>

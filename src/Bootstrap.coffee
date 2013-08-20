@@ -8,7 +8,7 @@ path = require "path"
 # require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
-  @extend require "./mixins/Singleton"
+  @extend require "./mixins/singleton"
   @mixin require "./mixins/metadata"
   @mixin require "./mixins/triggers"
 
