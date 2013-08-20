@@ -59,7 +59,7 @@ class Salad.Scope
     @
 
   count: (callback) ->
-    options = _.clone @data
+    options = _.clone @data, true
     if options.offset
       delete options.offset
 

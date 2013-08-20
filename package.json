@@ -36,7 +36,6 @@
     "coffee-script": "~1.6.0",
     "source-map-support": "~0.2.0",
     "coffee-script-mapped": "~0.1.2",
-    "underscore": ">= 0.0.1",
     "underscore.string": ">= 0.0.1",
     "express": ">= 3.0.0",
     "mime": ">= 0.0.1",
@@ -50,7 +49,8 @@
     "pg": "~2.3.0",
     "handlebars": "~1.0.12",
     "findit2": "~0.2.0",
-    "gaze": "~0.4.1"
+    "gaze": "~0.4.1",
+    "lodash": "~1.3.1"
   },
   "devDependencies": {
     "mocha": "~1.12.0",

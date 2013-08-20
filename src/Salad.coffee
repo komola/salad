@@ -1,6 +1,6 @@
 global.Salad = {}
 global.App = global.App || {}
-global._ = require "underscore"
+global._ = require "lodash"
 _.mixin require("underscore.string").exports()
 _.mixin require "underscore.inflections"
 

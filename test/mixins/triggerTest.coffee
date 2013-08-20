@@ -18,6 +18,16 @@ class Foo extends Salad.Base
   noCallbackAction: ->
     @noCallbackActionCalled = true
 
+class Parent extends Salad.Base
+  @mixin require "../../src/mixins/triggers"
+  @mixin require "../../src/mixins/metadata"
+
+  @before "test", ->
+
+class A extends Parent
+
+class B extends Parent
+
 describe "Trigger Mixin", ->
   describe "#runTriggers", ->
     it "resolves string function names when called on an instance", (done) ->
@@ -39,3 +49,9 @@ describe "Trigger Mixin", ->
         assert.isTrue a.noCallbackActionCalled
 
         done()
+
+    it "does not interfere with other classes", ->
+      A.before "a", ->
+      B.before "b", ->
+      _.keys(A.metadata().triggerStack).length.should.equal 2
+      _.keys(B.metadata().triggerStack).length.should.equal 2

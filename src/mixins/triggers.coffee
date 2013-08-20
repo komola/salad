@@ -18,6 +18,8 @@ module.exports =
     _registerTrigger: (method, action) ->
       @metadata().triggerStack or= {}
 
+      stack = @metadata().triggerStack
+
       @metadata().triggerStack[method] or= []
       @metadata().triggerStack[method].push action
 
