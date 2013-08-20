@@ -15,7 +15,7 @@ possibility to register routes and controllers and use popular ORM frameworks li
 
 * ✓ basic controllers
 * ✓ render JSON data
-* allow to implement @before filters to execute special logic before an action is executed
+* ✓ allow to implement @before filters to execute special logic before an action is executed
 * ✓ implement more robust rendering logic (replacable JSON and html renderers, other formats possible, too)
 * ✓ develop better system for storing metadata in controllers, similar to towers `@metadata()` object
 * ✓ support rendering HTML to the client
