@@ -5,6 +5,8 @@ module.exports =
 
   ClassMethods:
     # register a hasMany association for this mdoel
+    # Usage
+    #   App.Parent.hasMany App.Children, as: "Children", foreignKey: "parentId"
     hasMany: (targetModel, options) ->
       # this is the method that we will create in this model
       getterName = "get#{options.as}"
@@ -14,9 +16,6 @@ module.exports =
 
       # register the association
       @_registerAssociation options.as, targetModel
-
-      # register attribute in targetModel
-      targetModel.attribute foreignKey
 
       # register the method in this model
       # Don't bind to this context, because we want the method to be run in the
@@ -39,7 +38,6 @@ module.exports =
       # register the association
       @_registerAssociation options.as, targetModel
 
-      # @attributes[foreignKey] = undefined
       @attribute foreignKey
 
       # register the method in this model.
