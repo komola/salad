@@ -15,11 +15,16 @@ describe "App.Controller Triggers", ->
 
   describe "#after", ->
     it "is executed after actions", (done) ->
-      agent.get(":3001/triggers/afterTest").end (res) ->
-        App.Todo.first (err, res) ->
-          res.get("title").should.equal "afterTest"
+      @timeout 4000
 
-          done()
+      agent.get(":3001/triggers/afterTest").end (res) ->
+        query = =>
+          App.Todo.first (err, res) ->
+            res.get("title").should.equal "afterTest"
+
+            done()
+
+        setTimeout query, 400
 
   describe "#afterAction", ->
     it "is executed after every action", (done) ->

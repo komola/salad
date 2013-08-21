@@ -9,6 +9,14 @@ class Salad.Scope
       limit: -1
       offset: 0
 
+  ###
+  Usage:
+    # id has to equal "value"
+    scope.where(id: "value")
+
+    # id has to be IN [1, 2, 3]
+    scope.where(id: [1, 2, 3])
+  ###
   where: (attributes) ->
     unless typeof(attributes) is "object"
       throw new Error "where() only accepts an object as argument!"
