@@ -1,4 +1,11 @@
 describe "#render()", ->
+  it "should not render twice", (done) ->
+    agent.get(":3001/rendering/renderTwice")
+      .end (res) ->
+        res.ok.should.equal true
+
+        done()
+
   describe "handlebars", ->
     it "renders handlebars template", (done) ->
       agent.get(":3001/rendering/test")

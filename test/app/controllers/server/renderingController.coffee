@@ -18,3 +18,7 @@ class App.RenderingController extends Salad.Controller
 
   applicationLayout: ->
     @render "rendering/test", layout: "application"
+
+  renderTwice: ->
+    @render json: one: true, status: 200
+    @render json: two: true, status: 200

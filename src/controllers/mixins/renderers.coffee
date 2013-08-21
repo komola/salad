@@ -95,6 +95,10 @@ module.exports =
     @render "errors/notfound", status: 404
     ###
     render: (options) ->
+      # don't render twice
+      return if @isRendered
+
+      @isRendered = true
       unless typeof(options) is "object"
         templateOptions = arguments[1] or {}
 
@@ -112,7 +116,6 @@ module.exports =
       defaultOptions =
         status: 200
         layout: @metadata().layout
-
 
       options = _.extend defaultOptions, options
 
