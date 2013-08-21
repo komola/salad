@@ -61,20 +61,27 @@ module.exports =
 
       return null
 
-    findParent: (callback) ->
+    parentResource: ->
       relation = @findParentRelation()
 
       unless relation
+        return false
+
+      App[relation.resourceClass]
+
+    findParent: (callback) ->
+      parent = @parentResource()
+      relation = @findParentRelation()
+
+      unless parent
         return callback.call @, null, false if callback
         return false
 
-      parent = App[relation.resourceClass]
-
       parent.find @params[relation.idParameter], (err, parent) =>
+        @parent = parent
         return callback.call @, err, parent if callback
 
       false
-
 
     resource: ->
       unless @resourceOptions?.resourceClass

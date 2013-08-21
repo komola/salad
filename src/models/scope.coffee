@@ -66,18 +66,33 @@ class Salad.Scope
 
     @
 
+  nil: ->
+    @data.nil = true
+
+    @
+
   count: (callback) ->
     options = _.clone @data, true
+
+    if options.nil
+      return callback null, 0
+
     if options.offset
       delete options.offset
 
     if options.includes
       delete options.includes
 
+    if options.limit
+      delete options.limit
+
     @daoContext.count options, callback
 
   all: (callback) ->
     options = @data
+
+    if options.nil
+      return callback null, []
 
     @daoContext.findAll options, callback
 
@@ -85,7 +100,7 @@ class Salad.Scope
     options = @data
     options.limit = 1
 
-    @daoContext.findAll options, (err, resources) =>
+    @all (err, resources) =>
       if resources instanceof Array
         resources = resources[0]
 

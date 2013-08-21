@@ -17,6 +17,9 @@ module.exports =
     offset: (offset) ->
       @scope().offset offset
 
+    nil: (nil) ->
+      @scope().nil()
+
     asc: (field) ->
       @scope().asc field
 

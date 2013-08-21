@@ -280,6 +280,32 @@ describe "Salad.Model", ->
 
           done()
 
+    describe "#nil", ->
+      beforeEach (done) ->
+        App.Location.create title: "Parent", (err, resource) =>
+          done()
+
+      it "returns undefined on #first", (done) ->
+          App.Location.nil().first (err, res) ->
+            assert.isUndefined res
+            done()
+
+      it "returns empty array on #all", (done) ->
+          App.Location.nil().all (err, res) ->
+            res.length.should.equal 0
+
+            App.Location.all (err, res) ->
+              res.length.should.equal 1
+              done()
+
+      it "returns undefined un #find", (done) ->
+          App.Location.nil().find 1, (err, res) ->
+            assert.isUndefined res
+
+            App.Location.find 1, (err, res) ->
+              assert.ok res
+              done()
+
     describe "#remove", ->
       it "removes the association but does not delete the object", (done) ->
         App.Location.create title: "Parent", (err, parent) =>
@@ -291,6 +317,7 @@ describe "Salad.Model", ->
                 assert.equal newChildObject.get("parentId"), undefined
 
                 done()
+
 
     describe "#includes", ->
       it "eager-loads one associated objects", (done) ->
