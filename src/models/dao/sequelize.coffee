@@ -34,9 +34,6 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
   findAll: (options, callback) ->
     params = @_buildOptions options
 
-    # TODO do performance tests on how faster this is
-    params.raw = true
-
     @daoModelInstance.findAll(params)
       .success (rawResources) =>
         resources = []
