@@ -323,7 +323,7 @@ describe "Salad.Model", ->
       it "eager-loads one associated objects", (done) ->
         App.Operator.create title: "Operator", (err, operator) =>
           operator.getLocations().create title: "Location", (err, location) =>
-            App.Location.include([App.Operator]).all (err, locations) =>
+            App.Location.includes([App.Operator]).all (err, locations) =>
 
               locations.length.should.equal 1
               _.keys(locations[0].getAssociations()).length.should.equal 1
@@ -337,7 +337,7 @@ describe "Salad.Model", ->
       it "eager-loads many associated objects", (done) ->
         App.Operator.create title: "Operator", (err, operator) =>
           operator.getLocations().create title: "Location", (err, location) =>
-            App.Operator.include([App.Location]).all (err, operators) =>
+            App.Operator.includes([App.Location]).all (err, operators) =>
 
               operators.length.should.equal 1
               _.keys(operators[0].getAssociations()).length.should.equal 1

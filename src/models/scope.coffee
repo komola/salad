@@ -47,7 +47,7 @@ class Salad.Scope
 
     @
 
-  include: (models) ->
+  includes: (models) ->
     for model in models
       unless model.daoInstance
         throw new Error "Model has to be instance of Salad.Model! #{model}"

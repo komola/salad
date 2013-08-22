@@ -29,8 +29,8 @@ module.exports =
     contains: (field, value) ->
       @scope().contains field, value
 
-    include: (models) ->
-      @scope().include models
+    includes: (models) ->
+      @scope().includes models
 
     all: (callback) ->
       @scope().all callback
