@@ -28,6 +28,11 @@ class A extends Parent
 
 class B extends Parent
 
+class InvalidTrigger extends Salad.Base
+  @mixin require "../../src/mixins/triggers"
+  @mixin require "../../src/mixins/metadata"
+  @before "invoke", "notExistentTrigger"
+
 describe "Trigger Mixin", ->
   describe "#runTriggers", ->
     it "resolves string function names when called on an instance", (done) ->
@@ -55,3 +60,10 @@ describe "Trigger Mixin", ->
       B.before "b", ->
       _.keys(A.metadata().triggerStack).length.should.equal 2
       _.keys(B.metadata().triggerStack).length.should.equal 2
+
+    it "throws error when trigger does not exist", (done) ->
+      try
+        InvalidTrigger.runTriggers "before:invoke", ->
+      catch e
+        assert.ok e
+        done()

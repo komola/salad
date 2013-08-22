@@ -30,7 +30,11 @@ module.exports =
       iterator = (action, cb) =>
         # resolve action if only a string is passed
         if typeof action is "string"
+          unless @[action]
+            throw new Error("Could not find trigger method #{action}!")
+
           action = @[action]
+
 
         # does the method accept a callback parameter?
         if action.length > 0
