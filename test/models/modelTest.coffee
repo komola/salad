@@ -118,6 +118,15 @@ describe "Salad.Model", ->
 
             done()
 
+      it "changes the isNew attribute on save", (done) ->
+        location = App.Location.build title: "Test"
+        assert.isTrue location.isNew
+
+        location.save (err, res) ->
+          assert.isFalse location.isNew
+
+          done()
+
     describe "#destroy", ->
       it "destroys the model", (done) ->
         App.Location.create title: "Test", (err, res) ->

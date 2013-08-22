@@ -4,8 +4,11 @@ class Salad.Model extends Salad.Base
   @mixin require "../mixins/metadata"
   @mixin require "../mixins/triggers"
   @mixin require "./mixins/attributes"
+  @mixin require "./mixins/changes"
   @mixin require "./mixins/associations"
   @mixin require "./mixins/scope"
+
+  @after "save", "takeSnapshot"
 
   daoInstance: undefined
   eagerlyLoadedAssociations: {}
@@ -15,10 +18,14 @@ class Salad.Model extends Salad.Base
   constructor: (attributes, options) ->
     @setAttributes attributes
 
+
     # overwrite default options with passed options
     options = _.extend {isNew: true}, options
 
     @isNew = options.isNew
+
+    unless @isNew
+      @takeSnapshot()
 
     @eagerlyLoadedAssociations = options.eagerlyLoadedAssociations
 
@@ -86,7 +93,10 @@ class Salad.Model extends Salad.Base
     async.series [
         (cb) => @runTriggers "before:save", cb
         action
-        (cb) => resource.runTriggers "after:save", cb
+        (cb) =>
+          @isNew = false
+          cb()
+        (cb) => @runTriggers "after:save", cb
       ],
 
       =>
