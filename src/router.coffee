@@ -65,7 +65,7 @@ class Salad.Router extends Salad.Base
           controller[matching.action]()
           cb()
         # wait for the request to finish, so that we can trigger the after actions
-        (cb) => request.once "end", cb
+        (cb) => controller.on "render", cb
         (cb) => controller.runTriggers "after:#{matching.action}", cb
         (cb) => controller.runTriggers "afterAction", cb
       ],

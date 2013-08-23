@@ -123,9 +123,13 @@ module.exports =
 
       # Render JSON response
       if options.json
-        return @json options.json
+        @json options.json
 
-      @html options
+      else
+        @html options
+
+      @response.end()
+      @emit "render"
 
     # method to render the actual layout
     html: (data) ->

@@ -1,7 +1,10 @@
+{EventEmitter} = require "events"
+
 class Salad.Controller extends Salad.Base
   @mixin require "./mixins/metadata"
   @mixin require "./mixins/triggers"
   @mixin require "./controllers/mixins/renderers"
+  @include EventEmitter.prototype
 
   request: null
   response: null

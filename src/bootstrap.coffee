@@ -97,6 +97,7 @@ class Salad.Bootstrap extends Salad.Base
   initControllers: (cb) ->
     require("require-all")
       dirname: "#{Salad.root}/#{@options.controllerPath}"
+      filter: /\.coffee$/
 
     cb()
 
@@ -106,6 +107,7 @@ class Salad.Bootstrap extends Salad.Base
   initModels: (cb) ->
     require("require-all")
       dirname: "#{Salad.root}/#{@options.modelPath}"
+      filter: /\.coffee$/
 
     cb()
 
