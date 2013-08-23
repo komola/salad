@@ -46,6 +46,14 @@ describe "Salad.Model", ->
 
             done()
 
+      it "sets the id of the creating instance", (done) ->
+        location = App.Location.build title: "Test"
+
+        location.save (err, newLocation) ->
+          assert.ok location.get("id")
+
+          done()
+
       # TODO See https://github.com/sequelize/sequelize/issues/815
       it.skip "does not break when id is set to null", (done) ->
         attribs =

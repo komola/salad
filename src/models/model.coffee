@@ -95,6 +95,7 @@ class Salad.Model extends Salad.Base
         action
         (cb) =>
           @isNew = false
+          @set "id", resource.get("id")
           cb()
         (cb) => @runTriggers "after:save", cb
       ],
