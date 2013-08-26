@@ -10,7 +10,6 @@ describe "App.Model changes", ->
     todo = App.Todo.build title: "test"
 
     todo.save ->
-      console.log todo.previousValues
       todo.getSnapshot().title.should.equal "test"
 
       done()
@@ -41,9 +40,6 @@ describe "App.Model changes", ->
     todo = App.Todo.build title: "test"
 
     todo.save (err, res) ->
-      # _.keys(res.getChangedAttributes()).length.should.equal 0
-      # console.log todo.isNew
-      console.log todo.getSnapshot()
       _.keys(todo.getChangedAttributes()).length.should.equal 0
 
       done()

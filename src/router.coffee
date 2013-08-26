@@ -66,9 +66,12 @@ class Salad.Router extends Salad.Base
           cb()
         # wait for the request to finish, so that we can trigger the after actions
         (cb) =>
-          console.log "This is broken"
-          process.exit()
-        (cb) => controller.on "render", cb
+          # don't wait for the render event when the response is already finished
+          # this happens when the action does not contain any db calls etc.
+          if response.finished
+            return cb()
+
+          controller.on "render", cb
         (cb) => controller.runTriggers "after:#{matching.action}", cb
         (cb) => controller.runTriggers "afterAction", cb
       ],
