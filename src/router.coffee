@@ -1,4 +1,6 @@
 Router = require("barista").Router
+path = require "path"
+
 router = new Router
 
 # write our own salad-compatible resource method.
@@ -22,7 +24,9 @@ class Salad.Router extends Salad.Base
   # Dispatch the request to the associated controller
   dispatch: (request, response) =>
     # Get the first matching route
-    matching = router.first(request.path, request.method)
+    requestPath = path.normalize request.path
+
+    matching = router.first(requestPath, request.method)
 
     # No matching route found
     unless matching
