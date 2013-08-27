@@ -25,6 +25,8 @@ class Salad.Router extends Salad.Base
   dispatch: (request, response) =>
     # Get the first matching route
     requestPath = path.normalize request.path
+    if _.last(requestPath) is "/"
+      requestPath = requestPath.substr 0, requestPath.length - 1
 
     matching = router.first(requestPath, request.method)
 
