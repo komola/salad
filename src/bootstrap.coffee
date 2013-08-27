@@ -158,13 +158,17 @@ class Salad.Bootstrap extends Salad.Base
             App.Logger.info "Template #{index} reloaded"
 
   initDatabase: (cb) ->
-    dbConfig = Salad.Config.database[Salad.env]
+    dbConfig =
+      dialect: "postgres"
+      logging: false
+
+    dbConfig = _.extend dbConfig, Salad.Config.database[Salad.env]
 
     App.sequelize = new Sequelize dbConfig.database, dbConfig.username, dbConfig.password,
-      dialect: "postgres"
+      dialect: dbConfig.dialect
       host: dbConfig.host
       port: dbConfig.port
-      logging: if Salad.env is "development" then console.log else false
+      logging: if dbConfig.logging then console.log else false
 
     cb()
 
