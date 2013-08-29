@@ -164,11 +164,12 @@ class Salad.Bootstrap extends Salad.Base
 
     dbConfig = _.extend dbConfig, Salad.Config.database[Salad.env]
 
+    # don't pass secret information to the extraConfig object
+    extraConfig = _.omit dbConfig, "database", "username", "password"
+    extraConfig.logging = if dbConfig.logging then console.log else false
+
     App.sequelize = new Sequelize dbConfig.database, dbConfig.username, dbConfig.password,
-      dialect: dbConfig.dialect
-      host: dbConfig.host
-      port: dbConfig.port
-      logging: if dbConfig.logging then console.log else false
+      extraConfig
 
     cb()
 
