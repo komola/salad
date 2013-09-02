@@ -22,6 +22,7 @@ cleanupDatabase = (cb) =>
     .error(done)
 
 before (done) ->
+  @timeout 20000
   Salad.root += "/test"
   Salad.Bootstrap.run
     port: 3001
@@ -30,6 +31,7 @@ before (done) ->
       cleanupDatabase done
 
 beforeEach (done) ->
+  @timeout 20000
   cleanupDatabase done
 
 after (done) ->

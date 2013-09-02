@@ -10,6 +10,9 @@ require "./router"
 require "./controller"
 require "./controllers/restfulController"
 
+require "./template"
+require "./mailer"
+
 require "./models/scope"
 require "./models/dao/dao"
 require "./models/dao/sequelize"

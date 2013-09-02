@@ -17,6 +17,7 @@ class Salad.Bootstrap extends Salad.Base
   options:
     routePath: "app/config/server/routes"
     controllerPath: "app/controllers/server"
+    mailerPath: "app/mailers"
     modelPath: "app/models/server"
     configPath: "app/config/server/config"
     templatePath: ["app", "templates"].join(path.sep)
@@ -28,6 +29,7 @@ class Salad.Bootstrap extends Salad.Base
     @constructor.after "init", @initConfig
     @constructor.after "init", @initLogger
     @constructor.after "init", @initControllers
+    @constructor.after "init", @initMailers
     @constructor.after "init", @initRoutes
     @constructor.after "init", @initHelpers
     @constructor.after "init", @initDatabase
@@ -97,6 +99,13 @@ class Salad.Bootstrap extends Salad.Base
   initControllers: (cb) ->
     require("require-all")
       dirname: "#{Salad.root}/#{@options.controllerPath}"
+      filter: /\.coffee$/
+
+    cb()
+
+  initMailers: (cb) ->
+    require("require-all")
+      dirname: "#{Salad.root}/#{@options.mailerPath}"
       filter: /\.coffee$/
 
     cb()

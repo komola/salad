@@ -1,4 +1,4 @@
-describe "#render()", ->
+describe "Salad.Controller", ->
   it "should not render twice", (done) ->
     agent.get(":3001/rendering/renderTwice")
       .end (res) ->
