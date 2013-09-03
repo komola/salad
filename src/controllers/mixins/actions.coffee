@@ -9,6 +9,7 @@ module.exports =
     _index: (callback) ->
       @scoped (err, scope) =>
         scope.all (err, resources) =>
+          @resources = resources
           callback.apply @, [null, resources]
 
     show: ->
@@ -21,6 +22,8 @@ module.exports =
       @findResource (err, resource) =>
         unless resource
           return @_notFoundHandler()
+
+        @resource = resource
 
         callback.apply @, [err, resource]
 
@@ -39,6 +42,8 @@ module.exports =
         scope.create data, (err, resource) =>
           if err
             return callback.apply @, [err, null]
+
+          @resource = resource
 
           callback.apply @, [null, resource]
 
@@ -59,6 +64,8 @@ module.exports =
         resource.updateAttributes data, (err, resource) =>
           if err
             return callback.apply @, [err]
+
+          @resource = resource
 
           callback.apply @, [err, resource]
 
