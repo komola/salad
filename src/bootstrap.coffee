@@ -26,25 +26,22 @@ class Salad.Bootstrap extends Salad.Base
     env: "production"
 
   init: (options, callback) ->
-    @constructor.after "init", @initConfig
-    @constructor.after "init", @initLogger
-    @constructor.after "init", @initControllers
-    @constructor.after "init", @initMailers
-    @constructor.after "init", @initRoutes
-    @constructor.after "init", @initHelpers
-    @constructor.after "init", @initDatabase
-    @constructor.after "init", @initModels
-    @constructor.after "init", @initTemplates
-    @constructor.after "init", @initExpress
+    @constructor.before "init", @initConfig
+    @constructor.before "init", @initLogger
+    @constructor.before "init", @initControllers
+    @constructor.before "init", @initMailers
+    @constructor.before "init", @initRoutes
+    @constructor.before "init", @initHelpers
+    @constructor.before "init", @initDatabase
+    @constructor.before "init", @initModels
+    @constructor.before "init", @initTemplates
+    @constructor.before "init", @initExpress
+
+    @options.port = options.port || 80
+    @options.env = Salad.env = options.env || "production"
 
     async.series [
       (cb) => @runTriggers "before:init", cb
-      (cb) =>
-        @options.port = options.port || 80
-        @options.env = Salad.env = options.env || "production"
-
-        cb()
-
       (cb) => @runTriggers "after:init", cb
     ], (err) =>
       callback() if callback
@@ -186,12 +183,11 @@ class Salad.Bootstrap extends Salad.Base
     express = require "express"
     @metadata().app = express()
 
+    @metadata().app.use express.static("#{Salad.root}/public")
+    @metadata().app.use express.cookieParser()
     @metadata().app.use express.bodyParser()
     @metadata().app.use express.methodOverride()
-    @metadata().app.use express.static("#{Salad.root}/public")
 
-    router = new Salad.Router
-    @metadata().app.all "*", router.dispatch
 
     # TODO: Hack for this issue: https://github.com/sequelize/sequelize/issues/815
     # May need to think of a better way to handle this.
@@ -211,6 +207,9 @@ class Salad.Bootstrap extends Salad.Base
     async.series [
       (cb) => @runTriggers "before:start", cb
       (cb) =>
+        router = new Salad.Router
+        @metadata().app.all "*", router.dispatch
+
         @metadata().expressServer = @metadata().app.listen @options.port
 
         console.log "Started salad. Environment: #{Salad.env}" if Salad.env isnt "testing"

@@ -76,8 +76,8 @@ module.exports =
 
       else
         @html options
+        @response.end()
 
-      @response.end()
       @emit "render"
 
     # method to render the actual layout

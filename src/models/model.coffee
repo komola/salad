@@ -101,7 +101,8 @@ class Salad.Model extends Salad.Base
       ],
 
       =>
-        callback err, resource
+        if callback
+          callback err, resource
 
   destroy: (callback) ->
     @daoInstance.destroy @, callback
