@@ -46,3 +46,6 @@ module.exports =
 
     findAndCountAll: (callback) ->
       @scope().findAndCountAll callback
+
+    destroy: (callback) ->
+      @scope().destroy callback

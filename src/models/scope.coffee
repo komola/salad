@@ -119,18 +119,24 @@ class Salad.Scope
 
         callback err, result
 
-  ## Creation
-
+  # create object
   create: (data, callback) ->
     attributes = _.extend @data.conditions, data
 
     @context.create attributes, callback
 
+  # build an instance
   build: (data) ->
     attributes = _.extend @data.conditions, data
 
     @context.build attributes
 
+  destroy: (callback) ->
+    options = @data
+
+    @daoContext.destroy options, callback
+
+  # remove associations
   remove: (model, callback) ->
     keys = _.keys @data.conditions
 

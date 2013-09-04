@@ -24,12 +24,43 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
         resource = @_buildModelInstance daoResource
         callback null, resource
 
-  destroy: (model, callback) ->
-    @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
-      return callback err if err
+  ###
+  Destroy models in the database
 
-      sequelizeModel.destroy().success =>
-        callback null
+  Usage:
+    # destroy single instance
+    App.Todo.first (err, todo) =>
+      todo.destroy()
+
+    # destroy all objects
+    App.Todo.destroy (err) =>
+      console.log "everything gone"
+  ###
+  destroy: (model, callback) ->
+    if model instanceof Salad.Model
+      @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
+        return callback err if err
+
+        sequelizeModel.destroy().success =>
+          callback null
+
+    else
+      sequelizeModel = @daoModelInstance
+
+      # when no conditions are supplied we have to delete *every* object.
+      # Sequelize does not seem to allow this, since it creates a faulty SQL
+      # statement when passing {} as conditions.
+      # so we add a where statement that matches every row
+      if _.keys(model.conditions).length is 0
+        model.conditions = "true = true"
+
+      sequelizeModel.destroy(model.conditions)
+        .success =>
+          callback null
+        .error =>
+          console.log arguments
+
+          callback()
 
   findAll: (options, callback) ->
     params = @_buildOptions options

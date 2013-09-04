@@ -18,6 +18,8 @@ require "./models/dao/dao"
 require "./models/dao/sequelize"
 require "./models/model"
 
+require "./utils/models"
+
 path = process.cwd()
 Salad.root = path
 

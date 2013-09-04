@@ -76,7 +76,6 @@ module.exports =
 
       else
         @html options
-        @response.end()
 
       @emit "render"
 

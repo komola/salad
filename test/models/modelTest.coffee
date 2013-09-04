@@ -144,6 +144,23 @@ describe "Salad.Model", ->
 
               done()
 
+      it "destroys all created models", (done) ->
+        App.Location.create title: "Test", (err, res) ->
+          App.Location.destroy =>
+            App.Location.count (err, count) =>
+              count.should.equal 0
+
+              done()
+
+      it "accepts conditions for destroy", (done) ->
+        App.Location.create title: "A", ->
+          App.Location.create title: "B", ->
+            App.Location.where(title: "A").destroy ->
+              App.Location.count (err, count) =>
+                count.should.equal 1
+
+                done()
+
   describe "attributes", ->
     describe "#set", ->
       it "sets an attribute to a specific value", ->

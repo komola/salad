@@ -15,7 +15,7 @@ module.exports =
       foreignKey = options.foreignKey
 
       # register the association
-      @_registerAssociation options.as, targetModel
+      @_registerAssociation options.as, targetModel, isOwning: false
 
       # register the method in this model
       # Don't bind to this context, because we want the method to be run in the
@@ -36,7 +36,7 @@ module.exports =
       foreignKey = options.foreignKey
 
       # register the association
-      @_registerAssociation options.as, targetModel
+      @_registerAssociation options.as, targetModel, isOwning: true
 
       @attribute foreignKey
 
@@ -53,10 +53,12 @@ module.exports =
 
     # return the model class for the association key name
     getAssociation: (key) ->
-      @metadata().associations[key]
+      @metadata().associations[key].model
 
-    _registerAssociation: (key, model) ->
+    _registerAssociation: (key, model, options = {}) ->
       key = key.toLowerCase()
 
       @metadata().associations or= {}
-      @metadata().associations[key] = model
+      @metadata().associations[key] =
+        model: model
+        isOwning: options.isOwning
