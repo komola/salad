@@ -39,7 +39,7 @@ class Salad.Utils.Models
     tables = Salad.Utils.existingDatabaseTables()
   ###
   @existingDatabaseTables: ->
-    models = @registered()
+    models = @resolvedRegistered()
 
     tables = (model.daoInstance.daoModelInstance.tableName for model in models)
     tables.push "SequelizeMeta"
@@ -107,13 +107,22 @@ class Salad.Utils.Models
     resolvedDependencies.push model
 
   @emptyTables: (callback) ->
-    models = @resolvedRegistered()
+    tables = @existingDatabaseTables()
 
-    destroyIterator = (model, cb) ->
-      model.destroy (err) ->
-        cb()
+    # remove SequelizeMeta
+    tables.pop()
 
-    async.eachSeries models, destroyIterator, callback
+    tables = tables.map (item) -> "\"#{item}\""
+    table = tables.join ", "
+
+    sql = "TRUNCATE TABLE #{table} RESTART IDENTITY CASCADE"
+
+    App.sequelize.query(sql)
+      .success =>
+        callback()
+      .error =>
+        console.log arguments
+        callback "fail"
 
   @dropTables: (callback) ->
     tables = @existingDatabaseTables()
