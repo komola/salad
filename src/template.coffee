@@ -19,6 +19,8 @@ class Salad.Template
     # transform class representations of models to JSON data
     # otherwise handlebars can't handle them
     for key, val of options
+      if val instanceof Array
+        options[key] = (a.toJSON() for a in val)
       if val?.toJSON
         options[key] = val.toJSON()
 
