@@ -23,11 +23,13 @@ class Salad.Router extends Salad.Base
 
   # Dispatch the request to the associated controller
   dispatch: (request, response) =>
-    # Get the first matching route
     requestPath = path.normalize request.path
-    if _.last(requestPath) is "/"
+
+    # remove trailing slashes
+    if _.last(requestPath) is "/" and requestPath isnt "/"
       requestPath = requestPath.substr 0, requestPath.length - 1
 
+    # Get the first matching route
     matching = router.first(requestPath, request.method)
 
     # No matching route found

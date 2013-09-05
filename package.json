@@ -1,6 +1,6 @@
 {
   "name": "salad",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "",
   "homepage": "http://github.com/komola/salad",
   "main": "./salad.coffee",
