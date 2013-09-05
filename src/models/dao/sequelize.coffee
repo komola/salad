@@ -98,8 +98,23 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     if daoInstance.__eagerlyLoadedAssociations?.length > 0
       for key in daoInstance.__eagerlyLoadedAssociations
+        loadedAssociationsKey = key
+
+        associations = @modelClass.metadata().associations
+
+        # sequelize seems to use the tableName as the key for the eager-loaded
+        # association. We need to map this key back to the property we defined
+        # for the association. So we need to look up the key and match by model
+        # class.
+        # FIXME: This can lead to problems when a model has more than one
+        # association with another model.
+        for associationKey, association of associations
+          if associationKey.toLowerCase() is key
+            loadedAssociationsKey = associationKey
+            break
+
         # fetch the association model class from the associations object
-        associationModelClass = @modelClass.getAssociation key
+        associationModelClass = @modelClass.getAssociation loadedAssociationsKey
 
         daoModels = daoInstance[key]
         models = null
@@ -119,7 +134,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
         # add the instance to the options, so the constructor of modelInstance
         # model can pick them up
-        options.eagerlyLoadedAssociations[key] = models
+        options.eagerlyLoadedAssociations[loadedAssociationsKey] = models
 
     attributes = daoInstance.dataValues
 
@@ -164,5 +179,4 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       params.include = []
       for model in options.includes
         params.include.push model.daoModelInstance
-
     params

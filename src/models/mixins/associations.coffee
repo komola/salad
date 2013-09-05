@@ -56,7 +56,7 @@ module.exports =
       @metadata().associations[key].model
 
     _registerAssociation: (key, model, options = {}) ->
-      key = key.toLowerCase()
+      key = key[0].toLowerCase() + key.substr(1)
 
       @metadata().associations or= {}
       @metadata().associations[key] =

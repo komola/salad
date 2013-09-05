@@ -386,6 +386,16 @@ describe "Salad.Model", ->
 
               done()
 
+      it "preserves desired naming when eager-loading", (done) ->
+        App.Operator.create title: "Operator", (err, operator) =>
+          operator.getOperatorItems().create data: "test", (err, location) =>
+            App.Operator.includes([App.OperatorItem]).all (err, operators) =>
+              data = (a.toJSON() for a in operators)
+
+              data[0].should.have.property "operatorItems"
+
+              done()
+
     describe "#where", ->
       it "accepts normal fields", (done) ->
         App.Shop.create otherField: "Test", (err, resource) ->
