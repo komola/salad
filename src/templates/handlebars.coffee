@@ -1,53 +1,5 @@
 handlebars = require "handlebars"
 
-handlebars.registerHelper "debug", (optionalValue) ->
-  console.log "\nCurrent Context"
-  console.log "===================="
-  console.log @
-
-  if  arguments.length > 1
-    console.log "Value"
-    console.log "===================="
-    console.log optionalValue
-
-handlebars.registerHelper "stylesheets", (type) ->
-  assets = require "#{Salad.root}/app/config/server/assets"
-
-  stylesheets = assets.stylesheets[type] or []
-  files = []
-
-  if Salad.env is "production"
-    files.push "/assets/#{type}.css"
-
-  else
-    for stylesheet in stylesheets
-      files.push "/stylesheets/#{stylesheet}.css"
-
-  tags = []
-  for stylesheet in files
-    tags.push '<link href="'+stylesheet+'" rel="stylesheet">'
-
-  new handlebars.SafeString(tags.join("\n"))
-
-handlebars.registerHelper "javascripts", (type) ->
-  assets = require "#{Salad.root}/app/config/server/assets"
-
-  javascripts = assets.javascripts[type] or []
-  files = []
-
-  if Salad.env is "production"
-    files.push "/assets/#{type}.js"
-
-  else
-    for javascript in javascripts
-      files.push "/javascripts/#{javascript}.js"
-
-  links = []
-  for asset in files
-    links.push '<script src="'+asset+'" type="text/javascript"></script>'
-
-  new handlebars.SafeString(links.join("\n"))
-
 class Salad.Template.Handlebars
   registeredPartials: false
 
