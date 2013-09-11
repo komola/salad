@@ -20,7 +20,7 @@ class Salad.Template
     # otherwise handlebars can't handle them
     for key, val of options
       if val instanceof Array
-        options[key] = (a.toJSON() for a in val)
+        options[key] = (if a instanceof Salad.Model then a.toJSON() else a for a in val)
       if val?.toJSON
         options[key] = val.toJSON()
 
