@@ -16,19 +16,7 @@ class Salad.Template
 
     options = _.extend defaultOptions, options
 
-    serialize = (elm) ->
-      # call serialize on the array
-      if elm instanceof Array
-        return elm.map serialize
-
-      return elm unless elm?.toJSON
-
-      elm.toJSON()
-
-    # transform class representations of models to JSON data
-    # otherwise handlebars can't handle them
-    for key, val of options
-      options[key] = serialize val
+    options = @serialize options
 
     content = @_render file, options
 
@@ -41,5 +29,24 @@ class Salad.Template
 
   @_render: (file, options) ->
     Salad.Template.Handlebars.render file, options
+
+  # transform class representations of models to JSON data
+  # otherwise handlebars can't handle them
+  @serialize: (elm) ->
+    # if elm has a toJSON method it's easy
+    if elm?.toJSON
+      return elm.toJSON()
+
+    # call serialize on the array
+    if _.isArray elm
+      elm = elm.map @serialize
+      return elm
+
+    # call serialize on all properties of the object
+    if _.isObject elm
+      for key, val of elm
+        elm[key] = @serialize val
+
+    elm
 
 require "./templates/handlebars"
