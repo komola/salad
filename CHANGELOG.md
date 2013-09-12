@@ -2,6 +2,7 @@
 
 ## Version 0.2.7
 * [BUG] Renamed @resource() to @resourceClass() to prevent name clashes
+* [FEATURE] Error handler logs errors
 
 ## Version 0.2.6
 * [BUG] Fixed serialization of data for templates
