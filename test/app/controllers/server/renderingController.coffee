@@ -19,6 +19,18 @@ class App.RenderingController extends Salad.Controller
   applicationLayout: ->
     @render "rendering/test", layout: "application"
 
+  show: ->
+    App.Todo.first (err, todo) =>
+      @render "rendering/model", model: todo
+
+  list: ->
+    App.Todo.all (err, todos) =>
+      @render "rendering/list", models: todos
+
+  array: ->
+    data = ["1"]
+    @render "rendering/array", models: data
+
   renderTwice: ->
     @render json: one: true, status: 200
     @render json: two: true, status: 200
