@@ -83,7 +83,7 @@ module.exports =
 
       false
 
-    resource: ->
+    resourceClass: ->
       unless @resourceOptions?.resourceClass
         throw new Error "No resource registered!"
 
@@ -105,7 +105,7 @@ module.exports =
           scope = parent[collectionGetter]()
 
         else
-          scope = @resource()
+          scope = @resourceClass()
 
         conditions = @buildConditionsFromParameters @params
 

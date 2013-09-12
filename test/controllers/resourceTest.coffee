@@ -75,10 +75,10 @@ describe "App.Controller mixin resource", ->
           title: "Test"
           createdAt: gt: "2013-07-15T09:09:09.000Z"
 
-      scope = controller.resource()
+      scope = controller.resourceClass()
       scope = controller.applyConditionsToScope(scope,shouldConditions)
 
-      secondScope = controller.resource()
+      secondScope = controller.resourceClass()
 
       whereConditions =
         title: "Test"
@@ -96,10 +96,10 @@ describe "App.Controller mixin resource", ->
         asc: ["Title"]
         desc: ["Name"]
 
-      scope = controller.resource()
+      scope = controller.resourceClass()
       scope = controller.applyConditionsToScope(scope,shouldConditions)
 
-      secondScope = controller.resource()
+      secondScope = controller.resourceClass()
       secondScope = secondScope.asc("Title").desc("Name")
 
       scope.should.eql secondScope
@@ -111,10 +111,10 @@ describe "App.Controller mixin resource", ->
       shouldConditions =
         limit: 500
 
-      scope = controller.resource()
+      scope = controller.resourceClass()
       scope = controller.applyConditionsToScope(scope,shouldConditions)
 
-      secondScope = controller.resource()
+      secondScope = controller.resourceClass()
       secondScope = secondScope.limit(500)
 
       scope.should.eql secondScope
@@ -126,10 +126,10 @@ describe "App.Controller mixin resource", ->
       shouldConditions =
         offset: 50
 
-      scope = controller.resource()
+      scope = controller.resourceClass()
       scope = controller.applyConditionsToScope(scope,shouldConditions)
 
-      secondScope = controller.resource()
+      secondScope = controller.resourceClass()
 
       secondScope = secondScope.offset(50)
 
@@ -142,10 +142,10 @@ describe "App.Controller mixin resource", ->
       shouldConditions =
         includes: ["Child"]
 
-      scope = controller.resource()
+      scope = controller.resourceClass()
       scope = controller.applyConditionsToScope(scope,shouldConditions)
 
-      secondScope = controller.resource()
+      secondScope = controller.resourceClass()
 
       secondScope = secondScope.includes([App.Child])
 

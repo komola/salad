@@ -17,6 +17,9 @@ Salad.Router.register (router) ->
   router.get("/rendering/partial").to("rendering.partial")
   router.get("/rendering/applicationLayout").to("rendering.applicationLayout")
   router.get("/rendering/renderTwice").to("rendering.renderTwice")
+  router.get("/rendering/show").to("rendering.show")
+  router.get("/rendering/list").to("rendering.list")
+  router.get("/rendering/array").to("rendering.array")
 
   router.get("/performance").to("performance.test")
 

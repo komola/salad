@@ -48,6 +48,36 @@ describe "Salad.Controller", ->
           res.text.should.equal "partial"
           done()
 
+    it "serializes single models", (done) ->
+      App.Todo.create title: "Test", (err, todo) =>
+        agent.get(":3001/rendering/show")
+          .end (res) ->
+            res.ok.should.equal true
+
+            res.text.should.equal "<body>#{todo.get("id")}\n</body>"
+
+            done()
+
+    it "serializes an array of models", (done) ->
+      App.Todo.create title: "Test", (err, todo) =>
+        agent.get(":3001/rendering/list")
+          .end (res) ->
+            res.ok.should.equal true
+
+            res.text.should.equal "<body>#{todo.get("id")}\n</body>"
+
+            done()
+
+    it "serializes an array of text", (done) ->
+      agent.get(":3001/rendering/array")
+        .end (res) ->
+          res.ok.should.equal true
+
+          res.text.should.equal "<body>1\n</body>"
+
+          done()
+
+
 
 describe "#layout()", ->
   it "sets the layout of the controller", ->
