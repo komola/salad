@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.2.7
+* [BUG] Renamed @resource() to @resourceClass() to prevent name clashes
+
 ## Version 0.2.6
 * [BUG] Fixed serialization of data for templates
 
