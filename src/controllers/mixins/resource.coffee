@@ -134,6 +134,10 @@ module.exports =
       ###
       reservedParams = ["sort","include","includes","limit","offset","method","controller","action","format"]
 
+      # only accept parameters that represent an attribute for where conditions
+      allowedWhereAttributes = []
+      allowedWhereAttributes.push key for key,value of App[@resourceOptions.resourceClass].metadata().attributes
+
       conditions = {}
 
       for key,value of parameters
@@ -168,7 +172,8 @@ module.exports =
                   conditions.includes = []
               conditions.includes.push value
           continue
-
+        if key not in allowedWhereAttributes
+          continue
         # all other parameter names are treated as where conditions
         unless conditions.where?
           conditions.where = {}
