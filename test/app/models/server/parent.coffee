@@ -10,3 +10,5 @@ class App.Parent extends Salad.Model
   @attribute "title"
   @attribute "createdAt"
   @attribute "updatedAt"
+
+App.Parent.hasMany App.Child, as: "Children", foreignKey: "parentId"
