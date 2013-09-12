@@ -205,8 +205,8 @@ module.exports =
 
               # the param is a string, from which we need to construct the class name
               theClass = App[value]
-	      includesClassArray.push theClass
-	      scope = scope.includes includesClassArray
+              includesClassArray.push theClass
+              scope = scope.includes includesClassArray
 
             if key is "asc"
               scope = scope.asc value
