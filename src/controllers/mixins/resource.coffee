@@ -107,84 +107,84 @@ module.exports =
         else
           scope = @resource()
 
-	conditions = @buildConditionsFromParameters @params
+        conditions = @buildConditionsFromParameters @params
 
-	scope = @applyConditionsToScope scope, conditions
+        scope = @applyConditionsToScope scope, conditions
 
-	callback.call @, null, scope
+        callback.call @, null, scope
 
     ###
       This builds conditions by URL params. Possible condtions are:
-	Where:
-	  Equality:
-	    ?title=Dishes
-	  Greater than:
-	    ?createdAt=>2013-07-15T09:09:09.000Z
-	  Less than:
-	    ?createdAt=<2013-07-15T09:09:09.000Z
-	Sorting:
-	  ?sort=createdAt,-title
+        Where:
+          Equality:
+            ?title=Dishes
+          Greater than:
+            ?createdAt=>2013-07-15T09:09:09.000Z
+          Less than:
+            ?createdAt=<2013-07-15T09:09:09.000Z
+        Sorting:
+          ?sort=createdAt,-title
 
-	  This would sort ascending by createdAt and descending by title. Ascending is assumed by default
+          This would sort ascending by createdAt and descending by title. Ascending is assumed by default
     ###
     buildConditionsFromParameters: (parameters) ->
 
       ###
-	  Some parameter names are reserved and have a special meaning
+          Some parameter names are reserved and have a special meaning
       ###
       reservedParams = ["sort","include","includes","limit","offset","method","controller","action","format"]
 
       conditions = {}
 
       for key,value of parameters
-	# check if the parameter name needs special handling
-	if key in reservedParams
-	  if key is "sort"
-	    # sorting supports multiple attributes to sort by
-	    sortParams = value.split(",")
+        # check if the parameter name needs special handling
+        if key in reservedParams
+          if key is "sort"
+            # sorting supports multiple attributes to sort by
+            sortParams = value.split(",")
 
-	    for value in sortParams
-	      firstChar = value[0]
-	      # we sort ascending by default
-	      # a minus in front of the attribute sorts descending
-	      if firstChar isnt "-"
-		unless conditions.asc?
-		  conditions.asc = []
-		conditions.asc.push value
-	      else if firstChar is "-"
-		unless conditions.desc?
-		    conditions.desc = []
-		conditions.desc.push value[1..-1]
+            for value in sortParams
+              firstChar = value[0]
+              # we sort ascending by default
+              # a minus in front of the attribute sorts descending
+              if firstChar isnt "-"
+                unless conditions.asc?
+                  conditions.asc = []
+                conditions.asc.push value
+              else if firstChar is "-"
+                unless conditions.desc?
+                    conditions.desc = []
+                conditions.desc.push value[1..-1]
 
-	  if key is "limit" or key is "offset"
-	    # limit and offset are simple params
-	    conditions[key] = value
+          if key is "limit" or key is "offset"
+            # limit and offset are simple params
+            conditions[key] = value
 
-	  if key is "includes"
-	    # includes can contain multiple classes
-	    includeParams = value.split(",")
-	    for value in includeParams
-	      unless conditions.includes?
-		  conditions.includes = []
-	      conditions.includes.push value
-	  continue
+          if key is "includes"
+            # includes can contain multiple classes
+            includeParams = value.split(",")
+            for value in includeParams
+              unless conditions.includes?
+                  conditions.includes = []
+              conditions.includes.push value
+          continue
 
-	# all other parameter names are treated as where conditions
-	unless conditions.where?
-	  conditions.where = {}
-	firstChar = value[0]
-	checksForEquality = firstChar isnt ">" and firstChar isnt "<"
-	if not checksForEquality
-	  if firstChar is ">"
-	    # we search values which are greater as the specified value
-	    bindingElm = "gt"
-	  else
-	    bindingElm = "lt"
+        # all other parameter names are treated as where conditions
+        unless conditions.where?
+          conditions.where = {}
+        firstChar = value[0]
+        checksForEquality = firstChar isnt ">" and firstChar isnt "<"
+        if not checksForEquality
+          if firstChar is ">"
+            # we search values which are greater as the specified value
+            bindingElm = "gt"
+          else
+            bindingElm = "lt"
 
-	  conditions.where[key] = {}
-	  conditions.where[key][bindingElm] = value[1..-1]
-	else
-	  conditions.where[key] = value
+          conditions.where[key] = {}
+          conditions.where[key][bindingElm] = value[1..-1]
+        else
+          conditions.where[key] = value
 
       conditions
 
@@ -193,29 +193,29 @@ module.exports =
       simpleKeys = ["limit","offset","where"]
 
       for key,value of conditions
-	# iterate by key over the conditions object
-	if key not in simpleKeys
-	  # includes, asc and desc need special handling
+        # iterate by key over the conditions object
+        if key not in simpleKeys
+          # includes, asc and desc need special handling
 
-	  # includes takes an array as parameter
-	  includesClassArray = []
+          # includes takes an array as parameter
+          includesClassArray = []
 
-	  for value in conditions[key]
-	    if key is "includes"
+          for value in conditions[key]
+            if key is "includes"
 
-	      # the param is a string, from which we need to construct the class name
-	      theClass = App[value]
-	      classArray.push theClass
-	      scope = scope.includes classArray
+              # the param is a string, from which we need to construct the class name
+              theClass = App[value]
+              classArray.push theClass
+              scope = scope.includes classArray
 
-	    if key is "asc"
-	      scope = scope.asc value
+            if key is "asc"
+              scope = scope.asc value
 
-	    if key is "desc"
-	      scope = scope.desc value
-	else
-	  # apply calls the method key on the object scope with the values given in the array
-	  scope = scope[key].apply(scope,[value])
+            if key is "desc"
+              scope = scope.desc value
+        else
+          # apply calls the method key on the object scope with the values given in the array
+          scope = scope[key].apply(scope,[value])
 
       # return the scope, so it can be used
       scope
