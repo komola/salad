@@ -128,15 +128,13 @@ module.exports =
           This would sort ascending by createdAt and descending by title. Ascending is assumed by default
     ###
     buildConditionsFromParameters: (parameters) ->
-
       ###
           Some parameter names are reserved and have a special meaning
       ###
       reservedParams = ["sort","include","includes","limit","offset","method","controller","action","format"]
 
       # only accept parameters that represent an attribute for where conditions
-      allowedWhereAttributes = []
-      allowedWhereAttributes.push key for key,value of App[@resourceOptions.resourceClass].metadata().attributes
+      allowedWhereAttributes = _.keys(App[@resourceOptions.resourceClass].metadata().attributes)
 
       conditions = {}
 
@@ -152,12 +150,10 @@ module.exports =
               # we sort ascending by default
               # a minus in front of the attribute sorts descending
               if firstChar isnt "-"
-                unless conditions.asc?
-                  conditions.asc = []
+                conditions.asc or= []
                 conditions.asc.push value
               else if firstChar is "-"
-                unless conditions.desc?
-                    conditions.desc = []
+                conditions.desc or= []
                 conditions.desc.push value[1..-1]
 
           if key is "limit" or key is "offset"
@@ -168,15 +164,13 @@ module.exports =
             # includes can contain multiple classes
             includeParams = value.split(",")
             for value in includeParams
-              unless conditions.includes?
-                  conditions.includes = []
+              conditions.includes or= []
               conditions.includes.push value
           continue
         if key not in allowedWhereAttributes
           continue
         # all other parameter names are treated as where conditions
-        unless conditions.where?
-          conditions.where = {}
+        conditions.where or= {}
         firstChar = value[0]
         checksForEquality = firstChar isnt ">" and firstChar isnt "<"
         if not checksForEquality
@@ -190,6 +184,7 @@ module.exports =
           conditions.where[key][bindingElm] = value[1..-1]
         else
           conditions.where[key] = value
+
 
       conditions
 
