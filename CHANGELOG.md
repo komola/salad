@@ -3,6 +3,7 @@
 ## Version 0.2.8
 * Improved serialization of models when passed to handlebars
 * Added validation method implementations and validate in the controllers
+* Models can define default values of their attributes
 
 ## Version 0.2.7
 * [BUG] Renamed @resource() to @resourceClass() to prevent name clashes

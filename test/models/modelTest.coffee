@@ -63,6 +63,15 @@ describe "Salad.Model", ->
 
           done()
 
+      it "applies default values", (done) ->
+        App.Todo.create title: "test", (err, todo) ->
+          assert.ok todo
+
+          assert.isTrue todo.get("isDone") isnt null
+          todo.get("isDone").should.equal false
+
+          done()
+
     describe "#updateAttributes", ->
       res = null
       params =
@@ -95,6 +104,19 @@ describe "Salad.Model", ->
           assert.equal newResource.get("title"), null
 
           done()
+
+      it "can change default values", (done) ->
+        App.Todo.create title: "test", (err, todo) ->
+          assert.ok todo
+
+          todo.get("isDone").should.equal false
+
+          todo.set "isDone", true
+
+          todo.save (err, newTodo) ->
+            newTodo.get("isDone").should.equal true
+
+            done()
 
     describe "#save", ->
       it "creates a record when it is new", (done) ->
@@ -313,6 +335,17 @@ describe "Salad.Model", ->
           child.get("parentId").should.equal 1
 
           done()
+
+      it "applies default values", (done) ->
+        todo = App.Todo.build title: "test"
+
+        assert.ok todo
+
+        assert.isTrue todo.get("isDone") isnt null
+        todo.get("isDone").should.equal false
+
+        done()
+
 
     describe "#nil", ->
       beforeEach (done) ->

@@ -24,8 +24,24 @@ module.exports =
       for key, val of attributes
         @set key, val
 
+    getDefaultValues: ->
+      defaultValues = {}
+      for key, options of @getAttributeDefinitions() when options.default isnt undefined
+        defaultValues[key] = options.default
+
+      defaultValues
+
+    # initialize default values
+    initDefaultValues: ->
+      return if @attributeValues
+
+      @attributeValues = @getDefaultValues()
+
+      # do not register the default values as changes
+      @takeSnapshot()
+
     getAttributes: ->
-      @attributeValues or= {}
+      @initDefaultValues()
       @attributeValues
 
     getAttributeDefinitions: ->
@@ -33,13 +49,18 @@ module.exports =
 
     set: (key, value) ->
       @_checkIfKeyExists key
-      @attributeValues or= {}
+      @initDefaultValues()
       @attributeValues[key] = value
 
     get: (key) ->
       @_checkIfKeyExists key
-      @attributeValues or= {}
-      @attributeValues[key]
+      @initDefaultValues()
+      value = @attributeValues[key]
+
+      if value is undefined
+        value = @getAttributeDefinitions()[key]?.defaultValue
+
+      value
 
     _checkIfKeyExists: (key) ->
       unless key of @metadata().attributes

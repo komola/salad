@@ -43,3 +43,10 @@ describe "App.Model changes", ->
       _.keys(todo.getChangedAttributes()).length.should.equal 0
 
       done()
+
+  it "does not detect changed default values as changes", (done) ->
+    App.Todo.create title: "test", isDone: true, (err, todo) =>
+      App.Todo.find todo.get("id"), (err, newTodo) ->
+        _.keys(newTodo.getChangedAttributes()).length.should.equal 0
+
+        done()

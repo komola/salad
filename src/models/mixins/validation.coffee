@@ -2,14 +2,14 @@ module.exports =
   InstanceMethods:
     validate: (done) ->
       result = @isValid @getAttributes()
-      errors = null
+      error = null
 
       if result isnt true
-        errors =
-          isValid: false
-          errors: result
+        error = new Error "ValidationError"
+        error.isValid = false
+        error.errors = result
 
-      done errors
+      done error
 
     # Check if the passed attributes are valid
     #
