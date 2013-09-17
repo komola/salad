@@ -1,5 +1,13 @@
 module.exports =
   ClassMethods:
+    # Add an attribute to this model
+    #
+    # Possible calls:
+    #
+    # @attribute "firstname"
+    #
+    # # Setting the type
+    # @attribute "firstname", type: "String"
     attribute: (name, options) ->
       @metadata().attributes or= {}
 
@@ -19,6 +27,9 @@ module.exports =
     getAttributes: ->
       @attributeValues or= {}
       @attributeValues
+
+    getAttributeDefinitions: ->
+      @metadata().attributes
 
     set: (key, value) ->
       @_checkIfKeyExists key

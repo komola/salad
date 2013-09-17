@@ -32,7 +32,7 @@ class Salad.Template
 
   # transform class representations of models to JSON data
   # otherwise handlebars can't handle them
-  @serialize: (elm) ->
+  @serialize: (elm) =>
     # if elm has a toJSON method it's easy
     if elm?.toJSON
       return elm.toJSON()
