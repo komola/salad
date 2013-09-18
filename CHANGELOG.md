@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.2.12
+* Handlebars partials are re-registered when they changed
+
 ## Version 0.2.8
 * Improved serialization of models when passed to handlebars
 * Added validation method implementations and validate in the controllers

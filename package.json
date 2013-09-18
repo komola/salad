@@ -1,6 +1,6 @@
 {
   "name": "salad",
-  "main": "./index",
+  "main": "./index.js",
   "version": "0.2.11",
   "description": "",
   "homepage": "http://github.com/komola/salad",

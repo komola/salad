@@ -31,8 +31,14 @@ class Salad.Template.Handlebars
     @registeredPartials = true
 
     for file, content of Salad.Bootstrap.metadata().templates
-      fileParts = file.split "/"
+      @registerPartial file, content
 
-      if fileParts[1].substr(0, 1) is "_"
-        file = file.replace ".hbs", ""
-        handlebars.registerPartial file, content
+  @registerPartial: (file, content) ->
+    console.log "Registering partial #{file}"
+    fileParts = file.split "/"
+
+    # partials start with an underscore in their name
+    return unless fileParts[1].substr(0, 1) is "_"
+
+    file = file.replace ".hbs", ""
+    handlebars.registerPartial file, content

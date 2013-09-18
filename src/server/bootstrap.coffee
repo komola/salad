@@ -161,6 +161,9 @@ class Salad.Bootstrap extends Salad.Base
       gaze "#{dirname}/*/*/*.hbs", (err, watcher) =>
         watcher.on "changed", (file) =>
           loadTemplateFile file, (index) =>
+            content = @metadata().templates[index]
+            Salad.Template.Handlebars.registerPartial index, content
+
             App.Logger.info "Template #{index} reloaded"
 
   initDatabase: (cb) ->
