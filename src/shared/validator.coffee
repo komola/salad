@@ -1,12 +1,12 @@
 unless window?
   validator = require "validator"
+  {check, sanitize} = validator
 
 else
-  validator = window.validator
+  {check, sanitize} = window
+  window.Salad = Salad? or {}
 
-{check, sanitize} = validator
-
-class App.Validator
+class Salad.Validator
   @check: (attributes, checks) ->
     errors = false
 
