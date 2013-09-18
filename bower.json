@@ -1,0 +1,21 @@
+{
+  "name": "salad",
+  "main": "build/salad.js",
+  "version": "0.2.10",
+  "homepage": "https://github.com/komola/salad",
+  "authors": [
+    "Sebastian Hoitz <hoitz@komola.de>"
+  ],
+  "description": "Client side assets for salad",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "validator": "~0.0.4"
+  }
+}
