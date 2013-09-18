@@ -1,6 +1,6 @@
 {
   "name": "salad",
-  "version": "0.2.7",
+  "version": "0.2.8",
   "description": "",
   "homepage": "http://github.com/komola/salad",
   "main": "./salad.coffee",
@@ -60,7 +60,8 @@
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.6.0",
     "should": "~1.2.2",
-    "superagent": "~0.15.0"
+    "superagent": "~0.15.0",
+    "semver": "~2.1.0"
   },
   "scripts": {
     "test": "NODE_ENV=testing ./node_modules/.bin/mocha --require should --require coffee-script-mapped --reporter spec --timeout 2000 --growl ./test/server.coffee $(find test -name \"*Test.coffee\")"
