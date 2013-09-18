@@ -20,6 +20,8 @@ require "./models/model"
 
 require "./utils/models"
 
+require "../shared/validator"
+
 path = process.cwd()
 Salad.root = path
 

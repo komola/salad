@@ -1,2 +1,2 @@
 require("coffee-script");
-module.exports = require("./src/salad");
+module.exports = require("./src/server/salad");

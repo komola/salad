@@ -1,6 +1,6 @@
 class Foo extends Salad.Base
-  @mixin require "../../src/mixins/triggers"
-  @mixin require "../../src/mixins/metadata"
+  @mixin require "../../src/server/mixins/triggers"
+  @mixin require "../../src/server/mixins/metadata"
 
   @before "instanceTest", "instanceTestAction"
   instanceTestAction: (done) ->
@@ -19,8 +19,8 @@ class Foo extends Salad.Base
     @noCallbackActionCalled = true
 
 class Parent extends Salad.Base
-  @mixin require "../../src/mixins/triggers"
-  @mixin require "../../src/mixins/metadata"
+  @mixin require "../../src/server/mixins/triggers"
+  @mixin require "../../src/server/mixins/metadata"
 
   @before "test", ->
 
@@ -29,8 +29,8 @@ class A extends Parent
 class B extends Parent
 
 class InvalidTrigger extends Salad.Base
-  @mixin require "../../src/mixins/triggers"
-  @mixin require "../../src/mixins/metadata"
+  @mixin require "../../src/server/mixins/triggers"
+  @mixin require "../../src/server/mixins/metadata"
   @before "invoke", "notExistentTrigger"
 
 describe "Trigger Mixin", ->

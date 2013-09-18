@@ -1,9 +1,9 @@
 class Foo extends Salad.Base
   @foo = "test"
-  @mixin require "../../src/mixins/metadata"
+  @mixin require "../../src/server/mixins/metadata"
 
 class Bar extends Salad.Base
-  @mixin require "../../src/mixins/metadata"
+  @mixin require "../../src/server/mixins/metadata"
 
 describe "Mixins", ->
   describe "metadata", ->
