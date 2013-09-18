@@ -1,9 +1,9 @@
 {
   "name": "salad",
+  "main": "./index",
   "version": "0.2.10",
   "description": "",
   "homepage": "http://github.com/komola/salad",
-  "main": "./salad.coffee",
   "author": "Sebastian Hoitz <hoitz@komola.de>",
   "keywords": [
     "node"
@@ -33,9 +33,6 @@
     "npm": "1"
   },
   "dependencies": {
-    "coffee-script": "~1.6.0",
-    "source-map-support": "~0.2.0",
-    "coffee-script-mapped": "~0.1.2",
     "underscore.string": ">= 0.0.1",
     "express": ">= 3.0.0",
     "mime": ">= 0.0.1",
@@ -54,6 +51,9 @@
     "emailjs": "~0.3.5"
   },
   "devDependencies": {
+    "coffee-script": "~1.6.0",
+    "source-map-support": "~0.2.0",
+    "coffee-script-mapped": "~0.1.2",
     "mocha": "~1.12.0",
     "chai": "~1.7.0",
     "sinon": "~1.7.0",

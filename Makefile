@@ -1,13 +1,8 @@
 BIN = ./node_modules/.bin
-SRC = $(wildcard src/*.coffee)
-LIB = $(SRC:src/%.coffee=lib/%.js)
 TESTS = $(shell find test -name "*Test.coffee")
 
-build: $(LIB)
-
-lib/%.js: src/%.coffee
-	@mkdir -p $(@D)
-	@$(BIN)/coffee -bcp $< > $@
+build:
+	# $(BIN)/coffee --compile --output lib/ src/
 
 test: build
 	@NODE_ENV=testing ./node_modules/.bin/mocha \
@@ -16,7 +11,7 @@ test: build
 	  ./test/server.coffee $(TESTS)
 
 clean:
-	@rm -f $(LIB)
+	@rm -rf lib/*
 
 define release
 	VERSION=`node -pe "require('./package.json').version"` && \

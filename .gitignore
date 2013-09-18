@@ -19,6 +19,7 @@ rdoc
 pkg
 *.log
 
+/lib
 /node_modules
 
 npm-debug.log
