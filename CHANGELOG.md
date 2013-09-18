@@ -4,6 +4,7 @@
 * Improved serialization of models when passed to handlebars
 * Added validation method implementations and validate in the controllers
 * Models can define default values of their attributes
+* [BUG] Fixed ordering with newest sequelize version
 
 ## Version 0.2.7
 * [BUG] Renamed @resource() to @resourceClass() to prevent name clashes
