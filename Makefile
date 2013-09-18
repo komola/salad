@@ -1,6 +1,7 @@
 BIN = ./node_modules/.bin
 SRC = $(wildcard src/*.coffee)
 LIB = $(SRC:src/%.coffee=lib/%.js)
+TESTS = $(shell find test -name "*Test.coffee")
 
 build: $(LIB)
 
@@ -9,7 +10,10 @@ lib/%.js: src/%.coffee
 	@$(BIN)/coffee -bcp $< > $@
 
 test: build
-	@$(BIN)/mocha -b specs
+	@NODE_ENV=testing ./node_modules/.bin/mocha \
+	  -r should -r coffee-script \
+	  --reporter spec --timeout 2000 \
+	  ./test/server.coffee $(TESTS)
 
 clean:
 	@rm -f $(LIB)
