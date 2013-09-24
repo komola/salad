@@ -9,35 +9,13 @@ possibility to register routes and controllers and use popular ORM frameworks li
 
 * [Sequelize](http://www.sequelizejs.com/)
 
-## Roadmap
-
-### Controllers
-
-* ✓ basic controllers
-* ✓ render JSON data
-* ✓ allow to implement @before filters to execute special logic before an action is executed
-* ✓ implement more robust rendering logic (replacable JSON and html renderers, other formats possible, too)
-* ✓ develop better system for storing metadata in controllers, similar to towers `@metadata()` object
-* ✓ support rendering HTML to the client
-
-
-### Models
-
-* ✓ implement model layer that will wrap other models (i.e. Sequelize, Mongoose or other stuff, like Facebook)
-* ✓ implement association support
-* ✓ allow to implement `@before`/`@after` actions for hooking into actions
-* ✓ refactor the way models define attributes, transitioning to an API like @field "name", "type"
-
-
-### General
-* implement a modular construct, where modules provide custom models, controllers, etc.
-* ✓ refactor bootstrap flow. Implement an event system, where a user can hook into the initialization `@after "init", (done) ->`
-
 ## Getting started
 
-  npm install salad
+In your project, do this
 
-This is the basic directory setup:
+    npm install salad
+
+This is the basic directory setup you should have in your project:
 
 ```
     /app
@@ -66,9 +44,9 @@ This is the basic directory setup:
       /assets
 
     /bower.json
-    /grunt.coffee
+    /Gruntfile.coffee
     /package.json
-    /server.coffee
+    /server.js
 ```
 
 Salad is composed of several libraries, that are used to bring together useful
@@ -79,7 +57,7 @@ functionality.
 * Grunt
 * Bower
 
-The whole application should be instrumented using application configurations.
+The whole application is instrumented using application configurations.
 Configurations should register routes and according controllers.
 
 ## Brief "Getting started" guide
@@ -297,6 +275,28 @@ model.findAndCountAll (err, data) =>
   console.log data.rows # Array containing resources
 ```
 
+### Fixtures
+
+Let's assume you have a `App.User` model and you want to have some instances
+in the database for easy unit testing or just to have some data to show during
+development.
+
+You can create a file `test/fixtures/users.coffee`:
+
+```coffeescript
+module.exports = [
+  {
+    email: "user@domain.com"
+    firstname: "Tom"
+    lastname: "Bob"
+  }
+]
+```
+
+When you execute `cake db:load` the fixtures will get initialized and stored
+in the database.
+
+Fixtures make it very easy for you as a developer to quickly bootstrap some data.
 
 # License
 (MIT License)
