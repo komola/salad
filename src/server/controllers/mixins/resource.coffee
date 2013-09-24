@@ -128,9 +128,7 @@ module.exports =
           This would sort ascending by createdAt and descending by title. Ascending is assumed by default
     ###
     buildConditionsFromParameters: (parameters) ->
-      ###
-          Some parameter names are reserved and have a special meaning
-      ###
+      # Some parameter names are reserved and have a special meaning
       reservedParams = ["sort","include","includes","limit","offset","method","controller","action","format"]
 
       # only accept parameters that represent an attribute for where conditions
