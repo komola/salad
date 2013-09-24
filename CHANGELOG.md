@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.2.13
+* Common Cakefile helpers
+
 ## Version 0.2.12
 * Handlebars partials are re-registered when they changed
 * Salad.Validator can be used on the client-side
