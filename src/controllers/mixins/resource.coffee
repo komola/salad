@@ -142,49 +142,65 @@ module.exports =
         # check if the parameter name needs special handling
         if key in reservedParams
           if key is "sort"
-            # sorting supports multiple attributes to sort by
-            sortParams = value.split(",")
-
-            for value in sortParams
-              firstChar = value[0]
-              # we sort ascending by default
-              # a minus in front of the attribute sorts descending
-              if firstChar isnt "-"
-                conditions.asc or= []
-                conditions.asc.push value
-              else if firstChar is "-"
-                conditions.desc or= []
-                conditions.desc.push value[1..-1]
+            conditions = @_buildSortConditions value, conditions
 
           if key is "limit" or key is "offset"
             # limit and offset are simple params
             conditions[key] = value
 
           if key is "includes"
-            # includes can contain multiple classes
-            includeParams = value.split(",")
-            for value in includeParams
-              conditions.includes or= []
-              conditions.includes.push value
+            conditions = @_buildIncludesConditions value, conditions
+
           continue
+
         if key not in allowedWhereAttributes
           continue
         # all other parameter names are treated as where conditions
-        conditions.where or= {}
+        conditions = @_buildWhereConditions key, value, conditions
+
+      conditions
+
+    _buildSortConditions: (paramValue, conditions) ->
+      # sorting supports multiple attributes to sort by
+      sortParams = paramValue.split(",")
+
+      for value in sortParams
         firstChar = value[0]
-        checksForEquality = firstChar isnt ">" and firstChar isnt "<"
-        if not checksForEquality
-          if firstChar is ">"
-            # we search values which are greater as the specified value
-            bindingElm = "gt"
-          else
-            bindingElm = "lt"
+        # we sort ascending by default
+        # a minus in front of the attribute sorts descending
+        if firstChar isnt "-"
+          conditions.asc or= []
+          conditions.asc.push value
+        else if firstChar is "-"
+          conditions.desc or= []
+          conditions.desc.push value[1..-1]
 
-          conditions.where[key] = {}
-          conditions.where[key][bindingElm] = value[1..-1]
+      conditions
+
+    _buildIncludesConditions: (paramValue, conditions) ->
+      # includes can contain multiple classes
+      includeParams = paramValue.split(",")
+      for value in includeParams
+        conditions.includes or= []
+        conditions.includes.push value
+
+      conditions
+
+    _buildWhereConditions: (key, value, conditions) ->
+      conditions.where or= {}
+      firstChar = value[0]
+      checksForEquality = firstChar isnt ">" and firstChar isnt "<"
+      if not checksForEquality
+        if firstChar is ">"
+          # we search values which are greater as the specified value
+          bindingElm = "gt"
         else
-          conditions.where[key] = value
+          bindingElm = "lt"
 
+        conditions.where[key] = {}
+        conditions.where[key][bindingElm] = value[1..-1]
+      else
+        conditions.where[key] = value
 
       conditions
 
@@ -196,7 +212,6 @@ module.exports =
         # iterate by key over the conditions object
         if key not in simpleKeys
           # includes, asc and desc need special handling
-
           # includes takes an array as parameter
           includesClassArray = []
 
