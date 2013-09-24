@@ -1,5 +1,9 @@
 # Salad Changelog
 
+## Version 0.2.14
+* Salad.Model hasAttribute method added
+* [BUG] Load cakefile util class
+
 ## Version 0.2.13
 * Common Cakefile helpers
 

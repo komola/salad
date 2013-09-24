@@ -196,6 +196,22 @@ describe "Salad.Model", ->
         location = App.Location.build title: "Test"
         location.get("title").should.equal "Test"
 
+    describe "#setAttributes", ->
+      it "sets attributes of a model", ->
+        location = App.Location.build()
+        location.setAttributes
+          title: "Test"
+
+        location.get("title").should.equal "Test"
+
+      it "only sets existent attributes", ->
+        location = App.Location.build()
+        location.setAttributes
+          title: "Test"
+          foo: "bar"
+
+        location.get("title").should.equal "Test"
+
   describe "associations", ->
     describe "#hasMany", ->
       it "creates getter method", ->

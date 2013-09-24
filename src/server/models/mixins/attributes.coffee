@@ -21,7 +21,7 @@ module.exports =
 
   InstanceMethods:
     setAttributes: (attributes) ->
-      for key, val of attributes
+      for key, val of attributes when @hasAttribute key
         @set key, val
 
     getDefaultValues: ->
@@ -39,6 +39,10 @@ module.exports =
 
       # do not register the default values as changes
       @takeSnapshot()
+
+    # check if a model has an attribute
+    hasAttribute: (key) ->
+      @metadata().attributes[key]?
 
     getAttributes: ->
       @initDefaultValues()

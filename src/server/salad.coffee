@@ -19,6 +19,7 @@ require "./models/dao/sequelize"
 require "./models/model"
 
 require "./utils/models"
+require "./utils/cakefile"
 
 require "../shared/validator"
 
