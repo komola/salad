@@ -4,6 +4,7 @@ Salad.Router.register (router) ->
 
   router.resource("locations", "locations", "location")
 
+  router.get("/parents(.:format)", "GET").to("parents.index")
   router.get("/parent/:parentId/children(.:format)").to("childs.index")
   router.get("/children(.:format)").to("childs.index")
 
