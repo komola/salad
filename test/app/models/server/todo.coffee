@@ -6,6 +6,7 @@ attributes =
     allowNull: true
 
   title: Sequelize.STRING
+  isDone: Sequelize.BOOLEAN
 
   createdAt: Sequelize.DATE
   updatedAt: Sequelize.DATE
@@ -23,6 +24,7 @@ class App.Todo extends Salad.Model
 
   @attribute "id"
   @attribute "title"
+  @attribute "isDone", default: false
   @attribute "createdAt"
   @attribute "updatedAt"
   @attribute "completedAt"

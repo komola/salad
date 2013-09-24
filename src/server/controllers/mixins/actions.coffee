@@ -29,6 +29,9 @@ module.exports =
 
     create: ->
       @_create (error, resource) =>
+        if error?.isValid is false
+          return @render json: {error: error}, status: 400
+
         @respondWith
           html: ->
             name = _.pluralize @resourceOptions.name
@@ -48,7 +51,10 @@ module.exports =
           callback.apply @, [null, resource]
 
     update: ->
-      @_update (err, resource) =>
+      @_update (error, resource) =>
+        if error?.isValid is false
+          return @render json: {error: error}, status: 400
+
         @respondWith
           html: ->
             name = _.pluralize @resourceOptions.name

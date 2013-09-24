@@ -161,6 +161,9 @@ class Salad.Bootstrap extends Salad.Base
       gaze "#{dirname}/*/*/*.hbs", (err, watcher) =>
         watcher.on "changed", (file) =>
           loadTemplateFile file, (index) =>
+            content = @metadata().templates[index]
+            Salad.Template.Handlebars.registerPartial index, content
+
             App.Logger.info "Template #{index} reloaded"
 
   initDatabase: (cb) ->
@@ -188,7 +191,6 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().app.use express.bodyParser()
     @metadata().app.use express.methodOverride()
 
-
     # TODO: Hack for this issue: https://github.com/sequelize/sequelize/issues/815
     # May need to think of a better way to handle this.
     # ATM, this will only try to create the tables, fail because they are already
@@ -209,6 +211,15 @@ class Salad.Bootstrap extends Salad.Base
       (cb) =>
         router = new Salad.Router
         @metadata().app.all "*", router.dispatch
+
+        @metadata().app.use (err, req, res, next) ->
+          App.Logger.log "Error", err.stack
+
+          if Salad.env is "production"
+            res.send 500, "Internal server error!"
+          else
+            res.type "text"
+            res.send 500, err.stack
 
         @metadata().expressServer = @metadata().app.listen @options.port
 

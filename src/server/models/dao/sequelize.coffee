@@ -154,8 +154,16 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     if options.order.length > 0
       # transform the order params into i.e. 'name DESC'
-      order = ("#{elm.field} #{elm.type.toUpperCase()}" for elm in options.order)
-      params.order = order.join ","
+      order = []
+      for elm in options.order
+        order.push [
+          # BUG this will cause problems with mysql drivers because the
+          # escaping is off
+          "\"#{elm.field}\""
+          elm.type.toUpperCase()
+        ]
+
+      params.order = order
 
     if options.contains.length > 0
       attribs = ("'#{contains.value}' = ANY(\"#{contains.field}\")" for contains in options.contains)

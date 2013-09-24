@@ -1,3 +1,12 @@
+d = require("domain").create()
+
+# set up error handling to exit with error code on uncaught exceptions
+d.on "error", (err) ->
+  console.log "Uncaught Exception:", err.message
+  console.log err.stack
+
+  process.exit(1)
+
 require "coffee-script"
 require "coffee-script-mapped"
 require "../"
@@ -23,12 +32,15 @@ cleanupDatabase = (cb) =>
 
 before (done) ->
   @timeout 20000
-  Salad.root += "/test"
-  Salad.Bootstrap.run
-    port: 3001
-    env: "testing"
-    cb: =>
-      cleanupDatabase done
+
+  # wrap the domain to catch errors
+  d.run ->
+    Salad.root += "/test"
+    Salad.Bootstrap.run
+      port: 3001
+      env: "testing"
+      cb: =>
+        cleanupDatabase done
 
 beforeEach (done) ->
   @timeout 20000

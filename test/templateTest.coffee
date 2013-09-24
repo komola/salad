@@ -1,3 +1,5 @@
+model = null
+
 describe "Salad.Template", ->
   describe "#render", ->
     it "should render a template", ->
@@ -15,3 +17,38 @@ describe "Salad.Template", ->
 
       content.should.equal """head
 foot"""
+
+  describe "#serialize", ->
+    beforeEach (done) ->
+      App.Todo.create title: "Test", (err, todo) ->
+        model = todo
+        done()
+
+    it "should serialize a normal object", ->
+      data =
+        key: "value"
+
+      Salad.Template.serialize(data).should.equal data
+
+    it "should serialize a model", ->
+      data =
+        model: model
+
+      Salad.Template.serialize(data).should.eql
+        model: model.toJSON()
+
+    it "should serialize models in an array", ->
+      data =
+        models: [model]
+
+      Salad.Template.serialize(data).should.eql
+        models: [model.toJSON()]
+
+    it "should serialize nested models", ->
+      data =
+        bootstrap:
+          models: [model]
+
+      Salad.Template.serialize(data).should.eql
+        bootstrap:
+          models: [model.toJSON()]

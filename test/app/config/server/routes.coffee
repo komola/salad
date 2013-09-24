@@ -25,6 +25,7 @@ Salad.Router.register (router) ->
 
 
   router.resource("todos", "todos", "todo")
+  router.resource("validations", "validations", "validation")
 
   router.get("/triggers/test").to("trigger.test")
   router.get("/triggers/afterTest").to("trigger.afterTest")

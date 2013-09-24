@@ -7,7 +7,9 @@ class Salad.Model extends Salad.Base
   @mixin require "./mixins/changes"
   @mixin require "./mixins/associations"
   @mixin require "./mixins/scope"
+  @mixin require "./mixins/validation"
 
+  @before "save", "validate"
   @after "save", "takeSnapshot"
 
   daoInstance: undefined
@@ -62,7 +64,7 @@ class Salad.Model extends Salad.Base
           err = _err
           resource = _res
 
-          cb()
+          cb err
         (cb) => resource.runTriggers "after:create", cb
       ],
 
@@ -75,23 +77,21 @@ class Salad.Model extends Salad.Base
     @save callback
 
   save: (callback) =>
-    err = null
     resource = null
 
     action = (cb) =>
       if @isNew
         return @daoInstance.create @getAttributes(), (_err, _res) =>
-          err = _err
           resource = _res
-          cb()
+          cb _err
 
       @daoInstance.update @, @getAttributes(), (_err, _res) =>
-        err = _err
         resource = _res
-        cb()
+        cb _err
 
     async.series [
-        (cb) => @runTriggers "before:save", cb
+        (cb) => @runTriggers "before:save", (err) =>
+          cb err
         action
         (cb) =>
           @isNew = false
@@ -100,7 +100,7 @@ class Salad.Model extends Salad.Base
         (cb) => @runTriggers "after:save", cb
       ],
 
-      =>
+      (err) =>
         if callback
           callback err, resource
 

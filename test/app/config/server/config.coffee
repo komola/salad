@@ -7,9 +7,10 @@ config.database =
     host: "localhost"
     database: "salad-testing"
     port: 5432
+    logging: false
     pool:
-        maxConnections: 5
-        maxIdleTime: 30
+      maxConnections: 5
+      maxIdleTime: 30
 
 config.mailer =
   testing:
