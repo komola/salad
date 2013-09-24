@@ -172,11 +172,11 @@ module.exports =
         else if firstChar is "-"
           conditions.desc or= []
           conditions.desc.push value[1..-1]
-
       conditions
 
     _buildIncludesConditions: (paramValue, conditions) ->
       # includes can contain multiple classes
+
       includeParams = paramValue.split(",")
       for value in includeParams
         conditions.includes or= []
@@ -217,9 +217,14 @@ module.exports =
             if key is "includes"
 
               # the param is a string, from which we need to construct the class name
-              theClass = App[value]
-              includesClassArray.push theClass
+              associations = App[@resourceOptions.resourceClass].metadata().associations
+              theClass = associations[value]?.model
+              if theClass
+                includesClassArray.push theClass
               scope = scope.includes includesClassArray
+
+
+              # the param is a string, from which we need to construct the class name
 
             if key is "asc"
               scope = scope.asc value

@@ -140,7 +140,7 @@ describe "App.Controller mixin resource", ->
       controller = new App.ParentsController()
 
       shouldConditions =
-        includes: ["Child"]
+        includes: ["children"]
 
       scope = controller.resourceClass()
       scope = controller.applyConditionsToScope(scope,shouldConditions)
@@ -152,11 +152,11 @@ describe "App.Controller mixin resource", ->
       scope.should.eql secondScope
 
   describe "#scope", ->
-    it "should filter based on where (equality)", (done) ->
+    it "should filter based on where (equality) and ignore unknown attributes", (done) ->
 
       App.Parent.create title: "Hello", (err, model) =>
         App.Parent.create title: "Hey", (err, model) =>
-          agent.get(":3001/parents.json?title=Hey")
+          agent.get(":3001/parents.json?title=Hey&asdas=hi")
             .end (res) ->
               res.body.length.should.equal 1
               res.body[0].title.should.equal "Hey"
@@ -221,28 +221,37 @@ describe "App.Controller mixin resource", ->
                 res.body.length.should.equal 1
                 res.body[0].title.should.equal "Parent"
 
-                agent.get(":3001/parents.json?includes=Child")
+                agent.get(":3001/parents.json?includes=children")
+                  .end (res) ->
+                    res.body.length.should.equal 1
+                    res.body[0].should.have.property "children"
+
+                    done()
+
+    it "should only include objects which are associated", (done) ->
+      App.Parent.create title: "Parent", (err, parent) =>
+          parent.getChildren().create title: "Child", (err, child) ->
+            agent.get(":3001/parents.json")
+              .end (res) ->
+                res.body.length.should.equal 1
+                res.body[0].title.should.equal "Parent"
+
+                agent.get(":3001/parents.json?includes=Todo")
                   .end (res) ->
                     res.body.length.should.equal 1
 
                     done()
 
+    it "should only include objects which exists", (done) ->
+      App.Parent.create title: "Parent", (err, parent) =>
+          parent.getChildren().create title: "Child", (err, child) ->
+            agent.get(":3001/parents.json")
+              .end (res) ->
+                res.body.length.should.equal 1
+                res.body[0].title.should.equal "Parent"
 
+                agent.get(":3001/parents.json?includes=House")
+                  .end (res) ->
+                    res.body.length.should.equal 1
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    done()
