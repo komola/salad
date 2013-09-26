@@ -4,7 +4,7 @@ async = require "async"
 path = require "path"
 
 class Salad.Utils.Cakefile
-  @register: ->
+  @register: =>
     Salad.env = process.env.NODE_ENV or "production"
     require("#{Salad.root}/app/config/server/bootstrap")(run: false)
 
@@ -23,7 +23,7 @@ class Salad.Utils.Cakefile
 
     task 'db:statistics', "Shows statistics for the database", @databaseStatistics
 
-  @init: (cb) ->
+  @init: (cb) =>
     return cb() if @initialized
 
     @initialized = true
@@ -36,7 +36,7 @@ class Salad.Utils.Cakefile
       cb()
 
 
-  @migrationCreate: (options) ->
+  @migrationCreate: (options) =>
       name = options.title or "unnamed"
       command = [".", "node_modules", "salad", "node_modules", ".bin", "sequelize"].join(path.sep)
       migrate = spawn command, ["-c", name]
@@ -51,7 +51,7 @@ class Salad.Utils.Cakefile
         console.log "Done"
 
 
-  @migrate: ->
+  @migrate: =>
     command = [".", "node_modules", "salad", "node_modules", ".bin", "sequelize"].join(path.sep)
 
     migrate = spawn command, ["-e", Salad.env, "-m"]
@@ -66,21 +66,21 @@ class Salad.Utils.Cakefile
       console.log "Done"
 
 
-  @databaseDrop: ->
+  @databaseDrop: =>
     @init =>
       Salad.Utils.Models.dropTables =>
         console.log "Done!", arguments
 
         process.exit()
 
-  @databaseClear: ->
+  @databaseClear: =>
     @init =>
       Salad.Utils.Models.emptyTables =>
         console.log "Done!", arguments
 
         process.exit()
 
-  @databaseLoad: ->
+  @databaseLoad: =>
     @init =>
       Salad.Utils.Models.emptyTables =>
         Salad.Utils.Models.loadFixtures "#{Salad.root}/test/fixtures", =>
@@ -89,7 +89,7 @@ class Salad.Utils.Cakefile
           process.exit()
 
 
-  @databaseStatistics: ->
+  @databaseStatistics: =>
     @init =>
       models = Salad.Utils.Models.registered()
       data = {}

@@ -1,5 +1,9 @@
 # Salad Changelog
 
+## Version 0.2.15
+* Added ability to filter models in the request by adding ?where, ?sort
+  and ?includes GET parameters
+
 ## Version 0.2.14
 * Salad.Model hasAttribute method added
 * [BUG] Load cakefile util class
