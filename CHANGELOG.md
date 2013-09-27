@@ -1,5 +1,11 @@
 # Salad Changelog
 
+## Version 0.2.18
+* Added useful middleware for more detailed logging
+* Dispatch request logging
+* App.Logger.error now actually gets logged
+* Better error handling for requests using nodejs domains
+
 ## Version 0.2.15
 * Added ability to filter models in the request by adding ?where, ?sort
   and ?includes GET parameters

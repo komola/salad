@@ -31,6 +31,8 @@ class Salad.Router extends Salad.Base
 
     # Get the first matching route
     matching = router.first(requestPath, request.method)
+    # default format is html"
+    matching.format or= "html"
 
     # No matching route found
     unless matching
@@ -41,6 +43,7 @@ class Salad.Router extends Salad.Base
 
     # Get the matching controller
     controllerName = _.capitalize matching.controller
+    controllerName = "#{controllerName}Controller"
     controller = @_getMatchingController controllerName
 
     # Could not find associated controller
@@ -66,6 +69,15 @@ class Salad.Router extends Salad.Base
 
     # Call the controller action
     async.series [
+        (cb) =>
+          # do not log request information in testing
+          return cb() if Salad.env is "testing"
+
+          # output dispatching information
+          line = "Dispatching request: #{controllerName}.#{matching.action} (#{matching.format})"
+          App.Logger.log line, controller.params
+          cb()
+
         (cb) => controller.runTriggers "beforeAction", cb
         (cb) => controller.runTriggers "before:#{matching.action}", cb
         (cb) =>
@@ -89,10 +101,10 @@ class Salad.Router extends Salad.Base
 
   _getMatchingController: (controllerName) ->
     controllerName = _.capitalize controllerName
-    controller = App["#{controllerName}Controller"]
+    controller = App[controllerName]
 
     unless controller
-      throw new Error "Could not find 'App.#{controllerName}Controller'"
+      throw new Error "Could not find 'App.#{controllerName}'"
 
     controller = new controller
 

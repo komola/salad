@@ -5,6 +5,7 @@ findit = require "findit2"
 fs = require "fs"
 gaze = require "gaze"
 path = require "path"
+domain = require "domain"
 # require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
@@ -74,6 +75,7 @@ class Salad.Bootstrap extends Salad.Base
       prettyPrint: true
       colorize: true
       timestamp: true
+      level: "error"
 
     App.Logger = {}
 
@@ -186,10 +188,31 @@ class Salad.Bootstrap extends Salad.Base
     express = require "express"
     @metadata().app = express()
 
+    @metadata().app.use express.responseTime()
+
+    # put the static handler before the request logger because we don't want
+    # to show all assets. In production environments static assets are probably
+    # handled by nginx or something similar anyways
     @metadata().app.use express.static("#{Salad.root}/public")
+
+    if Salad.env is "development"
+      @metadata().app.use express.logger("dev")
+
+    else if Salad.env is "production"
+      @metadata().app.use express.logger()
+
     @metadata().app.use express.cookieParser()
     @metadata().app.use express.bodyParser()
     @metadata().app.use express.methodOverride()
+
+    # create a nodejs domain for every request
+    # this allows us to have solid error recovery during a request
+    @metadata().app.use (req, res, next) =>
+      requestDomain = domain.create()
+      requestDomain.add req
+      requestDomain.add res
+      requestDomain.on "error", next
+      requestDomain.run next
 
     # TODO: Hack for this issue: https://github.com/sequelize/sequelize/issues/815
     # May need to think of a better way to handle this.
@@ -213,7 +236,7 @@ class Salad.Bootstrap extends Salad.Base
         @metadata().app.all "*", router.dispatch
 
         @metadata().app.use (err, req, res, next) ->
-          App.Logger.log "Error", err.stack
+          console.error err.stack
 
           if Salad.env is "production"
             res.send 500, "Internal server error!"
