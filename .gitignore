@@ -20,7 +20,6 @@ pkg
 *.log
 
 /lib
-/build
 /node_modules
 /bower_components
 
