@@ -1,5 +1,9 @@
 # Salad Changelog
 
+## Version 0.3.1
+* Added Model.increment() and Model.decrement() to increment or decrement fields
+  of a model without concurrency issues.
+
 ## Version 0.2.18
 * Added useful middleware for more detailed logging
 * Dispatch request logging

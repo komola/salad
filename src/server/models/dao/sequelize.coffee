@@ -188,3 +188,49 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       for model in options.includes
         params.include.push model.daoModelInstance
     params
+
+  ###
+  Increment the field of a model.
+
+  This prevents concurrency issues
+
+  Usage:
+    App.Model.first (err, model) =>
+      model.increment "field", 3, (err, newModel) =>
+        console.log model.get("field") is newModel.get("field") # => true
+  ###
+  increment: (model, field, change, callback) =>
+    @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
+      successCallback = (daoResource) =>
+        resource = @_buildModelInstance daoResource
+
+        callback null, resource
+
+      if typeof field is "object"
+        sequelizeModel.increment(field).success successCallback
+
+      else
+        sequelizeModel.increment(field, change).success successCallback
+
+  ###
+  Decrement the field of a model
+
+  This prevents concurrency issues
+
+  Usage:
+    App.Model.first (err, model) =>
+      model.decrement "field", 3, (err, newModel) =>
+        console.log model.get("field") is newModel.get("field") # => true
+  ###
+  decrement: (model, field, change, callback) =>
+    @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
+      successCallback = (daoResource) =>
+        resource = @_buildModelInstance daoResource
+
+        callback null, resource
+
+      if typeof field is "object"
+        sequelizeModel.decrement(field).success successCallback
+
+      else
+        sequelizeModel.decrement(field, change).success successCallback

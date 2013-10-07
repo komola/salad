@@ -11,6 +11,8 @@ class Salad.DAO.Base
   findAll: (options, callback) ->
   count: (options, callback) ->
   destroy: (model, callback) ->
+  increment: (model, field, change, callback) ->
+  decrement: (model, field, change, callback) ->
 
 # class Salad.DAO.Memory
 #   store: {}

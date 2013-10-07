@@ -104,6 +104,60 @@ class Salad.Model extends Salad.Base
         if callback
           callback err, resource
 
+  ###
+  Increment the field or fields of a model
+
+  Usage:
+    # Increment a field by 1:
+    model.increment "counter", (err, res) =>
+      console.log model.get("counter") is res.get("counter") # => true
+
+    # Increment by a specific value:
+    model.increment "counter", 3, (err, res) =>
+      console.log model.get("counter") is res.get("counter") # => true
+
+    # Increment multiple fields:
+    model.increment counter: 1, counterB: 3, (err, res) =>
+      console.log model.get("counter") is res.get("counter") # => true
+      console.log model.get("counterB") is res.get("counterB") # => true
+  ###
+  increment: (field, value, callback) =>
+    if typeof value is "function"
+      callback = value
+      value = 1
+
+    @daoInstance.increment @, field, value, (err, model) =>
+      if typeof field isnt "object"
+        key = field
+        field = {}
+        field[key] = model.get key
+
+      for key, val of field
+        @set key, model.get(key)
+
+      callback err, model
+
+  ###
+  Decrement the field of a model.
+
+  See @increment for usage options
+  ###
+  decrement: (field, value, callback) =>
+    if typeof value is "function"
+      callback = value
+      value = 1
+
+    @daoInstance.decrement @, field, value, (err, model) =>
+      if typeof field isnt "object"
+        key = field
+        field = {}
+        field[key] = model.get key
+
+      for key, val of field
+        @set key, model.get(key)
+
+      callback err, model
+
   destroy: (callback) ->
     @daoInstance.destroy @, callback
 

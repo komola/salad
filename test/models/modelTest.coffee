@@ -183,6 +183,105 @@ describe "Salad.Model", ->
 
                 done()
 
+    describe "#increment", ->
+      model = null
+
+      beforeEach (done) ->
+        App.Todo.create title: "test", (err, todo) =>
+          model = todo
+
+          done()
+
+      it "increases the value of a field by the specified amount", (done) ->
+        model.get("counter").should.equal 0
+
+        model.increment "counter", 3, =>
+          model.get("counter").should.equal 3
+          App.Todo.find model.get("id"), (err, resource) =>
+            resource.get("counter").should.equal 3
+
+            done()
+
+      it "increases the value by 1 if no value is specified", (done) ->
+        model.get("counter").should.equal 0
+
+        model.increment "counter", =>
+          model.get("counter").should.equal 1
+          App.Todo.find model.get("id"), (err, resource) =>
+            resource.get("counter").should.equal 1
+
+            done()
+
+      it "accepts an object of fields", (done) ->
+        model.get("counter").should.equal 0
+        model.get("counterB").should.equal 0
+
+        model.increment counter: 1, counterB: 3, =>
+          model.get("counter").should.equal 1
+          model.get("counterB").should.equal 3
+          App.Todo.find model.get("id"), (err, resource) =>
+            resource.get("counter").should.equal 1
+            resource.get("counterB").should.equal 3
+
+            done()
+
+
+
+      it "should not run into concurrency issues", (done) ->
+        async.parallel [
+          (cb) => model.increment "counter", 1, cb
+          (cb) => model.increment "counter", 2, cb
+          (cb) => model.increment "counter", 3, cb
+          (cb) => model.increment "counter", 4, cb
+          (cb) => model.increment "counter", 5, cb
+        ], (err) =>
+          App.Todo.find model.get("id"), (err, resource) =>
+            resource.get("counter").should.equal 15
+
+            done()
+
+    describe "#decrement", ->
+      model = null
+
+      beforeEach (done) ->
+        App.Todo.create title: "test", counter: 4, counterB: 3, (err, todo) =>
+          model = todo
+
+          done()
+
+      it "increases the value of a field by the specified amount", (done) ->
+        model.get("counter").should.equal 4
+
+        model.decrement "counter", 3, =>
+          model.get("counter").should.equal 1
+          App.Todo.find model.get("id"), (err, resource) =>
+            resource.get("counter").should.equal 1
+
+            done()
+
+      it "increases the value by 1 if no value is specified", (done) ->
+        model.get("counter").should.equal 4
+
+        model.decrement "counter", =>
+          model.get("counter").should.equal 3
+          App.Todo.find model.get("id"), (err, resource) =>
+            resource.get("counter").should.equal 3
+
+            done()
+
+      it "accepts an object of fields", (done) ->
+        model.get("counter").should.equal 4
+        model.get("counterB").should.equal 3
+
+        model.decrement counter: 1, counterB: 3, =>
+          model.get("counter").should.equal 3
+          model.get("counterB").should.equal 0
+          App.Todo.find model.get("id"), (err, resource) =>
+            resource.get("counter").should.equal 3
+            resource.get("counterB").should.equal 0
+
+            done()
+
   describe "attributes", ->
     describe "#set", ->
       it "sets an attribute to a specific value", ->
