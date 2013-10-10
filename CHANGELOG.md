@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.3.2
+* Added Salad.Model.inspect() for console output
+
 ## Version 0.3.1
 * Added Model.increment() and Model.decrement() to increment or decrement fields
   of a model without concurrency issues.
