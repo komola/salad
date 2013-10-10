@@ -127,6 +127,8 @@ class Salad.Model extends Salad.Base
       value = 1
 
     @daoInstance.increment @, field, value, (err, model) =>
+      return callback err if err
+
       if typeof field isnt "object"
         key = field
         field = {}
@@ -148,6 +150,8 @@ class Salad.Model extends Salad.Base
       value = 1
 
     @daoInstance.decrement @, field, value, (err, model) =>
+      return callback err if err
+
       if typeof field isnt "object"
         key = field
         field = {}

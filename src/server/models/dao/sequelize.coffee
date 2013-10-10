@@ -201,6 +201,8 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
   ###
   increment: (model, field, change, callback) =>
     @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
+      return callback err if err
+
       successCallback = (daoResource) =>
         resource = @_buildModelInstance daoResource
 

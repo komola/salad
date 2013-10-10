@@ -73,6 +73,7 @@ class Salad.Utils.Models
 
         modelCreator = (attributes, _cb) =>
           element.model.create attributes, (err, res) =>
+            throw err if err
             modelInstances[element.name] or= []
             modelInstances[element.name].push res
 
