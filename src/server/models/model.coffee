@@ -178,3 +178,13 @@ class Salad.Model extends Salad.Base
 
   toString: ->
     @constructor.name
+
+  # Helpful method
+  # This is called when console.log modelInstance is called
+  inspect: ->
+    attributes = @toJSON()
+    methods = _.keys @
+
+    data =
+      attributes: attributes
+      methods: methods

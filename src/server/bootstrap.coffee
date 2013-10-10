@@ -82,7 +82,18 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().logger.extend App.Logger
 
     App.Logger.log = =>
+      for key, val of arguments
+        if val instanceof Salad.Model
+          arguments[key] = val.inspect()
+
       @metadata().logger.info.apply @, arguments
+
+    App.Logger.error = =>
+      for key, val of arguments
+        if val instanceof Salad.Model
+          arguments[key] = val.inspect()
+
+      @metadata().logger.error.apply @, arguments
 
     if Salad.env isnt "testing"
       console.log = App.Logger.log

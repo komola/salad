@@ -35,7 +35,6 @@ module.exports =
 
           action = @[action]
 
-
         # does the method accept a callback parameter?
         if action.length > 0
           action.call @, cb
