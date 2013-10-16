@@ -59,3 +59,12 @@ describe "Controller", ->
           res.body.items[0].id.should.equal 4
 
           done()
+
+    it "does not transform the result if there is an error", (done) ->
+      agent.get(":3001/paginations.json?error=true")
+        .end (res) ->
+          res.statusCode.should.equal 401
+
+          assert.ok res.body.error
+
+          done()

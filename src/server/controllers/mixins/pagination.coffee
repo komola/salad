@@ -15,7 +15,7 @@ module.exports =
               callback.apply @, [err, result.rows]
 
         json: (data) ->
-          if @params.action is "index"
+          if @params.action is "index" and not data.error
             data = @_buildPaginationResult data
 
           _json.call @, data
