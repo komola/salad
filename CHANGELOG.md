@@ -2,6 +2,7 @@
 
 ## Version 0.3.2
 * Added Salad.Model.inspect() for console output
+* Fixed a pagination mixin bug
 
 ## Version 0.3.1
 * Added Model.increment() and Model.decrement() to increment or decrement fields
