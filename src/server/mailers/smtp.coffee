@@ -15,18 +15,22 @@ class Salad.Mailer.Smtp
         subject: undefined
         text: undefined
         html: undefined
-        attachment: []
+        attachments: []
         options: undefined
 
     options = _.extend defaultOptions, options
     
     # Check if html is specified and attach it to the email as an alternative.
     if options.message.html != undefined
-      if !options.message.attachment
-        options.message.attachment = []
+      if !options.message.attachments
+        options.message.attachments = []
 
-      options.message.attachment.push({data:options.message.html, alternative:true})
+      options.message.attachments.push({data:options.message.html, alternative:true})
     delete options.message.html
+    
+    # Rename attachments to attachment for emailjs api
+    options.message.attachment = options.message.attachments
+    delete options.message.attachments
 
     connection = email.server.connect options.credentials
 
