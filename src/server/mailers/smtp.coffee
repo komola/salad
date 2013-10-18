@@ -15,10 +15,18 @@ class Salad.Mailer.Smtp
         subject: undefined
         text: undefined
         html: undefined
-        attachments: []
+        attachment: []
         options: undefined
 
     options = _.extend defaultOptions, options
+    
+    # Check if html is specified and attach it to the email as an alternative.
+    if options.message.html != undefined
+      if !options.message.attachment
+        options.message.attachment = []
+
+      options.message.attachment.push({data:options.message.html, alternative:true})
+    delete options.message.html
 
     connection = email.server.connect options.credentials
 
