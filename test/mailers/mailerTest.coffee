@@ -25,6 +25,6 @@ describe "Salad.Mailer", ->
         message.to.should.equal "user@company.tld"
         message.from.should.equal "root@localhost"
         message.text.should.equal "text1"
-        message.html.should.equal "html1"
+        message.attachment[0].data.should.equal "html1"
 
         done()
