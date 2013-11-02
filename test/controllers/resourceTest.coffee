@@ -170,6 +170,7 @@ describe "App.Controller mixin resource", ->
           App.Shop.create title: ['a', 'g', 'h'], (err, model) =>
             agent.get(":3001/shops.json?title=a")
               .end (res) ->
+                console.log res
                 res.body.length.should.equal 2
 
                 done()
