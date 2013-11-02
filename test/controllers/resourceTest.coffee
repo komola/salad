@@ -163,6 +163,17 @@ describe "App.Controller mixin resource", ->
 
               done()
 
+    it.only "should filter based on where even if sequelize.Array is used", (done) ->
+
+      App.Shop.create title: ['a', 'b', 'c'], (err, model) =>
+        App.Shop.create title: ['d', 'e', 'f'], (err, model) =>
+          App.Shop.create title: ['a', 'g', 'h'], (err, model) =>
+            agent.get(":3001/shops.json?title=a")
+              .end (res) ->
+                res.body.length.should.equal 2
+
+                done()
+
     it "should filter based on where (greather than)", (done) ->
 
       App.Parent.create title: "Hello", (err, model) =>
