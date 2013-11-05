@@ -188,7 +188,7 @@ module.exports =
       conditions.where or= {}
       conditions.contains or= []
       firstChar = value[0]
-      checksForEquality = firstChar isnt ">" and firstChar isnt "<" and firstChar isnt ":"
+      checksForEquality = firstChar not in [">", "<", ":"]
       if not checksForEquality
         if firstChar is ":"
           holder = {}
@@ -209,8 +209,8 @@ module.exports =
       else
         conditions.where[key] = value
 
-      for key of conditions
-        if JSON.stringify(conditions[key]) is "{}" or JSON.stringify(conditions[key]) is "[]" # I feel violated
+      for key, val of conditions
+        if _.isEmpty val
           delete conditions[key]
 
       conditions
