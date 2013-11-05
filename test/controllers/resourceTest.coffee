@@ -15,6 +15,18 @@ describe "App.Controller mixin resource", ->
 
       conditionsHash.should.eql shouldConditions
 
+    it "should translate GET parameters to contains conditions", ->
+      controller = new App.TodosController()
+      parameters =
+        title: ":a"
+
+      shouldConditions =
+        contains: [title: ["a"]]
+
+      conditionsHash = controller.buildConditionsFromParameters parameters
+
+      conditionsHash.should.eql shouldConditions
+
     it "should translate GET parameters to sort conditions", ->
       controller = new App.TodosController()
       parameters =
@@ -85,6 +97,21 @@ describe "App.Controller mixin resource", ->
         createdAt: gt: "2013-07-15T09:09:09.000Z"
 
       secondScope = secondScope.where(whereConditions)
+
+      scope.should.eql secondScope
+
+    it "should add contains to scope", ->
+
+      controller = new App.ShopsController()
+
+      shouldConditions =
+        contains: ["title": ["a"]]
+
+      scope = controller.resourceClass()
+      scope = controller.applyConditionsToScope(scope,shouldConditions)
+
+      secondScope = controller.resourceClass()
+      secondScope = secondScope.contains "title", "a"
 
       scope.should.eql secondScope
 
@@ -163,16 +190,20 @@ describe "App.Controller mixin resource", ->
 
               done()
 
-    it "(should filter based on where even if sequelize.Array is used)", (done) ->
+    it "should filter based on array values", (done) ->
 
       App.Shop.create title: ['a', 'b', 'c'], (err, model) =>
         App.Shop.create title: ['d', 'e', 'f'], (err, model) =>
           App.Shop.create title: ['a', 'g', 'h'], (err, model) =>
-            agent.get(":3001/shops.json")
+            agent.get(":3001/shops.json?title=:a")
               .end (res) ->
-                res.body.length.should.equal 3
+                res.body.length.should.equal 2
 
-                done()
+                agent.get(":3001/shops.json?title=:a,b")
+                  .end (res) ->
+                    res.body.length.should.equal 1
+
+                    done()
 
     it "should filter based on where (greather than)", (done) ->
 
