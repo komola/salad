@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.3.4
+* Added possibility to search array fields for values in the controller
+
 ## Version 0.3.2
 * Added Salad.Model.inspect() for console output
 * Fixed a pagination mixin bug
