@@ -154,7 +154,7 @@ module.exports =
         if key not in allowedWhereAttributes
           continue
         # all other parameter names are treated as where conditions
-        conditions = @_buildWhereConditions key, value, conditions
+        conditions = @_buildFilterConditions key, value, conditions
 
       conditions
 
@@ -184,21 +184,34 @@ module.exports =
 
       conditions
 
-    _buildWhereConditions: (key, value, conditions) ->
+    _buildFilterConditions: (key, value, conditions) ->
       conditions.where or= {}
+      conditions.contains or= []
       firstChar = value[0]
-      checksForEquality = firstChar isnt ">" and firstChar isnt "<"
+      checksForEquality = firstChar not in [">", "<", ":"]
       if not checksForEquality
-        if firstChar is ">"
-          # we search values which are greater as the specified value
-          bindingElm = "gt"
+        if firstChar is ":"
+          holder = {}
+          holder[key] or= []
+          filterParams = value[1..-1].split(",")
+          for param in filterParams
+            holder[key].push param
+          conditions.contains.push holder
         else
-          bindingElm = "lt"
+          if firstChar is ">"
+            # we search values which are greater as the specified value
+            bindingElm = "gt"
+          else if firstChar is "<"
+            bindingElm = "lt"
 
-        conditions.where[key] = {}
-        conditions.where[key][bindingElm] = value[1..-1]
+          conditions.where[key] = {}
+          conditions.where[key][bindingElm] = value[1..-1]
       else
         conditions.where[key] = value
+
+      for key, val of conditions
+        if _.isEmpty val
+          delete conditions[key]
 
       conditions
 
@@ -215,7 +228,6 @@ module.exports =
 
           for value in conditions[key]
             if key is "includes"
-
               # the param is a string, from which we need to construct the class name
               associations = App[@resourceOptions.resourceClass].metadata().associations
               theClass = associations[value]?.model
@@ -223,14 +235,19 @@ module.exports =
                 includesClassArray.push theClass
               scope = scope.includes includesClassArray
 
-
-              # the param is a string, from which we need to construct the class name
-
             if key is "asc"
               scope = scope.asc value
 
             if key is "desc"
               scope = scope.desc value
+
+            if key is "contains"
+              for containKey,paramArray of value
+                for param in paramArray
+                  scope = scope.contains containKey, param
+
+
+
         else
           # apply calls the method key on the object scope with the values given in the array
           scope = scope[key].apply(scope,[value])
