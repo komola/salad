@@ -209,9 +209,8 @@ module.exports =
       else
         conditions.where[key] = value
 
-      for key, val of conditions
-        if _.isEmpty val
-          delete conditions[key]
+      for key, val of conditions when _.isEmpty val
+        delete conditions[key]
 
       conditions
 
