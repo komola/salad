@@ -166,7 +166,8 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       params.order = order
 
     if options.contains.length > 0
-      attribs = ("'#{contains.value}' = ANY(\"#{contains.field}\")" for contains in options.contains)
+      tableName = @modelClass.daoInstance.daoModelInstance.tableName
+      attribs = ("'#{contains.value}' = ANY(\"#{tableName}\".\"#{contains.field}\")" for contains in options.contains)
 
       if params.where
         for key, val of params.where

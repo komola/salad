@@ -1,7 +1,8 @@
 require "./parent"
 
 App.SequelizeChild = App.sequelize.define "Child",
-  {title: Sequelize.STRING}
+  {title: Sequelize.STRING,
+  otherTitle: Sequelize.ARRAY(Sequelize.STRING)}
   {tableName: "children"}
 
 App.SequelizeParent.hasMany App.SequelizeChild, foreignKey: "parentId"
@@ -15,6 +16,7 @@ class App.Child extends Salad.Model
 
   @attribute "id"
   @attribute "title"
+  @attribute "otherTitle"
   @attribute "createdAt"
   @attribute "updatedAt"
 
