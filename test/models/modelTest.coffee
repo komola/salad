@@ -561,6 +561,14 @@ describe "Salad.Model", ->
               resources.length.should.equal 1
               done()
 
+      it "should prohibit ambiguity", (done) ->
+        App.Parent.create title: "Parent", otherTitle: ["Peter", "Alex"], (err, parent) =>
+          parent.getChildren().create title: "Child", otherTitle: ["Hans", "Max"], (err, child) =>
+            App.Parent.includes([App.Child]).contains("otherTitle", "Peter").all (err, resources) =>
+              resources.length.should.equal 1
+              done()
+
+
       it "allows camelCase in field title", (done) ->
         App.Shop.create anotherTitle: ["A", "B"], (err, resource) ->
           resource.set "anotherTitle", ["A", "B", "C"]

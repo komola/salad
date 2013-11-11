@@ -1,5 +1,6 @@
 App.SequelizeParent = App.sequelize.define "Parent",
   title: Sequelize.STRING
+  otherTitle: Sequelize.ARRAY(Sequelize.STRING)
 
 class App.Parent extends Salad.Model
   @dao
@@ -8,6 +9,7 @@ class App.Parent extends Salad.Model
 
   @attribute "id"
   @attribute "title"
+  @attribute "otherTitle"
   @attribute "createdAt"
   @attribute "updatedAt"
 
