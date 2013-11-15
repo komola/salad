@@ -311,6 +311,31 @@ describe "Salad.Model", ->
 
         location.get("title").should.equal "Test"
 
+      it "applies eagerlyLoadedAssociations for belongsTo", ->
+        data =
+          title: "Test"
+          operator:
+            title: "FooOperator"
+
+        location = App.Location.build data
+
+        assert.ok location.eagerlyLoadedAssociations.operator
+        assert.isTrue location.eagerlyLoadedAssociations.operator instanceof App.Operator
+
+      it "applies eagerlyLoadedAssociations for hasMany", ->
+        data =
+          title: "Test"
+          children:
+            [
+              title: "Foo"
+            ]
+
+        location = App.Location.build data
+
+        assert.ok location.eagerlyLoadedAssociations.children
+        assert.ok location.eagerlyLoadedAssociations.children.length
+        assert.isTrue location.eagerlyLoadedAssociations.children[0] instanceof App.Location
+
   describe "associations", ->
     describe "#hasMany", ->
       it "creates getter method", ->
@@ -397,6 +422,17 @@ describe "Salad.Model", ->
               res[0].get("id").should.equal parent.get("id")
 
               done()
+
+    describe "#hasAssociation", ->
+      it "should return true for existing associations", ->
+        App.Location.hasAssociation("operator").should.equal true
+        location = App.Location.build(title: "Test")
+        location.hasAssociation("operator").should.equal true
+
+      it "should return false for non-existing associations", ->
+        App.Location.hasAssociation("foo").should.equal false
+        location = App.Location.build(title: "Test")
+        location.hasAssociation("foo").should.equal false
 
   describe "scope", ->
     it "accepts chained conditions", ->

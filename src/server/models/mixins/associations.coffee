@@ -3,6 +3,30 @@ module.exports =
     getAssociations: ->
       _.clone @eagerlyLoadedAssociations
 
+    hasAssociation: (key) ->
+      @constructor.hasAssociation key
+
+    getAssociation: (key) ->
+      @constructor.getAssociation key
+
+    getAssociationType: (key) ->
+      @constructor.getAssociationType key
+
+    setAssociation: (key, serializedModel) ->
+      unless serializedModel instanceof Array
+        serializedModel = [serializedModel]
+
+      # Make sure that the serialized models are all resolved to model instances
+      models = serializedModel.map (model) =>
+        return model if model instanceof Salad.Model
+        return @getAssociation(key).build model
+
+      if @getAssociationType(key) is "hasMany"
+        @eagerlyLoadedAssociations[key] = models
+
+      else
+        @eagerlyLoadedAssociations[key] = models[0]
+
   ClassMethods:
     # register a hasMany association for this mdoel
     # Usage
@@ -15,7 +39,9 @@ module.exports =
       foreignKey = options.foreignKey
 
       # register the association
-      @_registerAssociation options.as, targetModel, isOwning: false
+      @_registerAssociation options.as, targetModel,
+        isOwning: false
+        type: "hasMany"
 
       # register the method in this model
       # Don't bind to this context, because we want the method to be run in the
@@ -36,7 +62,9 @@ module.exports =
       foreignKey = options.foreignKey
 
       # register the association
-      @_registerAssociation options.as, targetModel, isOwning: true
+      @_registerAssociation options.as, targetModel,
+        isOwning: true
+        type: "belongsTo"
 
       @attribute foreignKey
 
@@ -55,6 +83,12 @@ module.exports =
     getAssociation: (key) ->
       @metadata().associations[key].model
 
+    getAssociationType: (key) ->
+      @metadata().associations[key].type
+
+    hasAssociation: (key) ->
+      @metadata().associations[key] isnt undefined
+
     _registerAssociation: (key, model, options = {}) ->
       key = key[0].toLowerCase() + key.substr(1)
 
@@ -62,3 +96,4 @@ module.exports =
       @metadata().associations[key] =
         model: model
         isOwning: options.isOwning
+        type: options.type

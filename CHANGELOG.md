@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.3.6
+* Model.build() is able to initialize eagerly loaded associations
+
 ## Version 0.3.4
 * Added possibility to search array fields for values in the controller
 

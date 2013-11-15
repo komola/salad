@@ -18,18 +18,16 @@ class Salad.Model extends Salad.Base
   triggerStack: {}
 
   constructor: (attributes, options) ->
-    @setAttributes attributes
-
-
     # overwrite default options with passed options
     options = _.extend {isNew: true}, options
 
+    @eagerlyLoadedAssociations = options.eagerlyLoadedAssociations or {}
     @isNew = options.isNew
+
+    @setAttributes attributes
 
     unless @isNew
       @takeSnapshot()
-
-    @eagerlyLoadedAssociations = options.eagerlyLoadedAssociations
 
     unless options.daoInstance
       throw new Error "No DAO instance set!"

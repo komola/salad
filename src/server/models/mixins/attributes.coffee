@@ -21,8 +21,12 @@ module.exports =
 
   InstanceMethods:
     setAttributes: (attributes) ->
-      for key, val of attributes when @hasAttribute key
-        @set key, val
+      for key, val of attributes
+        if @hasAttribute key
+          @set key, val
+
+        else if @hasAssociation key
+          @setAssociation key, val
 
     getDefaultValues: ->
       defaultValues = {}
