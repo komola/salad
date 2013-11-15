@@ -1,5 +1,13 @@
 # Salad Changelog
 
+## Version 0.4.0
+* Greatly improved eager-loaded support. You can now specify exactly which models
+  you want to eagerLoad. It also supports eager-loaded many models of the same
+  type.
+* Introduced (possibly) backwards-compatibility-breaking change: Make sure, that
+  all your Sequelize model definitions also specify an `as: "Model"` alias
+  definition.
+
 ## Version 0.3.6
 * Model.build() is able to initialize eagerly loaded associations
 

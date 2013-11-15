@@ -81,19 +81,23 @@ module.exports =
 
     # return the model class for the association key name
     getAssociation: (key) ->
+      key = key[0].toLowerCase() + key.substr(1)
       @metadata().associations[key].model
 
     getAssociationType: (key) ->
+      key = key[0].toLowerCase() + key.substr(1)
       @metadata().associations[key].type
 
     hasAssociation: (key) ->
+      key = key[0].toLowerCase() + key.substr(1)
       @metadata().associations[key] isnt undefined
 
-    _registerAssociation: (key, model, options = {}) ->
-      key = key[0].toLowerCase() + key.substr(1)
+    _registerAssociation: (as, model, options = {}) ->
+      key = as[0].toLowerCase() + as.substr(1)
 
       @metadata().associations or= {}
       @metadata().associations[key] =
+        as: as
         model: model
         isOwning: options.isOwning
         type: options.type

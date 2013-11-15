@@ -47,12 +47,42 @@ class Salad.Scope
 
     @
 
+  # Eager-load models
+  #
+  # Usage:
+  #
+  # App.Location.includes([App.Operator])
+  #
+  # App.Location.includes(["Operator"])
   includes: (models) ->
     for model in models
-      unless model.daoInstance
-        throw new Error "Model has to be instance of Salad.Model! #{model}"
+      option = {}
+      field = null
 
-      @data.includes.push model.daoInstance
+      # Check if model is a Salad.Model class
+      if model.__super__ is Salad.Model.prototype
+        associations = @context.metadata().associations
+
+        # Resolve a Salad.Model to the field it is saved as
+        for key, currentAssociation of associations when currentAssociation.model is model
+          field = currentAssociation.as
+          break
+
+        model = model.daoInstance
+
+        unless field
+          throw new Error "Scope::includes - Could not find an association between #{@context} and #{model}"
+
+      # the association name was passed. Resolve to the correct association
+      else
+        field = model
+        model = @context.getAssociation(model).daoInstance
+
+      option =
+        model: model
+        as: field
+
+      @data.includes.push option
 
     @
 

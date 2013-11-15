@@ -580,6 +580,36 @@ describe "Salad.Model", ->
 
               done()
 
+      it "accepts strings for named field parameters", (done) ->
+        App.Operator.create title: "Operator", (err, operator) =>
+          operator.getOperatorItems().create data: "test", (err, location) =>
+            App.Operator.includes(["OperatorItems"]).all (err, operators) =>
+              data = (a.toJSON() for a in operators)
+
+              data[0].should.have.property "operatorItems"
+
+              done()
+
+      it "can load the correct association when there are more than one", (done) ->
+        App.Operator.create title: "OperatorA", (err, operatorA) =>
+          App.Operator.create title: "OperatorB", (err, operatorB) =>
+            data =
+              title: "test"
+              support_operatorId: operatorB.get("id")
+              operatorId: operatorA.get("id")
+
+            App.Location.create data, (err, location) =>
+              App.Location.includes(["SupportOperator", "Operator"]).all (err, locations) =>
+                data = (a.toJSON() for a in locations)
+
+                data[0].should.have.property "supportOperator"
+                data[0].should.have.property "operator"
+
+                data[0].supportOperator.id.should.equal operatorB.get("id")
+                data[0].operator.id.should.equal operatorA.get("id")
+
+                done()
+
     describe "#where", ->
       it "accepts normal fields", (done) ->
         App.Shop.create otherField: "Test", (err, resource) ->

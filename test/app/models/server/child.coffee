@@ -5,7 +5,7 @@ App.SequelizeChild = App.sequelize.define "Child",
   otherTitle: Sequelize.ARRAY(Sequelize.STRING)}
   {tableName: "children"}
 
-App.SequelizeParent.hasMany App.SequelizeChild, foreignKey: "parentId"
+App.SequelizeParent.hasMany App.SequelizeChild, as: "Children", foreignKey: "parentId"
 App.SequelizeChild.belongsTo App.SequelizeParent, as: "Parent", foreignKey: "parentId"
 
 
