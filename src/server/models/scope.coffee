@@ -70,13 +70,13 @@ class Salad.Scope
 
         model = model.daoInstance
 
-        unless field
-          throw new Error "Scope::includes - Could not find an association between #{@context} and #{model}"
-
       # the association name was passed. Resolve to the correct association
-      else
+      else if @context.hasAssociation(model)
         field = model
         model = @context.getAssociation(model).daoInstance
+
+      unless field
+        throw new Error "Scope::includes - Could not find an association between #{@context.name} and #{model}"
 
       option =
         model: model
