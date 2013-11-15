@@ -100,7 +100,7 @@ class Salad.Utils.Models
     # iterate over all owning associations
     # owning means, that the association stores the relation information
     # (i.e. has userId column).
-    for name, options of associations when options.isOwning
+    for name, options of associations when options.isOwning and not options.isWeak
       dependentModel = options.model
       # build the dependency tree for every associated model
       @_buildDependencyTree dependentModel, resolvedDependencies, processed

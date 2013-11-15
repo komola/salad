@@ -65,6 +65,7 @@ module.exports =
       @_registerAssociation options.as, targetModel,
         isOwning: true
         type: "belongsTo"
+        isWeak: options.isWeak
 
       @attribute foreignKey
 
@@ -101,3 +102,4 @@ module.exports =
         model: model
         isOwning: options.isOwning
         type: options.type
+        isWeak: options.isWeak
