@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.4.2
+* Remove the domains for requests that handled uncaught exceptions
+
 ## Version 0.4.0
 * Greatly improved eager-loaded support. You can now specify exactly which models
   you want to eagerLoad. It also supports eager-loaded many models of the same
