@@ -532,7 +532,7 @@ describe "Salad.Model", ->
 
             parent.getChildren().remove child, (err) =>
               App.Location.find child.get("id"), (err, newChildObject) =>
-                assert.equal newChildObject.get("parentId"), undefined
+                assert.equal newChildObject.get("parentId"), null
 
                 done()
 

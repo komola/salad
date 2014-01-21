@@ -96,34 +96,42 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       daoInstance: @
       eagerlyLoadedAssociations: {}
 
-    if daoInstance.__eagerlyLoadedAssociations?.length > 0
-      for key in daoInstance.__eagerlyLoadedAssociations
-        # fetch the association model class from the associations object
-        associationModelClass = @modelClass.getAssociation key
-        associationType = @modelClass.getAssociationType key
+    # make a copy of the datavalues.
+    # the possibly eagerloaded associations will be removed from this
+    # object later because they are initialized in a different way
+    dataValues = _.clone daoInstance.dataValues
 
-        daoModels = daoInstance[key]
-        models = null
+    associationKeys = _.keys @modelClass.metadata().associations
 
-        if daoModels is null
-          continue
+    for key in associationKeys when dataValues[key]
+      delete dataValues[key]
 
-        # create an instance of the associated model passing along our dao model instance
-        if associationType is "belongsTo"
-          daoModels = [daoModels]
+      # fetch the association model class from the associations object
+      associationModelClass = @modelClass.getAssociation key
+      associationType = @modelClass.getAssociationType key
 
-        models = daoModels.map associationModelClass.daoInstance.lazyInstantiate
+      daoModels = daoInstance.dataValues[key]
+      models = null
 
-        # Unwrap the model from the array if it is a belongsTo association.
-        # There can only be one association of this model
-        if associationType is "belongsTo"
-          models = models[0]
+      if daoModels is null
+        continue
 
-        # add the instance to the options, so the constructor of modelInstance
-        # model can pick them up
-        options.eagerlyLoadedAssociations[key] = models
+      # create an instance of the associated model passing along our dao model instance
+      if associationType is "belongsTo"
+        daoModels = [daoModels]
 
-    attributes = daoInstance.dataValues
+      models = daoModels.map associationModelClass.daoInstance.lazyInstantiate
+
+      # Unwrap the model from the array if it is a belongsTo association.
+      # There can only be one association of this model
+      if associationType is "belongsTo"
+        models = models[0]
+
+      # add the instance to the options, so the constructor of modelInstance
+      # model can pick them up
+      options.eagerlyLoadedAssociations[key] = models
+
+    attributes = dataValues
 
     return new @modelClass attributes, options
 
@@ -180,6 +188,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
           model = model.daoModelInstance
 
         params.include.push model
+
     params
 
   ###
@@ -202,10 +211,10 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
         callback null, resource
 
       if typeof field is "object"
-        sequelizeModel.increment(field).success successCallback
+        sequelizeModel.increment(field, by: 1).success successCallback
 
       else
-        sequelizeModel.increment(field, change).success successCallback
+        sequelizeModel.increment(field, by: change).success successCallback
 
   ###
   Decrement the field of a model
@@ -225,7 +234,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
         callback null, resource
 
       if typeof field is "object"
-        sequelizeModel.decrement(field).success successCallback
+        sequelizeModel.decrement(field, by: 1).success successCallback
 
       else
-        sequelizeModel.decrement(field, change).success successCallback
+        sequelizeModel.decrement(field, by: change).success successCallback

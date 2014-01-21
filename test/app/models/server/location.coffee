@@ -3,8 +3,8 @@ App.SequelizeLocation = App.sequelize.define "Location",
   description: Sequelize.TEXT
   messages: Sequelize.INTEGER
 
-App.SequelizeLocation.hasMany App.SequelizeLocation, as: "Children", foreignKey: "parentId"
-App.SequelizeLocation.belongsTo App.SequelizeLocation, as: "Parent", foreignKey: "parentId"
+App.SequelizeLocation.hasMany App.SequelizeLocation, as: "Children", foreignKey: "parentId", through: null
+App.SequelizeLocation.belongsTo App.SequelizeLocation, as: "Parent", foreignKey: "parentId", through: null
 
 class App.Location extends Salad.Model
   @dao

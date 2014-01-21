@@ -170,10 +170,6 @@ class Salad.Scope
   remove: (model, callback) ->
     keys = _.keys @data.conditions
 
-    updateData = {}
-    for key in keys
-      updateData[key] = undefined
-
-    model.setAttributes updateData
+    model.set key, null for key in keys
 
     model.save callback

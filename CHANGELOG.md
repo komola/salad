@@ -1,5 +1,11 @@
 # Salad Changelog
 
+## Version 0.5.0
+* Update to latest sequelize version
+
+  You might have to add through: null to some of the sequelize associations.
+  Since this might break some installations, this is marked as Version 0.5.0
+
 ## Version 0.4.2
 * Remove the domains for requests that handled uncaught exceptions
 

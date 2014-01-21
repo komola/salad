@@ -70,7 +70,7 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().logger.setLevels winston.config.syslog.levels
 
     @metadata().logger.add winston.transports.Console,
-      handleExceptions: true
+      handleExceptions: false
       prettyPrint: true
       colorize: true
       timestamp: true
