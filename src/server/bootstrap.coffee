@@ -5,7 +5,6 @@ findit = require "findit2"
 fs = require "fs"
 gaze = require "gaze"
 path = require "path"
-domain = require "domain"
 # require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
@@ -215,15 +214,6 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().app.use express.cookieParser()
     @metadata().app.use express.bodyParser()
     @metadata().app.use express.methodOverride()
-
-    # create a nodejs domain for every request
-    # this allows us to have solid error recovery during a request
-    @metadata().app.use (req, res, next) =>
-      requestDomain = domain.create()
-      requestDomain.add req
-      requestDomain.add res
-      requestDomain.on "error", next
-      requestDomain.run next
 
     # TODO: Hack for this issue: https://github.com/sequelize/sequelize/issues/815
     # May need to think of a better way to handle this.
