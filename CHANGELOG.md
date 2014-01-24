@@ -1,5 +1,9 @@
 # Salad Changelog
 
+## Version 0.5.1
+* Fix bug in count that was caused when an order statement was included in the 
+  options
+
 ## Version 0.5.0
 * Update to latest sequelize version
 

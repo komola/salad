@@ -116,6 +116,9 @@ class Salad.Scope
     if options.limit
       delete options.limit
 
+    if options.order
+      options.order = []
+
     @daoContext.count options, callback
 
   all: (callback) ->

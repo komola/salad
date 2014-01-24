@@ -477,6 +477,13 @@ describe "Salad.Model", ->
 
             done()
 
+      it "does not cause error with orderBy statements", (done) ->
+        App.Location.create title: "Test", (err, res) =>
+          App.Location.desc("createdAt").count (err, count) =>
+            count.should.equal 1
+
+            done()
+
 
     describe "#build", ->
       it "creates an instance with association information", (done) ->
