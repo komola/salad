@@ -38,7 +38,7 @@ before (done) ->
     Salad.root += "/test"
     Salad.Bootstrap.run
       port: 3001
-      env: "testing"
+      env: "test"
       cb: =>
         cleanupDatabase done
 

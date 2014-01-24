@@ -1,7 +1,7 @@
 config = {}
 
 config.database =
-  testing:
+  test:
     username: "testing"
     password: "testing"
     host: "localhost"
@@ -13,7 +13,7 @@ config.database =
       maxIdleTime: 30
 
 config.mailer =
-  testing:
+  test:
     transport: "debug"
     user: ""
     password: ""

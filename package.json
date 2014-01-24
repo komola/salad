@@ -70,6 +70,6 @@
     "grunt-cli": "~0.1.9"
   },
   "scripts": {
-    "test": "NODE_ENV=testing ./node_modules/.bin/mocha --require should --require coffee-script-mapped --reporter spec --timeout 2000 --growl ./test/server.coffee $(find test -name \"*Test.coffee\")"
+    "test": "NODE_ENV=test ./node_modules/.bin/mocha --require should --require coffee-script-mapped --reporter spec --timeout 2000 --growl ./test/server.coffee $(find test -name \"*Test.coffee\")"
   }
 }

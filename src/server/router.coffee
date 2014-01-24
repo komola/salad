@@ -70,8 +70,8 @@ class Salad.Router extends Salad.Base
     # Call the controller action
     async.series [
         (cb) =>
-          # do not log request information in testing
-          return cb() if Salad.env is "testing"
+          # do not log request information in test
+          return cb() if Salad.env is "test"
 
           # output dispatching information
           line = "Dispatching request: #{controllerName}.#{matching.action} (#{matching.format})"

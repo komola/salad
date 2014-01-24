@@ -94,7 +94,7 @@ class Salad.Bootstrap extends Salad.Base
 
       @metadata().logger.error.apply @, arguments
 
-    if Salad.env isnt "testing"
+    if Salad.env isnt "test"
       console.log = App.Logger.log
       console.error = App.Logger.error
 
@@ -219,7 +219,7 @@ class Salad.Bootstrap extends Salad.Base
     # May need to think of a better way to handle this.
     # ATM, this will only try to create the tables, fail because they are already
     # created, but by trying will learn about the table structure.
-    if Salad.env is "testing"
+    if Salad.env is "test"
       return cb()
 
     App.sequelize.sync()
@@ -247,7 +247,7 @@ class Salad.Bootstrap extends Salad.Base
 
         @metadata().expressServer = @metadata().app.listen @options.port
 
-        console.log "Started salad. Environment: #{Salad.env}" if Salad.env isnt "testing"
+        console.log "Started salad. Environment: #{Salad.env}" if Salad.env isnt "test"
         cb()
 
       (cb) => @runTriggers "after:start", cb

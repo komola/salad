@@ -1,5 +1,6 @@
 BIN = ./node_modules/.bin
 TESTS = $(shell find test -name "*Test.coffee")
+.PHONY: test clean
 
 build:
 	@echo "Creating folders"
@@ -9,10 +10,7 @@ build:
 	@$(BIN)/grunt compile
 
 test: build
-	@NODE_ENV=testing ./node_modules/.bin/mocha \
-	  -r should -r coffee-script \
-	  --reporter spec --timeout 2000 \
-	  ./test/server.coffee $(TESTS)
+	@npm test
 
 clean:
 	@rm -rf lib
