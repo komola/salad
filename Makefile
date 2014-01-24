@@ -43,5 +43,6 @@ release-major: build test
 	@$(call release,major)
 
 publish:
+	git push
 	git push --tags origin HEAD:master
 	npm publish
