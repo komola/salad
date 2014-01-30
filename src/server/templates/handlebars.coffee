@@ -31,7 +31,7 @@ class Salad.Template.Handlebars
     fileParts = file.split "/"
 
     # partials start with an underscore in their name
-    return unless fileParts[1].substr(0, 1) is "_"
+    return unless fileParts[1]?.substr(0, 1) is "_"
 
     file = file.replace ".hbs", ""
     handlebars.registerPartial file, content
