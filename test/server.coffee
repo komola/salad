@@ -7,8 +7,7 @@ d.on "error", (err) ->
 
   process.exit(1)
 
-require "coffee-script"
-require "coffee-script-mapped"
+require "coffee-script/register"
 require "../"
 
 require "./app/config/server/bootstrap"
