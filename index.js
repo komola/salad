@@ -9,6 +9,7 @@ if(fs.existsSync(root))
 }
 else
 {
-  require("coffee-script");
-  module.exports = require("./src/server/salad");
+  require("coffee-script/register");
+  root = path.join(__dirname, "src/server/salad");
+  module.exports = require(root);
 }
