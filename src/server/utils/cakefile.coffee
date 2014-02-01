@@ -30,6 +30,7 @@ class Salad.Utils.Cakefile
 
     options =
       env: Salad.env
+      isCakefile: true
 
     Salad.Bootstrap.instance().init options, =>
       App.sequelize.options.logging = false

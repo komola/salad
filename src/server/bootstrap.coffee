@@ -39,6 +39,7 @@ class Salad.Bootstrap extends Salad.Base
 
     @options.port = options.port || 80
     @options.env = Salad.env = options.env || "production"
+    @options.isCakefile = Salad.isCakefile = options.isCakefile || false
 
     async.series [
       (cb) => @runTriggers "before:init", cb
@@ -94,7 +95,7 @@ class Salad.Bootstrap extends Salad.Base
 
       @metadata().logger.error.apply @, arguments
 
-    if Salad.env isnt "test"
+    if Salad.env isnt "test" and not Salad.isCakefile
       console.log = App.Logger.log
       console.error = App.Logger.error
 
