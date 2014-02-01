@@ -46,3 +46,4 @@ publish:
 	git push
 	git push --tags origin HEAD:master
 	npm publish
+	@rm -rf lib
