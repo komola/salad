@@ -161,7 +161,6 @@ class Salad.Bootstrap extends Salad.Base
       async.eachSeries files,
         readFile = (file, done) =>
           loadTemplateFile file, (index) =>
-            App.Logger.info "Template #{index} loaded" if Salad.env is "development"
             done()
 
         # we are done!
