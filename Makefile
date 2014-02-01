@@ -2,7 +2,7 @@ BIN = ./node_modules/.bin
 TESTS = $(shell find test -name "*Test.coffee")
 .PHONY: test clean
 
-build:
+build: clean
 	@echo "Creating folders"
 	@mkdir -p lib
 	@mkdir -p build
