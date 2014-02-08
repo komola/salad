@@ -29,17 +29,7 @@ class Salad.Router extends Salad.Base
     if _.last(requestPath) is "/" and requestPath isnt "/"
       requestPath = requestPath.substr 0, requestPath.length - 1
 
-    # Get the first matching route
-    matching = router.first(requestPath, request.method)
-    # default format is html"
-    matching.format or= "html"
-
-    # No matching route found
-    unless matching
-      matching =
-        controller: "error"
-        action: 404
-        method: request.method
+    matching = @_resolveRoute requestPath, request
 
     # Get the matching controller
     controllerName = _.capitalize matching.controller
@@ -98,6 +88,21 @@ class Salad.Router extends Salad.Base
 
       # finished dispatching the request
       (err) =>
+
+  _resolveRoute: (requestPath, request) ->
+    # Get the first matching route
+    matching = router.first(requestPath, request.method)
+    # default format is html"
+    matching.format or= "html"
+
+    # No matching route found
+    unless matching
+      matching =
+        controller: "error"
+        action: 404
+        method: request.method
+
+    matching
 
   _getMatchingController: (controllerName) ->
     controllerName = _.capitalize controllerName
