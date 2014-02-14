@@ -103,6 +103,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     associationKeys = _.keys @modelClass.metadata().associations
 
+    # TODO: When does this happen? Seems like dataValues is null
     for key in associationKeys when dataValues?[key]
       delete dataValues[key]
 
