@@ -103,7 +103,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     associationKeys = _.keys @modelClass.metadata().associations
 
-    for key in associationKeys when dataValues[key]
+    for key in associationKeys when dataValues?[key]
       delete dataValues[key]
 
       # fetch the association model class from the associations object
