@@ -45,10 +45,15 @@ class Salad.Bootstrap extends Salad.Base
       (cb) => @runTriggers "before:init", cb
       (cb) => @runTriggers "after:init", cb
     ], (err) =>
-      callback() if callback
+      if err
+        App.Logger.error err
+
+      callback err if callback
 
   run: (options) ->
-    @init options, =>
+    @init options, (err) =>
+      return if err
+
       @start options.cb
 
   @run: (options) ->
@@ -130,7 +135,7 @@ class Salad.Bootstrap extends Salad.Base
 
     cb()
 
-  initTemplates: (cb) ->
+  initTemplates: (callback) ->
     # find all templates and save their content in a hash
     files = []
     @metadata().templates = {}
@@ -142,6 +147,8 @@ class Salad.Bootstrap extends Salad.Base
 
     loadTemplateFile = (file, cb) =>
       fs.readFile file, (err, content) =>
+        return cb err if err
+
         file = path.normalize(file)
         index = file
           .replace(path.normalize(dirname), "")
@@ -149,30 +156,30 @@ class Salad.Bootstrap extends Salad.Base
           .replace(/\/(server|shared)\//, "")
 
         @metadata().templates[index] = content.toString()
-        cb index
 
-    finder = findit dirname
+        cb err, index
 
-    # we received a file
-    finder.on "file", (file, stat) =>
-      files.push file
+    async.series [
+      (cb) =>
+        finder = findit dirname
 
-    # we received all files.
-    finder.on "end", =>
-      async.eachSeries files,
-        readFile = (file, done) =>
-          loadTemplateFile file, (index) =>
-            done()
+        # we received a file
+        finder.on "file", (file, stat) =>
+          files.push file
 
-        # we are done!
-        finished = (err) =>
-          cb()
+        # we received all files.
+        finder.on "end", cb
+
+      (cb) =>
+        async.eachSeries files, loadTemplateFile, cb
+    ], (err) =>
+      return callback err
 
     # watch for changes and automatically reload files
     if Salad.env is "development"
       gaze "#{dirname}/*/*/*.hbs", (err, watcher) =>
         watcher.on "changed", (file) =>
-          loadTemplateFile file, (index) =>
+          loadTemplateFile file, (err, index) =>
             content = @metadata().templates[index]
             Salad.Template.Handlebars.registerPartial index, content
 
