@@ -42,6 +42,7 @@ module.exports =
       @_registerAssociation options.as, targetModel,
         isOwning: false
         type: "hasMany"
+        foreignKey: foreignKey
 
       # register the method in this model
       # Don't bind to this context, because we want the method to be run in the
@@ -66,6 +67,7 @@ module.exports =
         isOwning: true
         type: "belongsTo"
         isWeak: options.isWeak
+        foreignKey: foreignKey
 
       @attribute foreignKey
 
@@ -83,15 +85,21 @@ module.exports =
     # return the model class for the association key name
     getAssociation: (key) ->
       key = key[0].toLowerCase() + key.substr(1)
-      @metadata().associations[key].model
+      return @metadata().associations[key].model
 
     getAssociationType: (key) ->
       key = key[0].toLowerCase() + key.substr(1)
-      @metadata().associations[key].type
+      return @metadata().associations[key].type
+
+    getForeignKeys: ->
+      foreignKeys = (elm.foreignKey for key, elm of @metadata().associations)
+      foreignKeys = _.unique foreignKeys
+
+      return foreignKeys
 
     hasAssociation: (key) ->
       key = key[0].toLowerCase() + key.substr(1)
-      @metadata().associations[key] isnt undefined
+      return @metadata().associations[key] isnt undefined
 
     _registerAssociation: (as, model, options = {}) ->
       key = as[0].toLowerCase() + as.substr(1)
@@ -103,3 +111,6 @@ module.exports =
         isOwning: options.isOwning
         type: options.type
         isWeak: options.isWeak
+        foreignKey: options.foreignKey
+
+      return true

@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.5.10
+* Add Salad.Model.getForeignKeys()
+
 ## Version 0.5.1
 * Fix bug in count that was caused when an order statement was included in the 
   options

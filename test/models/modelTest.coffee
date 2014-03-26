@@ -434,6 +434,13 @@ describe "Salad.Model", ->
         location = App.Location.build(title: "Test")
         location.hasAssociation("foo").should.equal false
 
+    describe "#getForeignKeys", ->
+      it "should return an array of foreignKey fields", ->
+        keys = App.Location.getForeignKeys()
+
+        keys.should.eql ["parentId", "operatorId", "support_operatorId"]
+
+
   describe "scope", ->
     it "accepts chained conditions", ->
       scope = App.Location.where(title: "Test").asc("title").limit(3)
