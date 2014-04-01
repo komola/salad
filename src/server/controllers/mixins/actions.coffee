@@ -30,7 +30,11 @@ module.exports =
     create: ->
       @_create (error, resource) =>
         if error?.isValid is false
-          return @render json: {error: error}, status: 400
+          errorData =
+            message: error?.message
+            isValid: error?.isValid
+
+          return @render json: {error: errorData}, status: 400
 
         @respondWith
           html: ->

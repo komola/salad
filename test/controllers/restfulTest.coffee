@@ -106,6 +106,16 @@ describe "App.RestfulController", ->
 
             done()
 
+      it "returns error message if association does not exist", (done) ->
+        agent.post(":3001/locations.json")
+          .send(location: { title: "New todo", parentId: 999})
+          .end (res) ->
+            res.status.should.equal 400, "correct http status code"
+            assert.ok res.body.error
+
+            done()
+
+
     describe "update", ->
       it "changes the model and redirects", (done) ->
         App.Todo.create title: "Test", (err, model) =>

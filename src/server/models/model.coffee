@@ -90,6 +90,7 @@ class Salad.Model extends Salad.Base
     async.series [
         (cb) => @runTriggers "before:save", (err) =>
           cb err
+        (cb) => @verifyAssociationsExist cb
         action
         (cb) =>
           @isNew = false
@@ -101,6 +102,41 @@ class Salad.Model extends Salad.Base
       (err) =>
         if callback
           callback err, resource
+
+  ###
+  Helper function that is called when calling save.
+  It verifies that all the associations actually exist before writing to the
+  database.
+
+  Calls the callback with an error if an invalid association was found.
+  ###
+  verifyAssociationsExist: (callback) =>
+    associations = @metadata().associations
+    attributes = @getAttributes()
+
+    checkForeignKey = (name, cb) =>
+      {foreignKey} = associations[name]
+
+      # only check for models that "own" the association and that contain the
+      # foreignKey attribute
+      return cb() if associations[name].isOwning
+
+      value = attributes[foreignKey]
+
+      # skip the check if there is no value provided for this field
+      return cb() unless value
+
+      modelClass = associations[name].model
+
+      modelClass.where(id: value).count (err, count) =>
+        return cb err if err
+        return cb() if count > 0
+
+        error = new Error("Invalid value for #{foreignKey}. No resource found with ID #{value}")
+        error.isValid = false
+        return cb error
+
+    async.eachSeries _.keys(associations), checkForeignKey, callback
 
   ###
   Increment the field or fields of a model

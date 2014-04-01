@@ -476,6 +476,16 @@ describe "Salad.Model", ->
 
             done()
 
+      it "verifies possible associations if they exist", (done) ->
+        App.Location.create title: "Parent", (err, resource) =>
+          App.Location.create title: "Child", parentId: 999, (err, resource) =>
+            assert.ok err
+
+            assert.isTrue err.message.indexOf("parentId") > 0, "returns correct error message"
+            assert.isTrue err.isValid is false
+
+            done()
+
     describe "#count", ->
       it "returns the correct count", (done) ->
         App.Location.create title: "Test", (err, res) =>

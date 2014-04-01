@@ -1,7 +1,17 @@
-App.SequelizeLocation = App.sequelize.define "Location",
+attributes =
   title: Sequelize.STRING
   description: Sequelize.TEXT
   messages: Sequelize.INTEGER
+  parentId:
+    type: Sequelize.INTEGER
+    references: "locations"
+    onDelete: "restrict"
+    onUpdate: "cascade"
+
+options =
+  tableName: "locations"
+
+App.SequelizeLocation = App.sequelize.define "Location", attributes, options
 
 App.SequelizeLocation.hasMany App.SequelizeLocation, as: "Children", foreignKey: "parentId", through: null
 App.SequelizeLocation.belongsTo App.SequelizeLocation, as: "Parent", foreignKey: "parentId", through: null
