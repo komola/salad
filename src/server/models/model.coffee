@@ -119,7 +119,7 @@ class Salad.Model extends Salad.Base
 
       # only check for models that "own" the association and that contain the
       # foreignKey attribute
-      return cb() if associations[name].isOwning
+      return cb() unless associations[name].isOwning
 
       value = attributes[foreignKey]
 
