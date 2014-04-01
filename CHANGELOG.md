@@ -1,5 +1,8 @@
 # Salad Changelog
 
+## Version 0.5.11
+* Verify foreign key integrity before saving data
+
 ## Version 0.5.10
 * Add Salad.Model.getForeignKeys()
 
