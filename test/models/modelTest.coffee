@@ -118,6 +118,24 @@ describe "Salad.Model", ->
 
             done()
 
+      it "only saves the changed values", (done) ->
+        App.Location.first (err, res1) =>
+          App.Location.first (err, res2) =>
+            async.series [
+              (cb) =>
+                res1.set "title", "A"
+                res1.save cb
+
+              (cb) =>
+                res2.set "description", "A"
+                res2.save cb
+            ], (err) =>
+              App.Location.first (err, res3) =>
+                res3.get("title").should.equal "A"
+                res3.get("description").should.equal "A"
+
+                done()
+
     describe "#save", ->
       it "creates a record when it is new", (done) ->
         resource = App.Location.build title: "Test"

@@ -83,7 +83,10 @@ class Salad.Model extends Salad.Base
           resource = _res
           cb _err
 
-      @daoInstance.update @, @getAttributes(), (_err, _res) =>
+      changedAttributes = _.keys @getChangedAttributes()
+      delta = _.pick @getAttributes(), changedAttributes
+
+      @daoInstance.update @, delta, (_err, _res) =>
         resource = _res
         cb _err
 
