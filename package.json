@@ -34,8 +34,8 @@
   },
   "dependencies": {
     "underscore.string": ">= 0.0.1",
-    "express": ">= 3.0.0",
-    "mime": ">= 0.0.1",
+    "express": "~3.4.0",
+    "mime": "~1.2.0",
     "require-all": "0.0.5",
     "barista": "~0.1.0",
     "async": "~0.2.8",
