@@ -20,7 +20,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
       return callback err if err
 
-      sequelizeModel.updateAttributes(attributes).success (daoResource) =>
+      sequelizeModel.updateAttributes(attributes, _.keys(attributes)).success (daoResource) =>
         resource = @_buildModelInstance daoResource
         callback null, resource
 

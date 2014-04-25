@@ -57,17 +57,15 @@ class Salad.Model extends Salad.Base
     resource = @build attributes
 
     async.series [
-        (cb) => resource.runTriggers "before:create", cb
-        (cb) => resource.save (_err, _res) =>
-          err = _err
-          resource = _res
+      (cb) => resource.runTriggers "before:create", cb
+      (cb) => resource.save (_err, _res) =>
+        err = _err
+        resource = _res
 
-          cb err
-        (cb) => resource.runTriggers "after:create", cb
-      ],
-
-      =>
-        callback err, resource
+        cb err
+      (cb) => resource.runTriggers "after:create", cb
+    ], =>
+      callback err, resource
 
   updateAttributes: (attributes, callback) ->
     @setAttributes attributes
