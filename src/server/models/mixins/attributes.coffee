@@ -50,7 +50,8 @@ module.exports =
 
     getAttributes: ->
       @initDefaultValues()
-      @attributeValues
+
+      return _.clone @attributeValues, true
 
     getAttributeDefinitions: ->
       @metadata().attributes

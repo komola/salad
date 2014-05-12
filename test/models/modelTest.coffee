@@ -72,6 +72,15 @@ describe "Salad.Model", ->
 
           done()
 
+    describe "#getAttributes", ->
+      it "should clone the attributes object", ->
+        a = App.Todo.build title: "Test"
+
+        attributes = a.getAttributes()
+        attributes.foo = "bar"
+
+        assert.isTrue a.getAttributes().foo is undefined
+
     describe "#updateAttributes", ->
       res = null
       params =
