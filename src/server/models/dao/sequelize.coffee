@@ -162,7 +162,8 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       params.order = order
 
     if options.contains.length > 0
-      tableName = @modelClass.daoInstance.daoModelInstance.tableName
+      tableName = @modelClass.daoInstance.daoModelInstance.name
+
       attribs = ("'#{contains.value}' = ANY(\"#{tableName}\".\"#{contains.field}\")" for contains in options.contains)
 
       if params.where
@@ -190,7 +191,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
         params.include.push model
 
-    params
+    return params
 
   ###
   Increment the field of a model.

@@ -40,7 +40,7 @@
     "barista": "~0.1.0",
     "async": "~0.2.8",
     "winston": "~0.7.1",
-    "sequelize": "git://github.com/sequelize/sequelize.git#milestones/2.0.0",
+    "sequelize": "git://github.com/sequelize/sequelize.git#master",
     "longjohn": "~0.2.0",
     "underscore.inflections": "~0.2.0",
     "pg": "~2.3.0",
