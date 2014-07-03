@@ -1,7 +1,12 @@
 class Salad.DAO.Sequelize extends Salad.DAO.Base
   create: (attributes, callback) ->
     attributes = @_cleanAttributes attributes
-    @daoModelInstance.create(attributes).success (daoResource) =>
+    options = {}
+
+    if App.transaction
+      options.transaction = App.transaction
+
+    @daoModelInstance.create(attributes, options).success (daoResource) =>
       resource = @_buildModelInstance daoResource
       callback null, resource
 
@@ -9,7 +14,16 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
   # query for each update operation.
   # We could use a instance hash of all daoModel objects and then just update those
   _getSequelizeModelBySaladModel: (model, callback) ->
-    @daoModelInstance.find(model.get("id")).success (sequelizeModel) =>
+    options = {}
+
+    if App.transaction
+      options.transaction = App.transaction
+
+    conditions =
+      where:
+        id: model.get("id")
+
+    @daoModelInstance.find(conditions, options).success (sequelizeModel) =>
       unless sequelizeModel
         error = new Error "Could not find model with id: #{model.get("id")}"
         return callback error
@@ -20,7 +34,13 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
       return callback err if err
 
-      sequelizeModel.updateAttributes(attributes, _.keys(attributes)).success (daoResource) =>
+      options =
+        fields: _.keys(attributes)
+
+      if App.transaction
+        options.transaction = App.transaction
+
+      sequelizeModel.updateAttributes(attributes, options).success (daoResource) =>
         resource = @_buildModelInstance daoResource
         callback null, resource
 
@@ -41,7 +61,12 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
         return callback err if err
 
-        sequelizeModel.destroy().success =>
+        options = {}
+
+        if App.transaction
+          options.transaction = App.transaction
+
+        sequelizeModel.destroy(options).success =>
           callback null
 
     else
@@ -54,7 +79,12 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       if _.keys(model.conditions).length is 0
         model.conditions = "true = true"
 
-      sequelizeModel.destroy(model.conditions)
+      options = {}
+
+      if App.transaction
+        options.transaction = App.transaction
+
+      sequelizeModel.destroy(model.conditions, options)
         .success =>
           callback null
         .error =>
@@ -64,6 +94,9 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
   findAll: (options, callback) ->
     params = @_buildOptions options
+
+    if App.transaction
+      params.transaction = App.transaction
 
     @daoModelInstance.findAll(params)
       .success (rawResources) =>
@@ -76,6 +109,9 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
   count: (options, callback) ->
     params = @_buildOptions options
+
+    if App.transaction
+      params.transaction = App.transaction
 
     @daoModelInstance.count(params)
       .success (count) =>
@@ -212,11 +248,17 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
         callback null, resource
 
-      if typeof field is "object"
-        sequelizeModel.increment(field, by: 1).success successCallback
+      options = {}
 
+      if typeof field is "object"
+        options.by = 1
       else
-        sequelizeModel.increment(field, by: change).success successCallback
+        options.by = change
+
+      if App.transaction
+        options.transaction = App.transaction
+
+      sequelizeModel.increment(field, options).success successCallback
 
   ###
   Decrement the field of a model
@@ -230,13 +272,21 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
   ###
   decrement: (model, field, change, callback) =>
     @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
+      return callback err if err
+
       successCallback = (daoResource) =>
         resource = @_buildModelInstance daoResource
 
         callback null, resource
 
-      if typeof field is "object"
-        sequelizeModel.decrement(field, by: 1).success successCallback
+      options = {}
 
+      if typeof field is "object"
+        options.by = 1
       else
-        sequelizeModel.decrement(field, by: change).success successCallback
+        options.by = change
+
+      if App.transaction
+        options.transaction = App.transaction
+
+      sequelizeModel.decrement(field, options).success successCallback
