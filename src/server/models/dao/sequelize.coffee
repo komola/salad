@@ -6,9 +6,20 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if App.transaction
       options.transaction = App.transaction
 
-    @daoModelInstance.create(attributes, options).success (daoResource) =>
+    query = @daoModelInstance.create(attributes, options)
+
+    query.success (daoResource) =>
       resource = @_buildModelInstance daoResource
-      callback null, resource
+      return callback null, resource
+
+    query.error (error) =>
+      if Salad.env isnt "test"
+        App.Logger.error "Create: Query returned error",
+          sql: error.sql
+          attributes: attributes
+        App.Logger.error error
+
+      return callback error
 
   # TODO: Optimize this. Right now this would create an additional select and update
   # query for each update operation.
@@ -23,12 +34,23 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       where:
         id: model.get("id")
 
-    @daoModelInstance.find(conditions, options).success (sequelizeModel) =>
+    query = @daoModelInstance.find(conditions, options)
+
+    query.success (sequelizeModel) =>
       unless sequelizeModel
         error = new Error "Could not find model with id: #{model.get("id")}"
         return callback error
 
-      callback null, sequelizeModel
+      return callback null, sequelizeModel
+
+    query.error (error) =>
+      if Salad.env isnt "test"
+        App.Logger.error "Find: Query returned error",
+          sql: error.sql
+          conditions: conditions
+        App.Logger.error error
+
+      return callback error
 
   update: (model, attributes, callback) ->
     @_getSequelizeModelBySaladModel model, (err, sequelizeModel) =>
@@ -40,9 +62,22 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       if App.transaction
         options.transaction = App.transaction
 
-      sequelizeModel.updateAttributes(attributes, options).success (daoResource) =>
+      query = sequelizeModel.updateAttributes(attributes, options)
+
+      query.success (daoResource) =>
         resource = @_buildModelInstance daoResource
         callback null, resource
+
+      query.error (error) =>
+        if Salad.env isnt "test"
+          App.Logger.error "Update: Query returned error",
+            sql: error.sql
+            attributes: attributes
+            options: _.omit options, "transaction"
+
+          App.Logger.error error
+
+        return callback error
 
   ###
   Destroy models in the database
@@ -66,8 +101,18 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
         if App.transaction
           options.transaction = App.transaction
 
-        sequelizeModel.destroy(options).success =>
+        query = sequelizeModel.destroy(options)
+
+        query.success =>
           callback null
+
+        query.error (error) =>
+          if Salad.env isnt "test"
+            App.Logger.error "Destroy: Query returned error",
+              sql: error.sql
+            App.Logger.error error
+
+          return callback error
 
     else
       sequelizeModel = @daoModelInstance
@@ -84,13 +129,18 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       if App.transaction
         options.transaction = App.transaction
 
-      sequelizeModel.destroy(model.conditions, options)
-        .success =>
-          callback null
-        .error =>
-          console.log arguments
+      query = sequelizeModel.destroy(model.conditions, options)
 
-          callback()
+      query.success =>
+        callback null
+
+      query.error (error) =>
+        if Salad.env isnt "test"
+          App.Logger.error "Query returned error",
+            sql: error.sql
+          App.Logger.error error
+
+        return callback error
 
   findAll: (options, callback) ->
     params = @_buildOptions options
@@ -98,14 +148,24 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if App.transaction
       params.transaction = App.transaction
 
-    @daoModelInstance.findAll(params)
-      .success (rawResources) =>
-        resources = []
+    query = @daoModelInstance.findAll(params)
 
-        for res in rawResources
-          resources.push @_buildModelInstance res
+    query.success (rawResources) =>
+      resources = []
 
-        callback null, resources
+      for res in rawResources
+        resources.push @_buildModelInstance res
+
+      callback null, resources
+
+    query.error (error) =>
+      if Salad.env isnt "test"
+        App.Logger.error "findAll: Query returned error",
+          sql: error.sql
+          parameter: params
+        App.Logger.error error
+
+      return callback error
 
   count: (options, callback) ->
     params = @_buildOptions options
@@ -113,9 +173,19 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if App.transaction
       params.transaction = App.transaction
 
-    @daoModelInstance.count(params)
-      .success (count) =>
+    query = @daoModelInstance.count(params)
+
+    query.success (count) =>
         callback null, count
+
+    query.error (error) =>
+      if Salad.env isnt "test"
+        App.Logger.error "Count: Query returned error",
+          sql: error.sql
+          parameter: params
+        App.Logger.error error
+
+      return callback error
 
   lazyInstantiate: (daoInstance) =>
     @_buildModelInstance daoInstance

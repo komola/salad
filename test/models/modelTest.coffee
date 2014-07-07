@@ -585,7 +585,7 @@ describe "Salad.Model", ->
               res.length.should.equal 1
               done()
 
-      it "returns undefined un #find", (done) ->
+      it "returns undefined on #find", (done) ->
           App.Location.nil().find 1, (err, res) ->
             assert.isUndefined res
 
@@ -787,3 +787,10 @@ describe "Salad.Model", ->
         shop.save ->
           triggered.should.equal true
           done()
+
+  describe "#find", ->
+    it "should return an error on invalid SQL", (done) ->
+      App.Todo.find "asdasd", (err, todo) =>
+        assert.ok err
+
+        done()
