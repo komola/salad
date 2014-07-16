@@ -138,6 +138,8 @@ module.exports =
 
       for key,value of parameters
         # check if the parameter name needs special handling
+        value = decodeURIComponent(value)
+
         if key in reservedParams
           if key is "sort"
             conditions = @_buildSortConditions value, conditions

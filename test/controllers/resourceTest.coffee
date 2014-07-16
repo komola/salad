@@ -2,18 +2,42 @@ describe "App.Controller mixin resource", ->
   describe "#buildConditionsFromParameters", ->
     it "should translate GET parameters to where conditions", ->
       controller = new App.TodosController()
-      parameters =
+      gtParameters =
         title: "Test"
         createdAt: ">2013-07-15T09:09:09.000Z"
 
-      shouldConditions =
+      encodedGtParameters =
+        title: "Test"
+        createdAt: "%3E2013-07-15T09:09:09.000Z"
+
+      ltParameters =
+        title: "Test"
+        createdAt: "<2013-07-15T09:09:09.000Z"
+
+      encodedLtParameters =
+        title: "Test"
+        createdAt: "%3C2013-07-15T09:09:09.000Z"
+
+      shouldGtConditions =
         where:
           title: "Test"
           createdAt: gt: "2013-07-15T09:09:09.000Z"
 
-      conditionsHash = controller.buildConditionsFromParameters parameters
+      shouldLtConditions =
+        where:
+          title: "Test"
+          createdAt: lt: "2013-07-15T09:09:09.000Z"
 
-      conditionsHash.should.eql shouldConditions
+      conditionsGtHash = controller.buildConditionsFromParameters gtParameters
+      conditionsLtHash = controller.buildConditionsFromParameters ltParameters
+      encodedGtHash = controller.buildConditionsFromParameters encodedGtParameters
+      encodedLtHash = controller.buildConditionsFromParameters encodedLtParameters
+
+      conditionsGtHash.should.eql shouldGtConditions
+      conditionsLtHash.should.eql shouldLtConditions
+
+      encodedGtHash.should.eql shouldGtConditions
+      encodedLtHash.should.eql shouldLtConditions
 
     it "should translate GET parameters to contains conditions", ->
       controller = new App.TodosController()
@@ -46,7 +70,7 @@ describe "App.Controller mixin resource", ->
         limit: 5000
 
       shouldConditions =
-        limit: 5000
+        limit: "5000"
 
       conditionsHash = controller.buildConditionsFromParameters parameters
 
@@ -58,7 +82,7 @@ describe "App.Controller mixin resource", ->
         offset: 5000
 
       shouldConditions =
-        offset: 5000
+        offset: "5000"
 
       conditionsHash = controller.buildConditionsFromParameters parameters
 
@@ -207,23 +231,35 @@ describe "App.Controller mixin resource", ->
 
     it "should filter based on where (greather than)", (done) ->
 
+      beforeDate = new Date()
       App.Parent.create title: "Hello", (err, model) =>
         App.Parent.create title: "Hey", (err, model) =>
-          agent.get(":3001/parents.json?createdAt=>1970-01-01T00:00:00.000Z")
+          afterDate = new Date()
+          agent.get(":3001/parents.json?createdAt=>#{beforeDate.toISOString()}")
             .end (res) ->
               res.body.length.should.equal 2
 
-              done()
+              agent.get(":3001/parents.json?createdAt=>#{afterDate.toISOString()}")
+                .end (res) ->
+                  res.body.length.should.equal 0
+
+                  done()
 
     it "should filter based on where (less than)", (done) ->
 
+      beforeDate = new Date()
       App.Parent.create title: "Hello", (err, model) =>
         App.Parent.create title: "Hey", (err, model) =>
-          agent.get(":3001/parents.json?createdAt=<1970-01-01T00:00:00.000Z")
+          afterDate = new Date()
+          agent.get(":3001/parents.json?createdAt=<#{beforeDate.toISOString()}")
             .end (res) ->
               res.body.length.should.equal 0
 
-              done()
+              agent.get(":3001/parents.json?createdAt=<#{afterDate.toISOString()}")
+                .end (res) ->
+                  res.body.length.should.equal 2
+
+                  done()
 
     it "should sort based on sort param", (done) ->
 
