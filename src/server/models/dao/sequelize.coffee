@@ -207,7 +207,8 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     # object later because they are initialized in a different way
     dataValues = _.clone daoInstance.dataValues
 
-    associationKeys = _.keys @modelClass.metadata().associations
+
+    associationKeys = _.pluck @modelClass.metadata().associations, "as"
 
     # TODO: When does this happen? Seems like dataValues is null
     for key in associationKeys when dataValues?[key]
@@ -233,6 +234,8 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       # There can only be one association of this model
       if associationType is "belongsTo"
         models = models[0]
+
+      key = key[0].toLowerCase() + key.substr(1)
 
       # add the instance to the options, so the constructor of modelInstance
       # model can pick them up
