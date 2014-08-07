@@ -207,7 +207,6 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     # object later because they are initialized in a different way
     dataValues = _.clone daoInstance.dataValues
 
-
     associationKeys = _.pluck @modelClass.metadata().associations, "as"
 
     # TODO: When does this happen? Seems like dataValues is null
@@ -292,15 +291,23 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     if options.includes?.length > 0
       params.include = []
-      for model in options.includes
-        if typeof model is "object" and model.as
-          model.model = model.model.daoModelInstance
-        else
-          model = model.daoModelInstance
+      for option in options.includes
+        option = @_transformInclude option
 
-        params.include.push model
+        params.include.push option
 
     return params
+
+  _transformInclude: (include) ->
+    if typeof include is "object" and include.as
+      include.model = include.model.daoModelInstance
+      if include.includes
+        for nestedInclude in include.includes
+          nestedIncludes = @_transformInclude nestedInclude
+        delete include.includes
+        include.include = nestedIncludes
+    include
+
 
   ###
   Increment the field of a model.
