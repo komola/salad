@@ -659,6 +659,26 @@ describe "Salad.Model", ->
 
               done()
 
+      it "accepts objects as params", (done) ->
+        App.Operator.create title: "Operator", (err, operator) =>
+          operator.getOperatorItems().create data: "test", (err, location) =>
+            App.Operator.includes([{model: App.OperatorItem}]).all (err, operators) =>
+              data = (a.toJSON() for a in operators)
+
+              data[0].should.have.property "operatorItems"
+
+              done()
+
+      it "accepts associations as params", (done) ->
+        App.Operator.create title: "Operator", (err, operator) =>
+          operator.getOperatorItems().create data: "test", (err, location) =>
+            App.Operator.includes([{association: "OperatorItems"}]).all (err, operators) =>
+              data = (a.toJSON() for a in operators)
+
+              data[0].should.have.property "operatorItems"
+
+              done()
+
       it "can load the correct association when there are more than one", (done) ->
         App.Operator.create title: "OperatorA", (err, operatorA) =>
           App.Operator.create title: "OperatorB", (err, operatorB) =>

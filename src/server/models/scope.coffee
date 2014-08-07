@@ -47,6 +47,23 @@ class Salad.Scope
 
     @
 
+  _normalizeInclude: (include) ->
+    # includes should always have one of the following forms:
+    # {model: Operator, …} where Operator is a subclass of Salad.Model
+    # {association: "Operators", …} where the association has been registered before
+    # however we allow calls like Scope.includes([Operator]) or Scope.includes(["Operators"])
+    # this method transforms the last forms to the normal form
+    # NO sanity checking is happening in this method
+
+    if typeof include is "string"
+      # this must be an association
+      return {association: include}
+    else if include.__super__ is Salad.Model.prototype
+      return {model: include}
+
+    include
+
+
   # Eager-load models
   #
   # Usage:
@@ -54,26 +71,39 @@ class Salad.Scope
   # App.Location.includes([App.Operator])
   #
   # App.Location.includes(["Operator"])
-  includes: (models) ->
-    for model in models
+  #
+  # App.Location.includes([{model: App.Operator, includes: [App.Cat]}])
+  #
+  # App.Location.includes([{association: "Operators", includes: ["Cats"]}]
+  #
+  # or a mix of the last two
+  includes: (includes) ->
+    for include in includes
       option = {}
       field = null
 
-      # Check if model is a Salad.Model class
-      if model.__super__ is Salad.Model.prototype
+      include = @_normalizeInclude include
+
+      if include.model
+        unless include.model.__super__ is Salad.Model.prototype
+          throw new Error "Scope::includes - Value of key 'model' has to be of type Salad.Model"
+
+        model = include.model
         associations = @context.metadata().associations
 
-        # Resolve a Salad.Model to the field it is saved as
         for key, currentAssociation of associations when currentAssociation.model is model
           field = currentAssociation.as
           break
-
         model = model.daoInstance
 
-      # the association name was passed. Resolve to the correct association
-      else if @context.hasAssociation(model)
-        field = model
-        model = @context.getAssociation(model).daoInstance
+      else if include.association
+        unless typeof include.association is "string"
+          throw new Error "Scope::includes - Value of key 'association' has to be a string"
+
+        if @context.hasAssociation(include.association)
+          field = include.association
+          model = @context.getAssociation(include.association).daoInstance
+
 
       unless field
         throw new Error "Scope::includes - Could not find an association between #{@context.name} and #{model}"

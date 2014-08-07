@@ -292,13 +292,11 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     if options.includes?.length > 0
       params.include = []
-      for model in options.includes
-        if typeof model is "object" and model.as
-          model.model = model.model.daoModelInstance
-        else
-          model = model.daoModelInstance
+      for option in options.includes
+        if typeof option is "object" and option.as
+          option.model = option.model.daoModelInstance
 
-        params.include.push model
+        params.include.push option
 
     return params
 
