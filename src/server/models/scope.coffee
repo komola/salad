@@ -77,10 +77,13 @@ class Salad.Scope
   # App.Location.includes([{association: "Operators", includes: ["Cats"]}]
   #
   # or a mix of the last two
-  includes: (includes) ->
-    for include in includes
+  includes: (includesArray) ->
+    for include in includesArray
       option = {}
       field = null
+      includes = null
+
+      saladModel = {}
 
       include = @_normalizeInclude include
 
@@ -94,6 +97,7 @@ class Salad.Scope
         for key, currentAssociation of associations when currentAssociation.model is model
           field = currentAssociation.as
           break
+        saladModel = model
         model = model.daoInstance
 
       else if include.association
@@ -102,8 +106,12 @@ class Salad.Scope
 
         if @context.hasAssociation(include.association)
           field = include.association
-          model = @context.getAssociation(include.association).daoInstance
+          saladModel = @context.getAssociation(include.association)
+          model = saladModel.daoInstance
 
+      if include.includes
+        # the included model requests other models to be included
+        includes = @_includeNestedIncludes saladModel,include.includes
 
       unless field
         throw new Error "Scope::includes - Could not find an association between #{@context.name} and #{model}"
@@ -112,9 +120,20 @@ class Salad.Scope
         model: model
         as: field
 
+      if includes
+        option.includes = includes
+
       @data.includes.push option
 
     @
+
+  _includeNestedIncludes: (model,nestedIncludes) ->
+    nestedScopes = []
+    for nestedInclude in nestedIncludes
+      nestedScope = model.includes([nestedInclude])
+      nestedScopes = nestedScopes.concat nestedScope.data.includes
+
+    nestedScopes
 
   limit: (limit) ->
     @data.limit = parseInt limit, 10
