@@ -691,7 +691,6 @@ describe "Salad.Model", ->
                 done()
 
       it "eager loads nested objects for n+1 levels", (done) ->
-        console.log "test"
         App.Operator.create title: "Operator", (err, operator) =>
           operator.getOperatorItems().create data: "test", (err, item) =>
             item.getOperatorItemStatus().create status: "used", (err, status) =>
@@ -712,6 +711,27 @@ describe "Salad.Model", ->
                     data[0].operatorItems[0].operatorItemStatus[0].operatorItemStatusLocations.length.should.equal 1 #it should only fetch correct operatorItemStatusLocations
                     # This doesn't work since PostGres has a limit of 63 chars for identifiers, see https://github.com/sequelize/sequelize/issues/2084
                     #data[0].operatorItems[0].operatorItemStatus[0].operatorItemStatusLocations[0].location.should.equal "Braunschweig" #it should populate the model
+
+                    done()
+
+      it.only "eager-loads nested includes with multiple models", (done) ->
+        console.log ""
+
+        App.Operator.create title: "Operator", (err, operator) =>
+          operator.getOperatorItems().create data: "test", (err, item) =>
+            item.getOperatorItemStatus().create status: "used", (err, status) =>
+              App.OperatorItemUser.create user: "komola", (err, user) =>
+                App.Operator.includes([
+                    {model: App.OperatorItem, includes: [
+                      {association: "OperatorItemStatus"},
+                      App.OperatorItemUser
+                    ]}
+                  ]).all (err, operators) =>
+                    data = (a.toJSON() for a in operators)
+
+                    data[0].should.have.property "operatorItems" #it should fetch operatorItems
+                    data[0].operatorItems[0].should.have.property "operatorItemStatus" # "it should fetch operatorItemStatus
+                    data[0].operatorItems[0].should.have.property "operatorItemUsers" # "it should fetch operatorItemUsers
 
                     done()
 
