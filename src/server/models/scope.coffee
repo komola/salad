@@ -55,6 +55,9 @@ class Salad.Scope
     # this method transforms the last forms to the normal form
     # NO sanity checking is happening in this method
 
+    if include is null or include is undefined
+      throw new Error "Scope::includes - Value of include must not be null"
+
     if typeof include is "string"
       # this must be an association
       return {association: include}
@@ -81,7 +84,7 @@ class Salad.Scope
     for include in includesArray
       option = {}
       field = null
-      includes = null
+      includes = []
 
       saladModel = {}
 
@@ -111,7 +114,7 @@ class Salad.Scope
 
       if include.includes
         # the included model requests other models to be included
-        includes = @_includeNestedIncludes saladModel,include.includes
+        includes = includes.concat @_includeNestedIncludes(saladModel,include.includes)
 
       unless field
         throw new Error "Scope::includes - Could not find an association between #{@context.name} and #{model}"
@@ -120,7 +123,7 @@ class Salad.Scope
         model: model
         as: field
 
-      if includes
+      if includes.length isnt 0
         option.includes = includes
 
       @data.includes.push option

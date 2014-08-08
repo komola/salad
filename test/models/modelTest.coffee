@@ -714,9 +714,7 @@ describe "Salad.Model", ->
 
                     done()
 
-      it.only "eager-loads nested includes with multiple models", (done) ->
-        console.log ""
-
+      it "eager-loads nested includes with multiple models", (done) ->
         App.Operator.create title: "Operator", (err, operator) =>
           operator.getOperatorItems().create data: "test", (err, item) =>
             item.getOperatorItemStatus().create status: "used", (err, status) =>
