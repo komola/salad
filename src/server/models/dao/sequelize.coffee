@@ -302,8 +302,9 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if typeof include is "object" and include.as
       include.model = include.model.daoModelInstance
       if include.includes
+        nestedIncludes = []
         for nestedInclude in include.includes
-          nestedIncludes = @_transformInclude nestedInclude
+          nestedIncludes.push @_transformInclude(nestedInclude)
         delete include.includes
         include.include = nestedIncludes
     include
