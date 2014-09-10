@@ -761,6 +761,15 @@ describe "Salad.Model", ->
 
             done()
 
+      it "adds or condition if value contains null", (done) ->
+        App.Shop.create otherField: "Test", (err, resource) ->
+          App.Shop.create otherField: null, (err) =>
+            App.Shop.where(otherField: [null, "Test"]).all (err, resource) ->
+              resource.length.should.equal 2
+
+              done()
+
+
     describe "#contains", ->
       it "searches in array fields", (done) ->
         App.Shop.create title: ["A", "B"], (err, resource) ->
