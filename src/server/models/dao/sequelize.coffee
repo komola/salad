@@ -248,7 +248,6 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     params = {}
 
     if _.keys(options.conditions).length > 0
-      options.conditions = App.sequelize.and.apply null, pairs
       params.where = options.conditions
 
     if options.limit > 0
