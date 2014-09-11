@@ -248,40 +248,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     params = {}
 
     if _.keys(options.conditions).length > 0
-      # We have to support a corner case where the condition might contain an
-      # array that contains a null value. The expected result would be:
-      #
-      # where column in ("a", "b") or column is null
-
-      pairs = []
-
-      for key, conditions of options.conditions
-        if _.isArray(conditions) and null in conditions
-          truthyConditions = {}
-
-          truthyConditions[key] = _.filter conditions, (elm) =>
-            elm isnt null
-
-          nullCondition = {}
-          nullCondition[key] = null
-
-          conditions = App.sequelize.or nullCondition, truthyConditions
-
-          pairs.push conditions
-
-        else
-          newConditions = {}
-          newConditions[key] = conditions
-
-          pairs.push newConditions
-
-      for value in pairs when value.args?.length > 1
-        containsOr = true
-        break
-
-      if containsOr
-        options.conditions = App.sequelize.and.apply null, pairs
-
+      options.conditions = App.sequelize.and.apply null, pairs
       params.where = options.conditions
 
     if options.limit > 0
