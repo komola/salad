@@ -38,18 +38,18 @@ class Salad.Utils.Cakefile
 
 
   @migrationCreate: (options) =>
-      name = options.title or "unnamed"
-      command = [".", "node_modules", "salad", "node_modules", ".bin", "sequelize"].join(path.sep)
-      migrate = spawn command, ["--coffee", "migration:create", "--name", name]
+    name = options.title or "unnamed"
+    command = [".", "node_modules", "salad", "node_modules", ".bin", "sequelize"].join(path.sep)
+    migrate = spawn command, ["--coffee",  "--name", name, "migration:create"]
 
-      migrate.stdout.on "data", (data) =>
-        console.log data.toString().replace(/\n$/m, '')
+    migrate.stdout.on "data", (data) =>
+      console.log data.toString().replace(/\n$/m, '')
 
-      migrate.stderr.on "data", (data) =>
-        console.log data.toString().replace(/\n$/m, '')
+    migrate.stderr.on "data", (data) =>
+      console.log data.toString().replace(/\n$/m, '')
 
-      migrate.on "close", =>
-        console.log "Done"
+    migrate.on "close", =>
+      console.log "Done"
 
 
   @migrate: =>
