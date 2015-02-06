@@ -22,12 +22,12 @@ global.agent = require "superagent"
 cleanupDatabase = (cb) =>
   done = =>
     sync = App.sequelize.sync(force: true)
-    sync.on "success", =>
+    sync.then =>
       cb()
 
   App.sequelize.query('DROP TABLE "Enums"')
-    .success(done)
-    .error(done)
+    .then(done)
+    .catch(done)
 
 before (done) ->
   @timeout 20000

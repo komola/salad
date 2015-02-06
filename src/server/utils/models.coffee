@@ -119,9 +119,9 @@ class Salad.Utils.Models
     sql = "TRUNCATE TABLE #{table} RESTART IDENTITY CASCADE"
 
     App.sequelize.query(sql)
-      .success =>
+      .then =>
         callback()
-      .error =>
+      .catch =>
         console.log arguments
         callback "fail"
 
@@ -131,9 +131,9 @@ class Salad.Utils.Models
     dropTable = (table, cb) =>
       sql = "DROP TABLE IF EXISTS \"#{table}\" CASCADE"
       App.sequelize.query(sql)
-        .success =>
+        .then =>
           cb()
-        .error =>
+        .catch =>
           console.log arguments
           cb "fail"
 

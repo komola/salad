@@ -230,10 +230,7 @@ class Salad.Bootstrap extends Salad.Base
       return cb()
 
     App.sequelize.sync()
-      .success =>
-        cb()
-
-      .error =>
+      .finally =>
         cb()
 
   start: (callback) =>

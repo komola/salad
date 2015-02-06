@@ -13,8 +13,8 @@ options =
 
 App.SequelizeLocation = App.sequelize.define "Location", attributes, options
 
-App.SequelizeLocation.hasMany App.SequelizeLocation, as: "Children", foreignKey: "parentId", through: null
-App.SequelizeLocation.belongsTo App.SequelizeLocation, as: "Parent", foreignKey: "parentId", through: null
+App.SequelizeLocation.hasMany App.SequelizeLocation, as: "Children", foreignKey: "parentId"
+App.SequelizeLocation.belongsTo App.SequelizeLocation, as: "Parent", foreignKey: "parentId"
 
 class App.Location extends Salad.Model
   @dao

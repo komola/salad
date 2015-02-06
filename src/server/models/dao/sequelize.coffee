@@ -8,11 +8,11 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     query = @daoModelInstance.create(attributes, options)
 
-    query.success (daoResource) =>
+    query.then (daoResource) =>
       resource = @_buildModelInstance daoResource
       return callback null, resource
 
-    query.error (error) =>
+    query.catch (error) =>
       if Salad.env isnt "test"
         App.Logger.error "Create: Query returned error",
           sql: error.sql
@@ -36,14 +36,14 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     query = @daoModelInstance.find(conditions, options)
 
-    query.success (sequelizeModel) =>
+    query.then (sequelizeModel) =>
       unless sequelizeModel
         error = new Error "Could not find model with id: #{model.get("id")}"
         return callback error
 
       return callback null, sequelizeModel
 
-    query.error (error) =>
+    query.catch (error) =>
       if Salad.env isnt "test"
         App.Logger.error "Find: Query returned error",
           sql: error.sql
@@ -64,11 +64,11 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
       query = sequelizeModel.updateAttributes(attributes, options)
 
-      query.success (daoResource) =>
+      query.then (daoResource) =>
         resource = @_buildModelInstance daoResource
         callback null, resource
 
-      query.error (error) =>
+      query.catch (error) =>
         if Salad.env isnt "test"
           App.Logger.error "Update: Query returned error",
             sql: error.sql
@@ -103,10 +103,10 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
         query = sequelizeModel.destroy(options)
 
-        query.success =>
+        query.then =>
           callback null
 
-        query.error (error) =>
+        query.catch (error) =>
           if Salad.env isnt "test"
             App.Logger.error "Destroy: Query returned error",
               sql: error.sql
@@ -117,6 +117,8 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     else
       sequelizeModel = @daoModelInstance
 
+      options = {}
+
       # when no conditions are supplied we have to delete *every* object.
       # Sequelize does not seem to allow this, since it creates a faulty SQL
       # statement when passing {} as conditions.
@@ -124,17 +126,17 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       if _.keys(model.conditions).length is 0
         model.conditions = "true = true"
 
-      options = {}
-
       if App.transaction
         options.transaction = App.transaction
 
-      query = sequelizeModel.destroy(model.conditions, options)
+      options.where = model.conditions
 
-      query.success =>
-        callback null
+      query = sequelizeModel.destroy(options)
 
-      query.error (error) =>
+      query.then =>
+        return callback null
+
+      query.catch (error) =>
         if Salad.env isnt "test"
           App.Logger.error "Query returned error",
             sql: error.sql
@@ -150,7 +152,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     query = @daoModelInstance.findAll(params)
 
-    query.success (rawResources) =>
+    query.then (rawResources) =>
       resources = []
 
       for res in rawResources
@@ -158,7 +160,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
       callback null, resources
 
-    query.error (error) =>
+    query.catch (error) =>
       if Salad.env isnt "test"
         App.Logger.error "findAll: Query returned error",
           sql: error.sql
@@ -175,10 +177,10 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
     query = @daoModelInstance.count(params)
 
-    query.success (count) =>
+    query.then (count) =>
         callback null, count
 
-    query.error (error) =>
+    query.catch (error) =>
       if Salad.env isnt "test"
         App.Logger.error "Count: Query returned error",
           sql: error.sql
@@ -339,7 +341,7 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       if App.transaction
         options.transaction = App.transaction
 
-      sequelizeModel.increment(field, options).success successCallback
+      sequelizeModel.increment(field, options).then successCallback
 
   ###
   Decrement the field of a model
@@ -370,4 +372,4 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
       if App.transaction
         options.transaction = App.transaction
 
-      sequelizeModel.decrement(field, options).success successCallback
+      sequelizeModel.decrement(field, options).then successCallback
