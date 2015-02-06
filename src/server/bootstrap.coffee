@@ -222,16 +222,7 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().app.use express.bodyParser()
     @metadata().app.use express.methodOverride()
 
-    # TODO: Hack for this issue: https://github.com/sequelize/sequelize/issues/815
-    # May need to think of a better way to handle this.
-    # ATM, this will only try to create the tables, fail because they are already
-    # created, but by trying will learn about the table structure.
-    if Salad.env is "test"
-      return cb()
-
-    App.sequelize.sync()
-      .finally =>
-        cb()
+    return cb()
 
   start: (callback) =>
     async.series [
