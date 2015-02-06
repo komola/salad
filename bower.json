@@ -1,7 +1,7 @@
 {
   "name": "salad",
   "main": "build/salad.js",
-  "version": "0.7.7",
+  "version": "1.0.0",
   "homepage": "https://github.com/komola/salad",
   "authors": [
     "Sebastian Hoitz <hoitz@komola.de>"
