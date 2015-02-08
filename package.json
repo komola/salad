@@ -1,7 +1,7 @@
 {
   "name": "salad",
   "main": "./index.js",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "",
   "homepage": "http://github.com/komola/salad",
   "author": "Sebastian Hoitz <hoitz@komola.de>",
@@ -53,7 +53,7 @@
     "sequelize-cli": "~1.2.0",
     "underscore.inflections": "~0.2.1",
     "underscore.string": ">= 3.0.2",
-    "validator": "~3.28.0",
+    "validator": "~2.1.0",
     "winston": "^0.9.0"
   },
   "devDependencies": {
