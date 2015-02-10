@@ -55,7 +55,7 @@ class Salad.Utils.Cakefile
   @migrate: =>
     command = [".", "node_modules", "salad", "node_modules", ".bin", "sequelize"].join(path.sep)
 
-    migrate = spawn command, ["--env", Salad.env, "--coffee", "db:migrate"]
+    migrate = spawn command, ["--coffee", "--env", Salad.env, "db:migrate"]
 
     migrate.stdout.on "data", (data) =>
       console.log data.toString().replace(/\n$/m, '')
