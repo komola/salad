@@ -111,13 +111,48 @@ class Salad.Bootstrap extends Salad.Base
 
     cb()
 
+  # This helps to set up hot loading of changed files
+  #
+  # It works by deleting the cached require entry for the file and then
+  # requiring it again.
+  #
+  # Afterwards we change the prototype of the old class, so that existing
+  # instances get changed, too
   setupHotloadingInFolder: (folder, callback) =>
     gaze ["#{folder}/**/*.coffee", "#{folder}/**/*.js"], (err, watcher) =>
       watcher.on "changed", (file) =>
         console.log "File changed!", file
 
+        # save current global App state in temporary variable
+        oldApp = global.App
+        global.App = {}
+
+        # reload file
         delete require.cache[require.resolve(file)]
         require file
+
+        # detect which classes where changed. By requiring the file, it gets
+        # a new entry in App and we can find out which class was changed
+        changedClasses =  _.keys global.App
+
+        # Iterate over all changed classes and detect if a method was deleted.
+        for newClassName in changedClasses
+          oldMethods = _.keys oldApp[newClassName].prototype
+          newMethods = _.keys global.App[newClassName].prototype
+
+          # If this is the case, delete the method from the existing instances
+          for currentMethod in oldMethods when currentMethod not in newMethods
+            console.log "Remove method #{methodName}"
+            delete oldApp[newClassName].prototype[currentMethod]
+
+          # Replace every old prototype method with the new version
+          for methodName, method of global.App[newClassName].prototype
+            console.log "Replace method #{methodName}"
+            oldApp[newClassName].prototype[methodName] = method
+
+          # TODO: Not working with fat arrow functions yet
+
+        global.App = oldApp
 
         callback null, file if callback
 
