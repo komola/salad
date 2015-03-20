@@ -111,17 +111,37 @@ class Salad.Bootstrap extends Salad.Base
 
     cb()
 
+  setupHotloadingInFolder: (folder, callback) =>
+    gaze ["#{folder}/**/*.coffee", "#{folder}/**/*.js"], (err, watcher) =>
+      watcher.on "changed", (file) =>
+        console.log "File changed!", file
+
+        delete require.cache[require.resolve(file)]
+        require file
+
+        callback null, file if callback
+
+
   initControllers: (cb) ->
+    directory = "#{Salad.root}/#{@options.controllerPath}"
     require("require-all")
-      dirname: "#{Salad.root}/#{@options.controllerPath}"
+      dirname: directory
       filter: /\.coffee$/
 
-    cb()
+    if Salad.env is "development"
+      @setupHotloadingInFolder directory
+
+    return cb()
+
 
   initMailers: (cb) ->
+    directory = "#{Salad.root}/#{@options.mailerPath}"
     require("require-all")
-      dirname: "#{Salad.root}/#{@options.mailerPath}"
+      dirname: directory
       filter: /\.coffee$/
+
+    if Salad.env is "development"
+      @setupHotloadingInFolder directory
 
     cb()
 
@@ -129,9 +149,13 @@ class Salad.Bootstrap extends Salad.Base
     cb()
 
   initModels: (cb) ->
+    directory = "#{Salad.root}/#{@options.modelPath}"
     require("require-all")
-      dirname: "#{Salad.root}/#{@options.modelPath}"
+      dirname: directory
       filter: /\.coffee$/
+
+    if Salad.env is "development"
+      @setupHotloadingInFolder directory
 
     cb()
 
