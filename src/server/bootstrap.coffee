@@ -137,24 +137,41 @@ class Salad.Bootstrap extends Salad.Base
 
         # Iterate over all changed classes and detect if a method was deleted.
         for newClassName in changedClasses
-          oldMethods = _.keys oldApp[newClassName].prototype
-          newMethods = _.keys global.App[newClassName].prototype
+          oldClass = oldApp[newClassName]
+          newClass = global.App[newClassName]
+
+          oldMethods = _.keys oldClass.prototype
+          newMethods = _.keys newClass.prototype
 
           # If this is the case, delete the method from the existing instances
           for currentMethod in oldMethods when currentMethod not in newMethods
-            console.log "Remove method #{methodName}"
-            delete oldApp[newClassName].prototype[currentMethod]
+            delete oldClass::[currentMethod]
+
+          oldMethods = _.keys oldClass
+          newMethods = _.keys newClass
+
+          # Do the same with static methods
+          for currentMethod in oldMethods when currentMethod not in newMethods
+            delete oldClass[currentMethod]
 
           # Replace every old prototype method with the new version
-          for methodName, method of global.App[newClassName].prototype
-            console.log "Replace method #{methodName}"
-            oldApp[newClassName].prototype[methodName] = method
+          for methodName in _.keys newClass.prototype
+            oldClass::[methodName] = newClass[methodName]
 
-          # TODO: Not working with fat arrow functions yet
+          # Do the same with static methods
+          for methodName in _.keys global.App[newClassName]
+            oldClass[methodName] = newClass[methodName]
+
+          # FIXME: fat arrow functions don't seem to work.
+          # I have no solution how to replace the bound methods, as they
+          # are bound per instance when instantiating and I have no way to
+          # access every instance
+          #
+          # Reference: http://stackoverflow.com/a/13687261/9535
 
         global.App = oldApp
 
-        callback null, file if callback
+        return callback null, file if callback
 
 
   initControllers: (cb) ->
