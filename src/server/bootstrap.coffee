@@ -118,58 +118,72 @@ class Salad.Bootstrap extends Salad.Base
   #
   # Afterwards we change the prototype of the old class, so that existing
   # instances get changed, too
-  setupHotloadingInFolder: (folder, callback) =>
+  setupHotloadingInFolder: (folder, options, callback) =>
+    if typeof(options) is "function"
+      callback = options
+      options = {}
+
     gaze ["#{folder}/**/*.coffee", "#{folder}/**/*.js"], (err, watcher) =>
       watcher.on "changed", (file) =>
+        if options.exclude and file.indexOf(options.exclude) isnt -1
+          return
+
         console.log "File changed!", file
 
-        # save current global App state in temporary variable
-        oldApp = global.App
-        global.App = {}
+        # reload file. Map this in a try block because we are messing with
+        # the global App variable
+        try
+          # save current global App state in temporary variable
+          oldApp = global.App
+          global.App = {}
 
-        # reload file
-        delete require.cache[require.resolve(file)]
-        require file
+          delete require.cache[require.resolve(file)]
+          require file
 
-        # detect which classes where changed. By requiring the file, it gets
-        # a new entry in App and we can find out which class was changed
-        changedClasses =  _.keys global.App
+          # detect which classes where changed. By requiring the file, it gets
+          # a new entry in App and we can find out which class was changed
+          changedClasses =  _.keys global.App
 
-        # Iterate over all changed classes and detect if a method was deleted.
-        for newClassName in changedClasses
-          oldClass = oldApp[newClassName]
-          newClass = global.App[newClassName]
+          # Iterate over all changed classes and detect if a method was deleted.
+          for newClassName in changedClasses
+            oldClass = oldApp[newClassName]
+            newClass = global.App[newClassName]
 
-          oldMethods = _.keys oldClass.prototype
-          newMethods = _.keys newClass.prototype
+            oldMethods = _.keys oldClass.prototype
+            newMethods = _.keys newClass.prototype
 
-          # If this is the case, delete the method from the existing instances
-          for currentMethod in oldMethods when currentMethod not in newMethods
-            delete oldClass::[currentMethod]
+            # If this is the case, delete the method from the existing instances
+            for currentMethod in oldMethods when currentMethod not in newMethods
+              delete oldClass::[currentMethod]
 
-          oldMethods = _.keys oldClass
-          newMethods = _.keys newClass
+            oldMethods = _.keys oldClass
+            newMethods = _.keys newClass
 
-          # Do the same with static methods
-          for currentMethod in oldMethods when currentMethod not in newMethods
-            delete oldClass[currentMethod]
+            # Do the same with static methods
+            for currentMethod in oldMethods when currentMethod not in newMethods
+              delete oldClass[currentMethod]
 
-          # Replace every old prototype method with the new version
-          for methodName in _.keys newClass.prototype
-            oldClass::[methodName] = newClass[methodName]
+            # Replace every old prototype method with the new version
+            for methodName in _.keys newClass.prototype
+              oldClass::[methodName] = newClass[methodName]
 
-          # Do the same with static methods
-          for methodName in _.keys global.App[newClassName]
-            oldClass[methodName] = newClass[methodName]
+            # Do the same with static methods
+            for methodName in _.keys global.App[newClassName]
+              oldClass[methodName] = newClass[methodName]
 
-          # FIXME: fat arrow functions don't seem to work.
-          # I have no solution how to replace the bound methods, as they
-          # are bound per instance when instantiating and I have no way to
-          # access every instance
-          #
-          # Reference: http://stackoverflow.com/a/13687261/9535
+            # FIXME: fat arrow functions don't seem to work.
+            # I have no solution how to replace the bound methods, as they
+            # are bound per instance when instantiating and I have no way to
+            # access every instance
+            #
+            # Reference: http://stackoverflow.com/a/13687261/9535
 
-        global.App = oldApp
+          global.App = oldApp
+
+        catch e
+          global.App = oldApp
+          delete require.cache[require.resolve(file)]
+          require file
 
         return callback null, file if callback
 
