@@ -156,6 +156,7 @@ class Salad.Bootstrap extends Salad.Base
 
             # If this is the case, delete the method from the existing instances
             for currentMethod in oldMethods when currentMethod not in newMethods
+              # console.log "Deleting instance method #{currentMethod}"
               delete oldClass::[currentMethod]
 
             oldMethods = _.keys oldClass
@@ -163,14 +164,17 @@ class Salad.Bootstrap extends Salad.Base
 
             # Do the same with static methods
             for currentMethod in oldMethods when currentMethod not in newMethods
+              # console.log "Deleting static method #{currentMethod}"
               delete oldClass[currentMethod]
 
             # Replace every old prototype method with the new version
-            for methodName in _.keys newClass.prototype
-              oldClass::[methodName] = newClass[methodName]
+            for methodName in _.keys newClass.prototype when typeof(newClass::[methodName]) is "function"
+              # console.log "Replacing instance method #{methodName}"
+              oldClass::[methodName] = newClass::[methodName]
 
             # Do the same with static methods
-            for methodName in _.keys global.App[newClassName]
+            for methodName in _.keys newClass when typeof(newClass[methodName]) is "function"
+              # console.log "Replacing static method #{methodName}"
               oldClass[methodName] = newClass[methodName]
 
             # FIXME: fat arrow functions don't seem to work.
@@ -184,6 +188,8 @@ class Salad.Bootstrap extends Salad.Base
 
         catch e
           global.App = oldApp
+          console.log "Error ocurred. Just reload file"
+
           delete require.cache[require.resolve(file)]
           require file
 
