@@ -123,6 +123,8 @@ class Salad.Bootstrap extends Salad.Base
       callback = options
       options = {}
 
+    options or= {}
+
     gaze ["#{folder}/**/*.coffee", "#{folder}/**/*.js"], (err, watcher) =>
       watcher.on "changed", (file) =>
         if options.exclude and file.indexOf(options.exclude) isnt -1
