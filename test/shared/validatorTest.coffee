@@ -1,5 +1,5 @@
 describe "Salad.Validator", ->
-  describe "#check", ->
+  describe.only "#check", ->
     it "should apply checks", ->
       result = Salad.Validator.check email: "asd",
         email:

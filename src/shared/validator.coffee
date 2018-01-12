@@ -43,4 +43,3 @@ class Salad.Validator
     result = if errors then errors else true
 
     return result
-
