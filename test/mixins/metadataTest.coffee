@@ -19,3 +19,4 @@ describe "Mixins", ->
 
       a.metadata().value.should.equal "test"
       b.metadata().value.should.equal "yeah"
+      return null

@@ -1,5 +1,5 @@
 describe "Salad.Validator", ->
-  describe.only "#check", ->
+  describe "#check", ->
     it "should apply checks", ->
       result = Salad.Validator.check email: "asd",
         email:
@@ -8,6 +8,8 @@ describe "Salad.Validator", ->
       result.should.eql
         email: ["Invalid email"]
 
+      return null
+
     it "should accept custom error messages", ->
       result = Salad.Validator.check email: "asd",
         email:
@@ -15,6 +17,7 @@ describe "Salad.Validator", ->
 
       result.should.eql
         email: ["A"]
+      return null
 
     it "should check for required fields", ->
       result = Salad.Validator.check email: "asd",
@@ -24,12 +27,15 @@ describe "Salad.Validator", ->
       result.should.eql
         firstname: ["String is empty"]
 
+      return null
+
     it "should not check non-existent non-required fields", ->
       result = Salad.Validator.check email: "asd",
         firstname:
           isAlphanumeric: true
 
       result.should.eql true
+      return null
 
     it "should be able to check isIn", ->
       result = Salad.Validator.check foo: "asd",
@@ -44,6 +50,7 @@ describe "Salad.Validator", ->
           isIn: ["A", "B"]
 
       result.should.eql true
+      return null
 
     it "should be possible to add options and custom message", ->
       result = Salad.Validator.check foo: "asd",
@@ -54,6 +61,7 @@ describe "Salad.Validator", ->
 
       result.should.eql
         foo: ["C"]
+      return null
 
     it "should be possible to just specify options", ->
       result = Salad.Validator.check foo: "asd",
@@ -63,3 +71,4 @@ describe "Salad.Validator", ->
 
       result.should.eql
         foo: ["Unexpected value or invalid argument"]
+      return null

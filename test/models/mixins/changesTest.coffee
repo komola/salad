@@ -5,6 +5,7 @@ describe "App.Model changes", ->
     assert.ok todo.getSnapshot()
 
     _.keys(todo.getChangedAttributes()).length.should.equal 1
+    return null
 
   it "takes snapshot after saving", (done) ->
     todo = App.Todo.build title: "test"
@@ -35,6 +36,7 @@ describe "App.Model changes", ->
     todo.getChangedAttributes().title.should.be.instanceof Array
     assert.isTrue todo.getChangedAttributes().title[0] is undefined
     todo.getChangedAttributes().title[1].should.equal "foo"
+    return null
 
   it "has no changes after save", (done) ->
     todo = App.Todo.build title: "test"

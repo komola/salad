@@ -80,6 +80,7 @@ describe "Salad.Model", ->
         attributes.foo = "bar"
 
         assert.isTrue a.getAttributes().foo is undefined
+        return null
 
     describe "#updateAttributes", ->
       res = null
@@ -334,11 +335,13 @@ describe "Salad.Model", ->
         location.set "title", "Foo"
 
         location.get("title").should.equal "Foo"
+        return null
 
     describe "#get", ->
       it "returns an attribute", ->
         location = App.Location.build title: "Test"
         location.get("title").should.equal "Test"
+        return null
 
     describe "#setAttributes", ->
       it "sets attributes of a model", ->
@@ -347,6 +350,7 @@ describe "Salad.Model", ->
           title: "Test"
 
         location.get("title").should.equal "Test"
+        return null
 
       it "only sets existent attributes", ->
         location = App.Location.build()
@@ -355,6 +359,7 @@ describe "Salad.Model", ->
           foo: "bar"
 
         location.get("title").should.equal "Test"
+        return null
 
       it "applies eagerlyLoadedAssociations for belongsTo", ->
         data =
@@ -366,6 +371,7 @@ describe "Salad.Model", ->
 
         assert.ok location.eagerlyLoadedAssociations.operator
         assert.isTrue location.eagerlyLoadedAssociations.operator instanceof App.Operator
+        return null
 
       it "applies eagerlyLoadedAssociations for hasMany", ->
         data =
@@ -380,6 +386,7 @@ describe "Salad.Model", ->
         assert.ok location.eagerlyLoadedAssociations.children
         assert.ok location.eagerlyLoadedAssociations.children.length
         assert.isTrue location.eagerlyLoadedAssociations.children[0] instanceof App.Location
+        return null
 
   describe "associations", ->
     describe "#hasMany", ->
@@ -387,6 +394,7 @@ describe "Salad.Model", ->
         model = App.Location.build title: "test"
 
         assert.ok model.getChildren
+        return null
 
       it "adds the correct conditions", ->
         model = App.Location.build title: "test", id: 1
@@ -396,6 +404,7 @@ describe "Salad.Model", ->
         assert.ok scope.data.conditions
         assert.ok scope.data.conditions.parentId
         scope.data.conditions.parentId.should.equal 1
+        return null
 
       it "returns the correct object", (done) ->
         App.Location.create title: "Parent", (err, parent) ->
@@ -421,6 +430,7 @@ describe "Salad.Model", ->
         model = App.Location.build title: "test"
 
         assert.ok model.getParent
+        return null
 
       it "adds the correct conditions", ->
         model = App.Location.build title: "test", parentId: 1
@@ -433,6 +443,7 @@ describe "Salad.Model", ->
         _.keys(scope.data.conditions).length.should.equal 1
 
         scope.data.conditions.id.should.equal 1
+        return null
 
       it "returns the correct object", (done) ->
         App.Location.create title: "Parent", (err, parent) ->
@@ -473,17 +484,20 @@ describe "Salad.Model", ->
         App.Location.hasAssociation("operator").should.equal true
         location = App.Location.build(title: "Test")
         location.hasAssociation("operator").should.equal true
+        return null
 
       it "should return false for non-existing associations", ->
         App.Location.hasAssociation("foo").should.equal false
         location = App.Location.build(title: "Test")
         location.hasAssociation("foo").should.equal false
+        return null
 
     describe "#getForeignKeys", ->
       it "should return an array of foreignKey fields", ->
         keys = App.Location.getForeignKeys()
 
         keys.should.eql ["parentId", "operatorId", "support_operatorId"]
+        return null
 
 
   describe "scope", ->
@@ -493,6 +507,7 @@ describe "Salad.Model", ->
       _.keys(scope.data.conditions).length.should.equal 1
       scope.data.order.length.should.equal 1
       scope.data.limit.should.equal 3
+      return null
 
     it "does not interfere with other scopes", ->
       scope = new Salad.Scope(daoInstance: undefined)
@@ -510,6 +525,7 @@ describe "Salad.Model", ->
 
       newScope.data.limit.should.equal 3
       _.keys(scope.data.conditions).length.should.equal 1, "first scope remains untouched"
+      return null
 
     describe "#create", ->
       it "creates an object with association information", (done) ->

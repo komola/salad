@@ -14,12 +14,14 @@ describe "Controller", ->
         .end (res) ->
           res.ok.should.equal true
 
-          res.body.total.should.exist
-          res.body.page.should.exist
-          res.body.totalPages.should.exist
-          res.body.offset.should.exist
-          res.body.limit.should.exist
-          res.body.items.should.exist
+          should.exist(res.body.total)
+          should.exist(res.body.page)
+          should.exist(res.body.totalPages)
+          should.exist(res.body.offset)
+          should.exist(res.body.limit)
+          should.exist(res.body.items)
+
+          return done()
 
           done()
 
@@ -29,7 +31,7 @@ describe "Controller", ->
           .end (res) ->
             res.ok.should.equal true
 
-            res.body.id.should.exist
+            should.exist(res.body.id)
 
             done()
 
