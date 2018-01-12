@@ -10,6 +10,7 @@ describe "Salad.Mailer", ->
       content = mailer.render "rendering/test"
 
       content.should.equal "<h1>Hello World!</h1>"
+      return null
 
   describe "#mail", ->
     todo = null
