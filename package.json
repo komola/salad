@@ -44,7 +44,7 @@
     "findit2": "~2.2.3",
     "gaze": "~0.5.1",
     "handlebars": "~4.0.11",
-    "lodash": "~3.1.0",
+    "lodash": "~4.17.4",
     "method-override": "~2.3.10",
     "pg": "~4.5.7",
     "pg-hstore": "~2.3.1",

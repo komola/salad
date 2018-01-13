@@ -58,8 +58,8 @@ describe "Trigger Mixin", ->
     it "does not interfere with other classes", ->
       A.before "a", ->
       B.before "b", ->
-      _.keys(A.metadata().triggerStack).length.should.equal 2
-      _.keys(B.metadata().triggerStack).length.should.equal 2
+      _.keysIn(A.metadata().triggerStack).length.should.equal 2
+      _.keysIn(B.metadata().triggerStack).length.should.equal 2
       return null
 
     it "throws error when trigger does not exist", (done) ->

@@ -14,6 +14,6 @@ module.exports =
       # metadata object. This would cause triggers and sorts to pile up in every
       # sub-class, leading to trigger actions that can't be found.
       if @_metadata is @__super__.constructor._metadata
-        @_metadata = _.clone @__super__.constructor._metadata, true
+        @_metadata = _.cloneDeep @__super__.constructor._metadata, true
 
       @_metadata
