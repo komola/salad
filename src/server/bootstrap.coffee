@@ -71,8 +71,8 @@ class Salad.Bootstrap extends Salad.Base
     cb()
 
   initLogger: (cb) ->
-    @metadata().logger = new winston.Logger
-    @metadata().logger.setLevels winston.config.syslog.levels
+    @metadata().logger = new winston.Logger()
+    @metadata().logger.setLevels(winston.config.syslog.levels)
 
     @metadata().logger.add winston.transports.Console,
       handleExceptions: false
@@ -81,9 +81,7 @@ class Salad.Bootstrap extends Salad.Base
       timestamp: true
       level: "error"
 
-    App.Logger = {}
-
-    @metadata().logger.extend App.Logger
+    App.Logger = @metadata().logger
 
     App.Logger.log = =>
       for key, val of arguments
