@@ -39,7 +39,7 @@ class Salad.Utils.Cakefile
 
   @migrationCreate: (options) =>
     name = options.title or "unnamed"
-    command = [".", "node_modules", "salad", "node_modules", "sequelize-cli", "bin", "sequelize"].join(path.sep)
+    command = [".", "node_modules", "sequelize-cli", "bin", "sequelize"].join(path.sep)
     migrate = spawn command, ["--coffee",  "--name", name, "migration:create"]
 
     migrate.stdout.on "data", (data) =>
@@ -53,7 +53,7 @@ class Salad.Utils.Cakefile
 
 
   @migrate: =>
-    command = [".", "node_modules", "salad", "node_modules", "sequelize-cli", "bin", "sequelize"].join(path.sep)
+    command = [".", "node_modules", "sequelize-cli", "bin", "sequelize"].join(path.sep)
 
     migrate = spawn command, ["--coffee", "--env", Salad.env, "db:migrate"]
 
