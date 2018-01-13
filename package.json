@@ -42,7 +42,7 @@
     "emailjs": "~0.3.12",
     "express": "~4.16.2",
     "findit2": "~2.2.3",
-    "gaze": "~0.5.1",
+    "gaze": "~1.1.2",
     "handlebars": "~4.0.11",
     "lodash": "~4.17.4",
     "method-override": "~2.3.10",
@@ -59,7 +59,7 @@
     "winston": "~2.4.0"
   },
   "devDependencies": {
-    "chai": "~1.10.0",
+    "chai": "~4.1.2",
     "grunt": "~0.4.5",
     "grunt-cli": "~0.1.13",
     "grunt-contrib-coffee": "~0.12.0",
