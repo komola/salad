@@ -5,7 +5,7 @@ describe "Controller", ->
         App.Parent.create title: "Parent", (err, parent) =>
           parent.getChildren().create title: "Child", (err, child) ->
             agent.get("http://localhost:3001/parent/#{parent.get("id")}/children.json")
-              .end (res) ->
+              .then (res) ->
                 res.ok.should.equal true
                 res.body.length.should.equal 1
 
@@ -16,7 +16,7 @@ describe "Controller", ->
           parent.getChildren().create title: "Child", (err, child) ->
             App.Child.create title: "Foobar", (err, child2) ->
               agent.get("http://localhost:3001/parent/#{parent.get("id")}/children.json")
-                .end (res) ->
+                .then (res) ->
                   res.ok.should.equal true
                   res.body.length.should.equal 1
 
@@ -25,7 +25,7 @@ describe "Controller", ->
       it "returns empty array for no associated objects", (done) ->
         App.Parent.create title: "Parent", (err, parent) =>
           agent.get("http://localhost:3001/parent/#{parent.get("id")}/children.json")
-            .end (res) ->
+            .then (res) ->
               res.ok.should.equal true
               res.body.length.should.equal 0
 
@@ -36,7 +36,7 @@ describe "Controller", ->
           parent.getChildren().create title: "Child", (err, child) ->
             App.Child.create title: "Foobar", (err, child2) ->
               agent.get("http://localhost:3001/children.json")
-                .end (res) ->
+                .then (res) ->
                   res.ok.should.equal true
                   res.body.length.should.equal 2
 
@@ -47,7 +47,7 @@ describe "Controller", ->
       async.parallel
         one: (cb) ->
           agent.get(":3001/performance?param=1")
-            .end (res) ->
+            .then (res) ->
               res.ok.should.equal true
               # res.text.should.equal 1
 
@@ -55,7 +55,7 @@ describe "Controller", ->
 
         two: (cb) ->
           agent.get(":3001/performance?param=2")
-            .end (res) ->
+            .then (res) ->
               res.ok.should.equal true
               # res.text.should.equal 2
 

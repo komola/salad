@@ -220,7 +220,7 @@ describe "App.Controller mixin resource", ->
       App.Parent.create title: "Hello", (err, model) =>
         App.Parent.create title: "Hey", (err, model) =>
           agent.get(":3001/parents.json?title=Hey&asdas=hi")
-            .end (res) ->
+            .then (res) ->
               res.body.length.should.equal 1
               res.body[0].title.should.equal "Hey"
 
@@ -234,11 +234,11 @@ describe "App.Controller mixin resource", ->
 #        App.Shop.create title: ['d', 'e', 'f'], (err, model) =>
 #          App.Shop.create title: ['a', 'g', 'h'], (err, model) =>
 #            agent.get(":3001/shops.json?title=:a")
-#              .end (res) ->
+#              .then (err, res) ->
 #                res.body.length.should.equal 2
 #
 #                agent.get(":3001/shops.json?title=:a,b")
-#                  .end (res) ->
+#                  .then (err, res) ->
 #                    res.body.length.should.equal 1
 #
 #                    done()
@@ -252,11 +252,11 @@ describe "App.Controller mixin resource", ->
           App.Parent.create title: "Hey", (err2, model2) =>
             afterDate = new Date()
             agent.get(":3001/parents.json?createdAt=>#{beforeDate.toISOString()}")
-              .end (res) ->
+              .then (res) ->
                 res.body.length.should.equal 2
 
                 agent.get(":3001/parents.json?createdAt=>#{afterDate.toISOString()}")
-                  .end (res) ->
+                  .then (res) ->
                     res.body.length.should.equal 0
 
                     done()
@@ -268,11 +268,11 @@ describe "App.Controller mixin resource", ->
         App.Parent.create title: "Hey", (err, model) =>
           afterDate = new Date()
           agent.get(":3001/parents.json?createdAt=<#{beforeDate.toISOString()}")
-            .end (res) ->
+            .then (res) ->
               res.body.length.should.equal 0
 
               agent.get(":3001/parents.json?createdAt=<#{afterDate.toISOString()}")
-                .end (res) ->
+                .then (res) ->
                   res.body.length.should.equal 2
 
                   done()
@@ -282,12 +282,12 @@ describe "App.Controller mixin resource", ->
       App.Parent.create title: "Hello", (err, model) =>
         App.Parent.create title: "Hey", (err, model) =>
           agent.get(":3001/parents.json?sort=-title")
-            .end (res) ->
+            .then (res) ->
               res.body.length.should.equal 2
               res.body[0].title.should.equal "Hey"
 
               agent.get(":3001/parents.json?sort=title")
-                .end (res) ->
+                .then (res) ->
                   res.body.length.should.equal 2
                   res.body[0].title.should.equal "Hello"
                   done()
@@ -297,12 +297,12 @@ describe "App.Controller mixin resource", ->
       App.Parent.create title: "Hello", (err, model) =>
         App.Parent.create title: "Hey", (err, model) =>
           agent.get(":3001/parents.json?limit=1&offset=0")
-            .end (res) ->
+            .then (res) ->
               res.body.length.should.equal 1
               res.body[0].title.should.equal "Hello"
 
               agent.get(":3001/parents.json?offset=1&limit=1")
-                .end (res) ->
+                .then (res) ->
                   res.body.length.should.equal 1
                   res.body[0].title.should.equal "Hey"
                   done()
@@ -311,12 +311,12 @@ describe "App.Controller mixin resource", ->
       App.Parent.create title: "Parent", (err, parent) =>
           parent.getChildren().create title: "Child", (err, child) ->
             agent.get(":3001/parents.json")
-              .end (res) ->
+              .then (res) ->
                 res.body.length.should.equal 1
                 res.body[0].title.should.equal "Parent"
 
                 agent.get(":3001/parents.json?includes=children")
-                  .end (res) ->
+                  .then (res) ->
                     res.body.length.should.equal 1
                     res.body[0].should.have.property "children"
 
@@ -326,12 +326,12 @@ describe "App.Controller mixin resource", ->
       App.Parent.create title: "Parent", (err, parent) =>
           parent.getChildren().create title: "Child", (err, child) ->
             agent.get(":3001/parents.json")
-              .end (res) ->
+              .then (res) ->
                 res.body.length.should.equal 1
                 res.body[0].title.should.equal "Parent"
 
                 agent.get(":3001/parents.json?includes=Todo")
-                  .end (res) ->
+                  .then (res) ->
                     res.body.length.should.equal 1
 
                     done()
@@ -340,12 +340,12 @@ describe "App.Controller mixin resource", ->
       App.Parent.create title: "Parent", (err, parent) =>
           parent.getChildren().create title: "Child", (err, child) ->
             agent.get(":3001/parents.json")
-              .end (res) ->
+              .then (res) ->
                 res.body.length.should.equal 1
                 res.body[0].title.should.equal "Parent"
 
                 agent.get(":3001/parents.json?includes=House")
-                  .end (res) ->
+                  .then (res) ->
                     res.body.length.should.equal 1
 
                     done()

@@ -66,7 +66,7 @@
     "semver": "~5.4.1",
     "should": "~13.2.1",
     "sinon": "~1.12.2",
-    "superagent": "~0.21.0"
+    "superagent": "~3.8.2"
   },
   "scripts": {
     "test": "NODE_ENV=test ./node_modules/.bin/mocha --require should --require coffee-script/register --reporter spec --timeout 2000 --growl ./test/server.coffee $(find test -name \"*Test.coffee\")"

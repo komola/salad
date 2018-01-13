@@ -11,7 +11,7 @@ describe "Controller", ->
 
     it "transforms the JSON index response", (done) ->
       agent.get(":3001/paginations.json")
-        .end (res) ->
+        .end (err, res) ->
           res.ok.should.equal true
 
           should.exist(res.body.total)
@@ -25,48 +25,60 @@ describe "Controller", ->
 
           done()
 
+      return null
+
     it "does not affect get requests", (done) ->
       App.Location.create title: "test", (err, resource) ->
         agent.get(":3001/paginations/#{resource.get("id")}.json")
-          .end (res) ->
+          .end (err, res) ->
             res.ok.should.equal true
 
             should.exist(res.body.id)
 
             done()
 
+        return null
+
     it "calculates total correct", (done) ->
       agent.get(":3001/paginations.json")
-        .end (res) ->
+        .end (err, res) ->
           res.ok.should.equal true
 
           res.body.total.should.equal 20
 
           done()
 
+      return null
+
     it "accepts limit as parameter", (done) ->
       agent.get(":3001/paginations.json?limit=3")
-        .end (res) ->
+        .end (err, res) ->
           res.ok.should.equal true
 
           res.body.items.length.should.equal 3
 
           done()
 
+      return null
+
     it "accepts offset as parameter", (done) ->
       agent.get(":3001/paginations.json?offset=3")
-        .end (res) ->
+        .end (err, res) ->
           res.ok.should.equal true
 
           res.body.items[0].id.should.equal 4
 
           done()
 
+      return null
+
     it "does not transform the result if there is an error", (done) ->
       agent.get(":3001/paginations.json?error=true")
-        .end (res) ->
+        .end (err, res) ->
           res.statusCode.should.equal 401
 
           assert.ok res.body.error
 
           done()
+
+      return null
