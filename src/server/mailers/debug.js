@@ -1,5 +1,12 @@
-class Salad.Mailer.Debug
-  @mail: (options, callback) ->
-    email = options.message
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+Salad.Mailer.Debug = class Debug {
+  static mail(options, callback) {
+    const email = options.message;
 
-    callback null, email
+    return callback(null, email);
+  }
+};

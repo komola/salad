@@ -1,29 +1,42 @@
-module.exports =
-  InstanceMethods:
-    render: (options) ->
-      # render template: @render "foo/bar", model: @resource
-      unless typeof(options) is "object"
-        templateOptions = arguments[1] or {}
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  InstanceMethods: {
+    render(options) {
+      // render template: @render "foo/bar", model: @resource
+      if (typeof(options) !== "object") {
+        const templateOptions = arguments[1] || {};
 
-        options =
-          template: options
+        options = {
+          template: options,
           data: templateOptions
+        };
 
-        if templateOptions.status
-          options.status = templateOptions.status
+        if (templateOptions.status) {
+          options.status = templateOptions.status;
+        }
 
-        if templateOptions.layout isnt undefined
-          options.layout = templateOptions.layout
-          delete templateOptions.layout
+        if (templateOptions.layout !== undefined) {
+          options.layout = templateOptions.layout;
+          delete templateOptions.layout;
+        }
+      }
 
-      @_render options
+      return this._render(options);
+    },
 
-    _render: (options) ->
-      defaultOptions =
-        env: Salad.env
+    _render(options) {
+      const defaultOptions =
+        {env: Salad.env};
 
-      options = _.extend defaultOptions, options
+      options = _.extend(defaultOptions, options);
 
-      content = Salad.Template.render options.template, options.data
+      const content = Salad.Template.render(options.template, options.data);
 
-      content
+      return content;
+    }
+  }
+};

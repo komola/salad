@@ -1,21 +1,33 @@
-module.exports =
-  InstanceMethods:
-    takeSnapshot: ->
-      @previousValues = _.clone @getAttributes(), true
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  InstanceMethods: {
+    takeSnapshot() {
+      return this.previousValues = _.clone(this.getAttributes(), true);
+    },
 
-    getSnapshot: ->
-      @previousValues or {}
+    getSnapshot() {
+      return this.previousValues || {};
+    },
 
-    getChangedAttributes: ->
-      changes = {}
+    getChangedAttributes() {
+      const changes = {};
 
-      current = @getAttributes()
-      previous = @getSnapshot()
+      const current = this.getAttributes();
+      const previous = this.getSnapshot();
 
-      for key, newValue of current
-        oldValue = previous[key]
-        continue if _.isEqual newValue, oldValue
+      for (let key in current) {
+        const newValue = current[key];
+        const oldValue = previous[key];
+        if (_.isEqual(newValue, oldValue)) { continue; }
 
-        changes[key] = [oldValue, newValue]
+        changes[key] = [oldValue, newValue];
+      }
 
-      changes
+      return changes;
+    }
+  }
+};

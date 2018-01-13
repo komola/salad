@@ -1,143 +1,178 @@
-fs = require "fs"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const fs = require("fs");
 
-Salad.Utils or= {}
+if (!Salad.Utils) { Salad.Utils = {}; }
 
-class Salad.Utils.Models
-  ###
+Salad.Utils.Models = class Models {
+  /*
   Returns an array of all available models in the current app.
 
   This is useful for automatically loading fixtures.
 
   Usage:
     models = Salad.Utils.Models.registered()
-  ###
-  @registered: ->
-    namespace = App
-    models = []
+  */
+  static registered() {
+    const namespace = App;
+    const models = [];
 
-    for modelName, modelClass of App when modelClass.prototype instanceof Salad.Model
-      models.push modelClass
+    for (let modelName in App) {
+      const modelClass = App[modelName];
+      if (modelClass.prototype instanceof Salad.Model) {
+        models.push(modelClass);
+      }
+    }
 
-    models
+    return models;
+  }
 
-  @resolvedRegistered: ->
-    models = @registered()
+  static resolvedRegistered() {
+    const models = this.registered();
 
-    resolvedDependencies = []
-    processed = []
+    const resolvedDependencies = [];
+    const processed = [];
 
-    # build dependency tree
-    for model in models
-      @_buildDependencyTree model, resolvedDependencies, processed
+    // build dependency tree
+    for (let model of Array.from(models)) {
+      this._buildDependencyTree(model, resolvedDependencies, processed);
+    }
 
-    resolvedDependencies
+    return resolvedDependencies;
+  }
 
-  ###
+  /*
   Return the corresponding database tables of all the models in our app.
 
   Usage:
     tables = Salad.Utils.existingDatabaseTables()
-  ###
-  @existingDatabaseTables: ->
-    models = @resolvedRegistered()
+  */
+  static existingDatabaseTables() {
+    const models = this.resolvedRegistered();
 
-    tables = (model.daoInstance.daoModelInstance.tableName for model in models)
-    tables.push "SequelizeMeta"
+    const tables = (Array.from(models).map((model) => model.daoInstance.daoModelInstance.tableName));
+    tables.push("SequelizeMeta");
 
-    tables
+    return tables;
+  }
 
-  @loadFixtures: (path, callback) ->
-    models = @resolvedRegistered()
+  static loadFixtures(path, callback) {
+    let name;
+    const models = this.resolvedRegistered();
 
-    modelToFixtureFile = []
+    const modelToFixtureFile = [];
 
-    for model in models
-      name = _.pluralize model.name
-      name = name.substr(0, 1).toLowerCase() + name.substr(1)
+    for (let model of Array.from(models)) {
+      name = _.pluralize(model.name);
+      name = name.substr(0, 1).toLowerCase() + name.substr(1);
 
-      modelToFixtureFile.push
-        name: model.name
-        model: model
+      modelToFixtureFile.push({
+        name: model.name,
+        model,
         file: name
+      });
+    }
 
-    modelInstances = {}
-    fixtureData = {}
+    const modelInstances = {};
+    const fixtureData = {};
 
-    createData = (element, cb) =>
-      fixturePath = "#{path}/#{element.file}"
+    const createData = (element, cb) => {
+      const fixturePath = `${path}/${element.file}`;
 
-      fs.exists "#{fixturePath}.coffee", (exists) =>
-        return cb() unless exists
+      return fs.exists(`${fixturePath}.coffee`, exists => {
+        if (!exists) { return cb(); }
 
-        data = require fixturePath
+        const data = require(fixturePath);
 
-        modelCreator = (attributes, _cb) =>
-          element.model.create attributes, (err, res) =>
-            throw err if err
-            modelInstances[element.name] or= []
-            modelInstances[element.name].push res
+        const modelCreator = (attributes, _cb) => {
+          return element.model.create(attributes, (err, res) => {
+            if (err) { throw err; }
+            if (!modelInstances[element.name]) { modelInstances[element.name] = []; }
+            modelInstances[element.name].push(res);
 
-            fixtureData[element.name] or= []
-            fixtureData[element.name].push attributes
+            if (!fixtureData[element.name]) { fixtureData[element.name] = []; }
+            fixtureData[element.name].push(attributes);
 
-            _cb err
+            return _cb(err);
+          });
+        };
 
-        async.eachSeries data, modelCreator, cb
+        return async.eachSeries(data, modelCreator, cb);
+      });
+    };
 
-    async.eachSeries modelToFixtureFile, createData, (err) =>
-      callback err, {instances: modelInstances, data: fixtureData}
+    return async.eachSeries(modelToFixtureFile, createData, err => {
+      return callback(err, {instances: modelInstances, data: fixtureData});
+  });
+  }
 
-  @_buildDependencyTree: (model, resolvedDependencies, processed) ->
-    # model was already processed. Skip
-    return if model.name in processed
+  static _buildDependencyTree(model, resolvedDependencies, processed) {
+    // model was already processed. Skip
+    if (Array.from(processed).includes(model.name)) { return; }
 
-    # get the models association
-    associations = model.metadata().associations
+    // get the models association
+    const { associations } = model.metadata();
 
-    # mark the model as processed
-    processed.push model.name
+    // mark the model as processed
+    processed.push(model.name);
 
-    # iterate over all owning associations
-    # owning means, that the association stores the relation information
-    # (i.e. has userId column).
-    for name, options of associations when options.isOwning and not options.isWeak
-      dependentModel = options.model
-      # build the dependency tree for every associated model
-      @_buildDependencyTree dependentModel, resolvedDependencies, processed
+    // iterate over all owning associations
+    // owning means, that the association stores the relation information
+    // (i.e. has userId column).
+    for (let name in associations) {
+      const options = associations[name];
+      if (options.isOwning && !options.isWeak) {
+        const dependentModel = options.model;
+        // build the dependency tree for every associated model
+        this._buildDependencyTree(dependentModel, resolvedDependencies, processed);
+      }
+    }
 
-    resolvedDependencies.push model
+    return resolvedDependencies.push(model);
+  }
 
-  @emptyTables: (callback) ->
-    tables = @existingDatabaseTables()
+  static emptyTables(callback) {
+    let tables = this.existingDatabaseTables();
 
-    # remove SequelizeMeta
-    tables.pop()
+    // remove SequelizeMeta
+    tables.pop();
 
-    tables = tables.map (item) -> "\"#{item}\""
-    table = tables.join ", "
+    tables = tables.map(item => `\"${item}\"`);
+    const table = tables.join(", ");
 
-    sql = "TRUNCATE TABLE #{table} RESTART IDENTITY CASCADE"
+    const sql = `TRUNCATE TABLE ${table} RESTART IDENTITY CASCADE`;
 
-    App.sequelize.query(sql)
-      .then =>
-        callback()
-      .catch =>
-        console.log arguments
-        callback "fail"
+    return App.sequelize.query(sql)
+      .then(() => {
+        return callback();
+    }).catch(function() {
+        console.log(arguments);
+        return callback("fail");
+    }.bind(this));
+  }
 
-  @dropTables: (callback) ->
-    tables = @existingDatabaseTables()
+  static dropTables(callback) {
+    const tables = this.existingDatabaseTables();
 
-    dropTable = (table, cb) =>
-      sql = "DROP TABLE IF EXISTS \"#{table}\" CASCADE"
-      App.sequelize.query(sql)
-        .then =>
-          cb()
-        .catch =>
-          console.log arguments
-          cb "fail"
+    const dropTable = (table, cb) => {
+      const sql = `DROP TABLE IF EXISTS \"${table}\" CASCADE`;
+      return App.sequelize.query(sql)
+        .then(() => {
+          return cb();
+      }).catch(function() {
+          console.log(arguments);
+          return cb("fail");
+      }.bind(this));
+    };
 
-    async.eachSeries tables, dropTable, (err) =>
-      console.log err if err
+    return async.eachSeries(tables, dropTable, err => {
+      if (err) { console.log(err); }
 
-      callback()
+      return callback();
+    });
+  }
+};

@@ -1,77 +1,121 @@
-module.exports =
-  ClassMethods:
-    # Add an attribute to this model
-    #
-    # Possible calls:
-    #
-    # @attribute "firstname"
-    #
-    # # Setting the type
-    # @attribute "firstname", type: "String"
-    attribute: (name, options) ->
-      @metadata().attributes or= {}
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS104: Avoid inline assignments
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  ClassMethods: {
+    // Add an attribute to this model
+    //
+    // Possible calls:
+    //
+    // @attribute "firstname"
+    //
+    // # Setting the type
+    // @attribute "firstname", type: "String"
+    attribute(name, options) {
+      let base;
+      if (!(base = this.metadata()).attributes) { base.attributes = {}; }
 
-      defaultOptions =
-        name: name
+      const defaultOptions = {
+        name,
         type: "String"
+      };
 
-      options = _.extend defaultOptions, options
+      options = _.extend(defaultOptions, options);
 
-      @metadata().attributes[name] = options
+      return this.metadata().attributes[name] = options;
+    }
+  },
 
-  InstanceMethods:
-    setAttributes: (attributes) ->
-      for key, val of attributes
-        if @hasAttribute key
-          @set key, val
+  InstanceMethods: {
+    setAttributes(attributes) {
+      return (() => {
+        const result = [];
+        for (let key in attributes) {
+          const val = attributes[key];
+          if (this.hasAttribute(key)) {
+            result.push(this.set(key, val));
 
-        else if @hasAssociation key
-          @setAssociation key, val
+          } else if (this.hasAssociation(key)) {
+            result.push(this.setAssociation(key, val));
+          } else {
+            result.push(undefined);
+          }
+        }
+        return result;
+      })();
+    },
 
-    getDefaultValues: ->
-      defaultValues = {}
-      for key, options of @getAttributeDefinitions() when options.default isnt undefined
-        defaultValues[key] = options.default
+    getDefaultValues() {
+      const defaultValues = {};
+      const object = this.getAttributeDefinitions();
+      for (let key in object) {
+        const options = object[key];
+        if (options.default !== undefined) {
+          defaultValues[key] = options.default;
+        }
+      }
 
-      defaultValues
+      return defaultValues;
+    },
 
-    # initialize default values
-    initDefaultValues: ->
-      return if @attributeValues
+    // initialize default values
+    initDefaultValues() {
+      if (this.attributeValues) { return; }
 
-      @attributeValues = @getDefaultValues()
+      this.attributeValues = this.getDefaultValues();
 
-      # do not register the default values as changes
-      @takeSnapshot()
+      // do not register the default values as changes
+      return this.takeSnapshot();
+    },
 
-    # check if a model has an attribute
-    hasAttribute: (key) ->
-      @metadata().attributes[key]?
+    // check if a model has an attribute
+    hasAttribute(key) {
+      return (this.metadata().attributes[key] != null);
+    },
 
-    getAttributes: ->
-      @initDefaultValues()
+    getAttributes() {
+      this.initDefaultValues();
 
-      return _.clone @attributeValues, true
+      return _.clone(this.attributeValues, true);
+    },
 
-    getAttributeDefinitions: ->
-      @metadata().attributes
+    getAttributeDefinitions() {
+      return this.metadata().attributes;
+    },
 
-    set: (key, value) ->
-      @_checkIfKeyExists key
-      @initDefaultValues()
-      @attributeValues[key] = value
+    set(key, value) {
+      this._checkIfKeyExists(key);
+      this.initDefaultValues();
+      return this.attributeValues[key] = value;
+    },
 
-    get: (key) ->
-      @_checkIfKeyExists key
-      @initDefaultValues()
-      value = @attributeValues[key]
+    get(key) {
+      this._checkIfKeyExists(key);
+      this.initDefaultValues();
+      let value = this.attributeValues[key];
 
-      if value is undefined
-        value = @getAttributeDefinitions()[key]?.defaultValue
+      if (value === undefined) {
+        value = __guard__(this.getAttributeDefinitions()[key], x => x.defaultValue);
+      }
 
-      value
+      return value;
+    },
 
-    _checkIfKeyExists: (key) ->
-      unless key of @metadata().attributes
-        throw new Error "#{key} not existent in #{@}"
+    _checkIfKeyExists(key) {
+      if (!(key in this.metadata().attributes)) {
+        throw new Error(`${key} not existent in ${this}`);
+      }
+    }
+  }
+};
 
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

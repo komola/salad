@@ -1,16 +1,27 @@
-class Salad.Base
-  # For static methods
-  @extend: (obj) ->
-    _.extend @, obj
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+Salad.Base = class Base {
+  // For static methods
+  static extend(obj) {
+    return _.extend(this, obj);
+  }
 
-  # For instance methods
-  @include: (obj) ->
-    for key, value of obj
-      # Assign properties to the prototype
-      @::[key] = value
+  // For instance methods
+  static include(obj) {
+    for (let key in obj) {
+      // Assign properties to the prototype
+      const value = obj[key];
+      this.prototype[key] = value;
+    }
 
-    @
+    return this;
+  }
 
-  @mixin: (obj) ->
-    @extend obj.ClassMethods if obj.ClassMethods
-    @include obj.InstanceMethods if obj.InstanceMethods
+  static mixin(obj) {
+    if (obj.ClassMethods) { this.extend(obj.ClassMethods); }
+    if (obj.InstanceMethods) { return this.include(obj.InstanceMethods); }
+  }
+};

@@ -1,125 +1,167 @@
-Router = require("barista").Router
-path = require "path"
+/*
+ * decaffeinate suggestions:
+ * DS001: Remove Babel/TypeScript constructor workaround
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const { Router } = require("barista");
+const path = require("path");
 
-router = new Router
+const router = new Router;
 
-# write our own salad-compatible resource method.
-# salad needs routes in this form: resources/:resourceId, barista
-# creates them in this format: resources/:id
-router.resource = (path, controller, resourceName) ->
-  # router.get("/"+controller).to(controller+".index")
+// write our own salad-compatible resource method.
+// salad needs routes in this form: resources/:resourceId, barista
+// creates them in this format: resources/:id
+router.resource = function(path, controller, resourceName) {
+  // router.get("/"+controller).to(controller+".index")
 
-  router.get('/'+path+'(.:format)', 'GET').to(controller+'.index')
-  router.post('/'+path+'(.:format)', 'POST').to(controller+'.create')
-  router.get('/'+path+'/add(.:format)', 'GET').to(controller+'.add')
+  router.get(`/${path}(.:format)`, 'GET').to(controller+'.index');
+  router.post(`/${path}(.:format)`, 'POST').to(controller+'.create');
+  router.get(`/${path}/add(.:format)`, 'GET').to(controller+'.add');
 
-  router.get('/'+path+'/:'+resourceName+'Id(.:format)', 'GET').to(controller+'.show')
-  router.get('/'+path+'/:'+resourceName+'Id/edit(.:format)', 'GET').to(controller+'.edit')
-  router.put('/'+path+'/:'+resourceName+'Id(.:format)', 'PUT').to(controller+'.update')
-  router.del('/'+path+'/:'+resourceName+'Id(.:format)', 'DELETE').to(controller+'.destroy')
+  router.get(`/${path}/:${resourceName}Id(.:format)`, 'GET').to(controller+'.show');
+  router.get(`/${path}/:${resourceName}Id/edit(.:format)`, 'GET').to(controller+'.edit');
+  router.put(`/${path}/:${resourceName}Id(.:format)`, 'PUT').to(controller+'.update');
+  return router.del(`/${path}/:${resourceName}Id(.:format)`, 'DELETE').to(controller+'.destroy');
+};
 
-class Salad.Router extends Salad.Base
-  @extend require "./mixins/singleton"
+const Cls = (Salad.Router = class Router extends Salad.Base {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.indexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.dispatch = this.dispatch.bind(this);
+    super(...args);
+  }
 
-  # Dispatch the request to the associated controller
-  dispatch: (request, response) =>
-    requestPath = path.normalize request.path
+  static initClass() {
+    this.extend(require("./mixins/singleton"));
+  }
 
-    # remove trailing slashes
-    if _.last(requestPath) is "/" and requestPath isnt "/"
-      requestPath = requestPath.substr 0, requestPath.length - 1
+  // Dispatch the request to the associated controller
+  dispatch(request, response) {
+    let acceptHeader;
+    let requestPath = path.normalize(request.path);
 
-    matching = @_resolveRoute requestPath, request
+    // remove trailing slashes
+    if ((_.last(requestPath) === "/") && (requestPath !== "/")) {
+      requestPath = requestPath.substr(0, requestPath.length - 1);
+    }
 
-    # Get the matching controller
-    controllerName = _.capitalize matching.controller
-    controllerName = "#{controllerName}Controller"
-    controller = @_getMatchingController controllerName
+    const matching = this._resolveRoute(requestPath, request);
 
-    # Could not find associated controller
-    unless controller
-      unless App.ErrorContoller
-        throw new Error "Tried to use App.ErrorController but it does not exist. Please create an ErrorController to show error messages!"
-      controller = App.ErrorContoller.instance()
+    // Get the matching controller
+    let controllerName = _.capitalize(matching.controller);
+    controllerName = `${controllerName}Controller`;
+    let controller = this._getMatchingController(controllerName);
 
-    # Action does not exist in the controller
-    if typeof controller[matching.action] is undefined
-      controller = App.ErrorController.instance()
-      matching.action = 404
+    // Could not find associated controller
+    if (!controller) {
+      if (!App.ErrorContoller) {
+        throw new Error("Tried to use App.ErrorController but it does not exist. Please create an ErrorController to show error messages!");
+      }
+      controller = App.ErrorContoller.instance();
+    }
 
-    # Parse Accept header to determine which response format to use
-    if acceptHeader = request.headers.accept
-      if acceptHeader.indexOf("application/json") isnt -1
-        matching.format = "json"
+    // Action does not exist in the controller
+    if (typeof controller[matching.action] === undefined) {
+      controller = App.ErrorController.instance();
+      matching.action = 404;
+    }
 
-    # Pass request and response objects on to the controller instance
-    controller.response = response
-    controller.request = request
-    controller.params = _.extend request.query, request.body, matching
+    // Parse Accept header to determine which response format to use
+    if (acceptHeader = request.headers.accept) {
+      if (acceptHeader.indexOf("application/json") !== -1) {
+        matching.format = "json";
+      }
+    }
 
-    # Call the controller action
-    async.series [
-        (cb) =>
-          # do not log request information in test
-          return cb() if Salad.env is "test"
+    // Pass request and response objects on to the controller instance
+    controller.response = response;
+    controller.request = request;
+    controller.params = _.extend(request.query, request.body, matching);
 
-          # output dispatching information
-          line = "Dispatching request: #{controllerName}.#{matching.action} (#{matching.format})"
-          App.Logger.log line, controller.params
-          cb()
+    // Call the controller action
+    return async.series([
+        cb => {
+          // do not log request information in test
+          if (Salad.env === "test") { return cb(); }
 
-        (cb) => controller.runTriggers "beforeAction", cb
-        (cb) => controller.runTriggers "before:#{matching.action}", cb
-        (cb) =>
-          # call the action on our controller
-          controller[matching.action]()
-          cb()
-        # wait for the request to finish, so that we can trigger the after actions
-        (cb) =>
-          # don't wait for the render event when the response is already finished
-          # this happens when the action does not contain any db calls etc.
-          if response.finished
-            return cb()
+          // output dispatching information
+          const line = `Dispatching request: ${controllerName}.${matching.action} (${matching.format})`;
+          App.Logger.log(line, controller.params);
+          return cb();
+        },
 
-          controller.on "render", cb
-        (cb) => controller.runTriggers "after:#{matching.action}", cb
-        (cb) => controller.runTriggers "afterAction", cb
+        cb => controller.runTriggers("beforeAction", cb),
+        cb => controller.runTriggers(`before:${matching.action}`, cb),
+        cb => {
+          // call the action on our controller
+          controller[matching.action]();
+          return cb();
+        },
+        // wait for the request to finish, so that we can trigger the after actions
+        cb => {
+          // don't wait for the render event when the response is already finished
+          // this happens when the action does not contain any db calls etc.
+          if (response.finished) {
+            return cb();
+          }
+
+          return controller.on("render", cb);
+        },
+        cb => controller.runTriggers(`after:${matching.action}`, cb),
+        cb => controller.runTriggers("afterAction", cb)
       ],
 
-      # finished dispatching the request
-      (err) =>
+      // finished dispatching the request
+      err => {});
+  }
 
-  _resolveRoute: (requestPath, request) ->
-    # Get the first matching route
-    matching = router.first(requestPath, request.method)
-    # default format is html"
-    matching.format or= "html"
+  _resolveRoute(requestPath, request) {
+    // Get the first matching route
+    let matching = router.first(requestPath, request.method);
+    // default format is html"
+    if (!matching.format) { matching.format = "html"; }
 
-    # No matching route found
-    unless matching
-      matching =
-        controller: "error"
-        action: 404
+    // No matching route found
+    if (!matching) {
+      matching = {
+        controller: "error",
+        action: 404,
         method: request.method
+      };
+    }
 
-    matching
+    return matching;
+  }
 
-  _getMatchingController: (controllerName) ->
-    controllerName = _.capitalize controllerName
-    controller = App[controllerName]
+  _getMatchingController(controllerName) {
+    controllerName = _.capitalize(controllerName);
+    let controller = App[controllerName];
 
-    unless controller
-      throw new Error "Could not find 'App.#{controllerName}'"
+    if (!controller) {
+      throw new Error(`Could not find 'App.${controllerName}'`);
+    }
 
-    controller = new controller
+    controller = new controller;
 
-    controller
+    return controller;
+  }
 
-  ###
+  /*
   Usage:
     Salad.Router.register (router) ->
       router.match("/path").to("controller.action")
 
-  ###
-  @register: (cb) ->
-    cb.apply @instance(), [router]
+  */
+  static register(cb) {
+    return cb.apply(this.instance(), [router]);
+  }
+});
+Cls.initClass();

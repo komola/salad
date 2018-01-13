@@ -1,239 +1,302 @@
-class Salad.Scope
-  constructor: (@context) ->
-    @daoContext = @context.daoInstance
-    @data =
-      conditions: {}
-      contains: []
-      includes: []
-      order: []
-      limit: -1
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+Salad.Scope = class Scope {
+  constructor(context) {
+    this.context = context;
+    this.daoContext = this.context.daoInstance;
+    this.data = {
+      conditions: {},
+      contains: [],
+      includes: [],
+      order: [],
+      limit: -1,
       offset: 0
+    };
+  }
 
-  ###
+  /*
   Usage:
-    # id has to equal "value"
+    * id has to equal "value"
     scope.where(id: "value")
 
-    # id has to be IN [1, 2, 3]
+    * id has to be IN [1, 2, 3]
     scope.where(id: [1, 2, 3])
-  ###
-  where: (attributes) ->
-    unless typeof(attributes) is "object"
-      throw new Error "where() only accepts an object as argument!"
+  */
+  where(attributes) {
+    if (typeof(attributes) !== "object") {
+      throw new Error("where() only accepts an object as argument!");
+    }
 
-    for key, val of attributes
-      @data.conditions[key] = val
+    for (let key in attributes) {
+      const val = attributes[key];
+      this.data.conditions[key] = val;
+    }
 
-    @
+    return this;
+  }
 
-  asc: (field) ->
-    @data.order.push
-      field: field
+  asc(field) {
+    this.data.order.push({
+      field,
       type: "asc"
+    });
 
-    @
+    return this;
+  }
 
-  desc: (field) ->
-    @data.order.push
-      field: field
+  desc(field) {
+    this.data.order.push({
+      field,
       type: "desc"
+    });
 
-    @
+    return this;
+  }
 
-  contains: (field, value) ->
-    @data.contains.push
-      field: field
-      value: value
+  contains(field, value) {
+    this.data.contains.push({
+      field,
+      value
+    });
 
-    @
+    return this;
+  }
 
-  _normalizeInclude: (include) ->
-    # includes should always have one of the following forms:
-    # {model: Operator, …} where Operator is a subclass of Salad.Model
-    # {association: "Operators", …} where the association has been registered before
-    # however we allow calls like Scope.includes([Operator]) or Scope.includes(["Operators"])
-    # this method transforms the last forms to the normal form
-    # NO sanity checking is happening in this method
+  _normalizeInclude(include) {
+    // includes should always have one of the following forms:
+    // {model: Operator, …} where Operator is a subclass of Salad.Model
+    // {association: "Operators", …} where the association has been registered before
+    // however we allow calls like Scope.includes([Operator]) or Scope.includes(["Operators"])
+    // this method transforms the last forms to the normal form
+    // NO sanity checking is happening in this method
 
-    if include is null or include is undefined
-      throw new Error "Scope::includes - Value of include must not be null"
+    if ((include === null) || (include === undefined)) {
+      throw new Error("Scope::includes - Value of include must not be null");
+    }
 
-    if typeof include is "string"
-      # this must be an association
-      return {association: include}
-    else if include.__super__ is Salad.Model.prototype
-      return {model: include}
+    if (typeof include === "string") {
+      // this must be an association
+      return {association: include};
+    } else if (include.__super__ === Salad.Model.prototype) {
+      return {model: include};
+    }
 
-    include
+    return include;
+  }
 
 
-  # Eager-load models
-  #
-  # Usage:
-  #
-  # App.Location.includes([App.Operator])
-  #
-  # App.Location.includes(["Operator"])
-  #
-  # App.Location.includes([{model: App.Operator, includes: [App.Cat]}])
-  #
-  # App.Location.includes([{association: "Operators", includes: ["Cats"]}]
-  #
-  # or a mix of the last two
-  includes: (includesArray) ->
-    for include in includesArray
-      option = {}
-      field = null
-      includes = []
+  // Eager-load models
+  //
+  // Usage:
+  //
+  // App.Location.includes([App.Operator])
+  //
+  // App.Location.includes(["Operator"])
+  //
+  // App.Location.includes([{model: App.Operator, includes: [App.Cat]}])
+  //
+  // App.Location.includes([{association: "Operators", includes: ["Cats"]}]
+  //
+  // or a mix of the last two
+  includes(includesArray) {
+    for (let include of Array.from(includesArray)) {
+      var model;
+      let option = {};
+      let field = null;
+      let includes = [];
 
-      saladModel = {}
+      let saladModel = {};
 
-      include = @_normalizeInclude include
+      include = this._normalizeInclude(include);
 
-      if include.model
-        unless include.model.__super__ is Salad.Model.prototype
-          throw new Error "Scope::includes - Value of key 'model' has to be of type Salad.Model"
+      if (include.model) {
+        if (include.model.__super__ !== Salad.Model.prototype) {
+          throw new Error("Scope::includes - Value of key 'model' has to be of type Salad.Model");
+        }
 
-        model = include.model
-        associations = @context.metadata().associations
+        ({ model } = include);
+        const { associations } = this.context.metadata();
 
-        for key, currentAssociation of associations when currentAssociation.model is model
-          field = currentAssociation.as
-          break
-        saladModel = model
-        model = model.daoInstance
+        for (let key in associations) {
+          const currentAssociation = associations[key];
+          if (currentAssociation.model === model) {
+            field = currentAssociation.as;
+            break;
+          }
+        }
+        saladModel = model;
+        model = model.daoInstance;
 
-      else if include.association
-        unless typeof include.association is "string"
-          throw new Error "Scope::includes - Value of key 'association' has to be a string"
+      } else if (include.association) {
+        if (typeof include.association !== "string") {
+          throw new Error("Scope::includes - Value of key 'association' has to be a string");
+        }
 
-        if @context.hasAssociation(include.association)
-          field = include.association
-          saladModel = @context.getAssociation(include.association)
-          model = saladModel.daoInstance
+        if (this.context.hasAssociation(include.association)) {
+          field = include.association;
+          saladModel = this.context.getAssociation(include.association);
+          model = saladModel.daoInstance;
+        }
+      }
 
-      if include.includes
-        # the included model requests other models to be included
-        includes = includes.concat @_includeNestedIncludes(saladModel,include.includes)
+      if (include.includes) {
+        // the included model requests other models to be included
+        includes = includes.concat(this._includeNestedIncludes(saladModel,include.includes));
+      }
 
-      unless field
-        throw new Error "Scope::includes - Could not find an association between #{@context.name} and #{model}"
+      if (!field) {
+        throw new Error(`Scope::includes - Could not find an association between ${this.context.name} and ${model}`);
+      }
 
-      option =
-        model: model
+      option = {
+        model,
         as: field
+      };
 
-      if includes.length isnt 0
-        option.includes = includes
+      if (includes.length !== 0) {
+        option.includes = includes;
+      }
 
-      @data.includes.push option
+      this.data.includes.push(option);
+    }
 
-    @
+    return this;
+  }
 
-  _includeNestedIncludes: (model,nestedIncludes) ->
-    nestedScopes = []
-    for nestedInclude in nestedIncludes
-      nestedScope = model.includes([nestedInclude])
-      nestedScopes = nestedScopes.concat nestedScope.data.includes
+  _includeNestedIncludes(model,nestedIncludes) {
+    let nestedScopes = [];
+    for (let nestedInclude of Array.from(nestedIncludes)) {
+      const nestedScope = model.includes([nestedInclude]);
+      nestedScopes = nestedScopes.concat(nestedScope.data.includes);
+    }
 
-    nestedScopes
+    return nestedScopes;
+  }
 
-  limit: (limit) ->
-    @data.limit = parseInt limit, 10
+  limit(limit) {
+    this.data.limit = parseInt(limit, 10);
 
-    @
+    return this;
+  }
 
-  offset: (offset) ->
-    @data.offset = parseInt offset, 10
+  offset(offset) {
+    this.data.offset = parseInt(offset, 10);
 
-    @
+    return this;
+  }
 
-  nil: ->
-    @data.nil = true
+  nil() {
+    this.data.nil = true;
 
-    @
+    return this;
+  }
 
-  count: (callback) ->
-    options = _.clone @data, true
+  count(callback) {
+    const options = _.clone(this.data, true);
 
-    if options.nil
-      return callback null, 0
+    if (options.nil) {
+      return callback(null, 0);
+    }
 
-    if options.offset
-      delete options.offset
+    if (options.offset) {
+      delete options.offset;
+    }
 
-    if options.includes
-      delete options.includes
+    if (options.includes) {
+      delete options.includes;
+    }
 
-    if options.limit
-      delete options.limit
+    if (options.limit) {
+      delete options.limit;
+    }
 
-    if options.order
-      options.order = []
+    if (options.order) {
+      options.order = [];
+    }
 
-    @daoContext.count options, callback
-    return null
+    this.daoContext.count(options, callback);
+    return null;
+  }
 
-  all: (callback) ->
-    options = @data
+  all(callback) {
+    const options = this.data;
 
-    if options.nil
-      return callback null, []
+    if (options.nil) {
+      return callback(null, []);
+    }
 
-    @daoContext.findAll options, callback
-    return null
+    this.daoContext.findAll(options, callback);
+    return null;
+  }
 
-  first: (callback) ->
-    options = @data
-    options.limit = 1
+  first(callback) {
+    const options = this.data;
+    options.limit = 1;
 
-    @all (err, resources) =>
-      if resources instanceof Array
-        resources = resources[0]
+    this.all((err, resources) => {
+      if (resources instanceof Array) {
+        resources = resources[0];
+      }
 
-      return callback err, resources
+      return callback(err, resources);
+    });
 
-    return null
+    return null;
+  }
 
-  find: (id, callback) ->
-    @where(id: id).first callback
-    return null
+  find(id, callback) {
+    this.where({id}).first(callback);
+    return null;
+  }
 
-  findAndCountAll: (callback) ->
+  findAndCountAll(callback) {
 
-    @all (err, resources) =>
-      @count (err, count) =>
-        result =
-          count: count
+    this.all((err, resources) => {
+      return this.count((err, count) => {
+        const result = {
+          count,
           rows: resources
+        };
 
-        callback err, result
-    return null
+        return callback(err, result);
+      });
+    });
+    return null;
+  }
 
-  # create object
-  create: (data, callback) ->
-    attributes = _.extend @data.conditions, data
+  // create object
+  create(data, callback) {
+    const attributes = _.extend(this.data.conditions, data);
 
-    @context.create attributes, callback
-    return null
+    this.context.create(attributes, callback);
+    return null;
+  }
 
-  # build an instance
-  build: (data) ->
-    attributes = _.extend @data.conditions, data
+  // build an instance
+  build(data) {
+    const attributes = _.extend(this.data.conditions, data);
 
-    @context.build attributes
+    return this.context.build(attributes);
+  }
 
-  destroy: (callback) ->
-    options = @data
+  destroy(callback) {
+    const options = this.data;
 
-    @daoContext.destroy options, callback
-    return null
+    this.daoContext.destroy(options, callback);
+    return null;
+  }
 
-  # remove associations
-  remove: (model, callback) ->
-    keys = _.keys @data.conditions
+  // remove associations
+  remove(model, callback) {
+    const keys = _.keys(this.data.conditions);
 
-    model.set key, null for key in keys
+    for (let key of Array.from(keys)) { model.set(key, null); }
 
-    model.save callback
-    return null
+    model.save(callback);
+    return null;
+  }
+};

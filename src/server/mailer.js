@@ -1,41 +1,59 @@
-class Salad.Mailer extends Salad.Base
-  @mixin require "./mailers/mixins/renderers"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const Cls = (Salad.Mailer = class Mailer extends Salad.Base {
+  static initClass() {
+    this.mixin(require("./mailers/mixins/renderers"));
+  }
 
-  mail: (options, callback) ->
-    defaultOptions =
-      subject: ""
-      to: ""
-      from: ""
+  mail(options, callback) {
+    const defaultOptions = {
+      subject: "",
+      to: "",
+      from: "",
       options: null
+    };
 
-    options = _.extend defaultOptions, options
+    options = _.extend(defaultOptions, options);
 
-    unless options.to
-      throw new Error "No recipient given!"
+    if (!options.to) {
+      throw new Error("No recipient given!");
+    }
 
-    if options.html
-      options.html = options.html()
+    if (options.html) {
+      options.html = options.html();
+    }
 
-    if options.text
-      options.text = options.text()
+    if (options.text) {
+      options.text = options.text();
+    }
 
-    emailConnection = Salad.Config.mailer[Salad.env]
-    transport = @getTransport emailConnection.transport
+    const emailConnection = Salad.Config.mailer[Salad.env];
+    const transport = this.getTransport(emailConnection.transport);
 
-    mailOptions =
-      credentials: emailConnection
+    const mailOptions = {
+      credentials: emailConnection,
       message: options
+    };
 
-    transport.mail mailOptions, callback
+    return transport.mail(mailOptions, callback);
+  }
 
-  getTransport: (name) ->
-    name = _.classify name
-    transport = Salad.Mailer[name]
+  getTransport(name) {
+    name = _.classify(name);
+    const transport = Salad.Mailer[name];
 
-    unless transport
-      throw new Error "Could not find email transport #{name}"
+    if (!transport) {
+      throw new Error(`Could not find email transport ${name}`);
+    }
 
-    transport
+    return transport;
+  }
+});
+Cls.initClass();
 
-require "./mailers/smtp"
-require "./mailers/debug"
+require("./mailers/smtp");
+require("./mailers/debug");

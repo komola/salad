@@ -1,101 +1,151 @@
-module.exports =
-  InstanceMethods:
-    index: ->
-      @_index (error, resources) =>
-        @respondWith
-          html: -> @render "#{@resourceOptions.name}/index", collection: resources
-          json: -> @render json: resources
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  InstanceMethods: {
+    index() {
+      return this._index((error, resources) => {
+        return this.respondWith({
+          html() { return this.render(`${this.resourceOptions.name}/index`, {collection: resources}); },
+          json() { return this.render({json: resources}); }
+        });
+      });
+    },
 
-    _index: (callback) ->
-      @scoped (err, scope) =>
-        scope.all (err, resources) =>
-          @resources = resources
-          callback.apply @, [null, resources]
+    _index(callback) {
+      return this.scoped((err, scope) => {
+        return scope.all((err, resources) => {
+          this.resources = resources;
+          return callback.apply(this, [null, resources]);
+      });
+    });
+    },
 
-    show: ->
-      @_show (err, resource) =>
-        @respondWith
-          html: -> @render "#{@resourceOptions.name}/show", model: resource
-          json: -> @render json: resource
+    show() {
+      return this._show((err, resource) => {
+        return this.respondWith({
+          html() { return this.render(`${this.resourceOptions.name}/show`, {model: resource}); },
+          json() { return this.render({json: resource}); }
+        });
+      });
+    },
 
-    _show: (callback) ->
-      @findResource (err, resource) =>
-        unless resource
-          return @_notFoundHandler()
+    _show(callback) {
+      return this.findResource((err, resource) => {
+        if (!resource) {
+          return this._notFoundHandler();
+        }
 
-        @resource = resource
+        this.resource = resource;
 
-        callback.apply @, [err, resource]
+        return callback.apply(this, [err, resource]);
+    });
+    },
 
-    create: ->
-      @_create (error, resource) =>
-        if error?.isValid is false
-          errorData =
-            message: error?.message
-            isValid: error?.isValid
+    create() {
+      return this._create((error, resource) => {
+        if ((error != null ? error.isValid : undefined) === false) {
+          const errorData = {
+            message: (error != null ? error.message : undefined),
+            isValid: (error != null ? error.isValid : undefined)
+          };
 
-          return @render json: {error: errorData}, status: 400
+          return this.render({json: {error: errorData}, status: 400});
+        }
 
-        @respondWith
-          html: ->
-            name = _.pluralize @resourceOptions.name
-            @redirectTo "/#{name}/#{resource.get("id")}"
-          json: -> @render json: resource, status: 201
+        return this.respondWith({
+          html() {
+            const name = _.pluralize(this.resourceOptions.name);
+            return this.redirectTo(`/${name}/${resource.get("id")}`);
+          },
+          json() { return this.render({json: resource, status: 201}); }
+        });
+      });
+    },
 
-    _create: (callback) ->
-      data = @params[@resourceOptions.name]
+    _create(callback) {
+      const data = this.params[this.resourceOptions.name];
 
-      @scoped (err, scope) =>
-        scope.create data, (err, resource) =>
-          if err
-            return callback.apply @, [err, null]
+      return this.scoped((err, scope) => {
+        return scope.create(data, (err, resource) => {
+          if (err) {
+            return callback.apply(this, [err, null]);
+          }
 
-          @resource = resource
+          this.resource = resource;
 
-          callback.apply @, [null, resource]
+          return callback.apply(this, [null, resource]);
+      });
+    });
+    },
 
-    update: ->
-      @_update (error, resource) =>
-        if error?.isValid is false
-          return @render json: {error: error}, status: 400
+    update() {
+      return this._update((error, resource) => {
+        if ((error != null ? error.isValid : undefined) === false) {
+          return this.render({json: {error}, status: 400});
+        }
 
-        @respondWith
-          html: ->
-            name = _.pluralize @resourceOptions.name
-            @redirectTo "/#{name}/#{resource.get("id")}"
-          json: -> @render json: resource, status: 200
+        return this.respondWith({
+          html() {
+            const name = _.pluralize(this.resourceOptions.name);
+            return this.redirectTo(`/${name}/${resource.get("id")}`);
+          },
+          json() { return this.render({json: resource, status: 200}); }
+        });
+      });
+    },
 
-    _update: (callback) ->
-      @findResource (err, resource) =>
-        unless resource
-         return @_notFoundHandler()
+    _update(callback) {
+      return this.findResource((err, resource) => {
+        if (!resource) {
+         return this._notFoundHandler();
+       }
 
-        data = @params[@resourceOptions.name]
-        resource.updateAttributes data, (err, resource) =>
-          if err
-            return callback.apply @, [err]
+        const data = this.params[this.resourceOptions.name];
+        return resource.updateAttributes(data, (err, resource) => {
+          if (err) {
+            return callback.apply(this, [err]);
+          }
 
-          @resource = resource
+          this.resource = resource;
 
-          callback.apply @, [err, resource]
+          return callback.apply(this, [err, resource]);
+      });
+    });
+    },
 
-    destroy: ->
-      @_destroy (err, resource) =>
-        resource.destroy (err) =>
-          @respondWith
-            html: ->
-              name = _.pluralize @resourceOptions.name
-              @redirectTo "/#{name}"
-            json: -> @render json: {}, status: 204
+    destroy() {
+      return this._destroy((err, resource) => {
+        return resource.destroy(err => {
+          return this.respondWith({
+            html() {
+              const name = _.pluralize(this.resourceOptions.name);
+              return this.redirectTo(`/${name}`);
+            },
+            json() { return this.render({json: {}, status: 204}); }
+          });
+        });
+      });
+    },
 
-    _destroy: (callback) ->
-      @findResource (err, resource) =>
-        unless resource
-         return @_notFoundHandler()
+    _destroy(callback) {
+      return this.findResource((err, resource) => {
+        if (!resource) {
+         return this._notFoundHandler();
+       }
 
-        callback.apply @, [err, resource]
+        return callback.apply(this, [err, resource]);
+    });
+    },
 
-    _notFoundHandler: ->
-      @respondWith
-        html: => @render "error/404", status: 404
-        json: => @render json: {error: "not found"}, status: 404
+    _notFoundHandler() {
+      return this.respondWith({
+        html: () => this.render("error/404", {status: 404}),
+        json: () => this.render({json: {error: "not found"}, status: 404})
+      });
+    }
+  }
+};

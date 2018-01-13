@@ -1,364 +1,465 @@
-global.Sequelize = require("sequelize")
-global.async = require "async"
-winston = require "winston"
-findit = require "findit2"
-fs = require "fs"
-gaze = require "gaze"
-path = require "path"
-responseTime = require("response-time")
-cookieParser = require("cookie-parser")
-bodyParser = require("body-parser")
-methodOverride = require("method-override")
+/*
+ * decaffeinate suggestions:
+ * DS001: Remove Babel/TypeScript constructor workaround
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+global.Sequelize = require("sequelize");
+global.async = require("async");
+const winston = require("winston");
+const findit = require("findit2");
+const fs = require("fs");
+const gaze = require("gaze");
+const path = require("path");
+const responseTime = require("response-time");
+const cookieParser = require("cookie-parser");
+const bodyParser = require("body-parser");
+const methodOverride = require("method-override");
 
-class Salad.Bootstrap extends Salad.Base
-  @extend require "./mixins/singleton"
-  @mixin require "./mixins/metadata"
-  @mixin require "./mixins/triggers"
+const Cls = (Salad.Bootstrap = class Bootstrap extends Salad.Base {
+  constructor(...args) {
+    {
+      // Hack: trick Babel/TypeScript into allowing this before super.
+      if (false) { super(); }
+      let thisFn = (() => { this; }).toString();
+      let thisName = thisFn.slice(thisFn.indexOf('{') + 1, thisFn.indexOf(';')).trim();
+      eval(`${thisName} = this;`);
+    }
+    this.setupHotloadingInFolder = this.setupHotloadingInFolder.bind(this);
+    this.start = this.start.bind(this);
+    super(...args);
+  }
 
-  app: null
+  static initClass() {
+    this.extend(require("./mixins/singleton"));
+    this.mixin(require("./mixins/metadata"));
+    this.mixin(require("./mixins/triggers"));
+  
+    this.prototype.app = null;
+  
+    this.prototype.options = {
+      routePath: "app/config/server/routes",
+      controllerPath: "app/controllers/server",
+      mailerPath: "app/mailers",
+      modelPath: "app/models/server",
+      configPath: "app/config/server/config",
+      templatePath: ["app", "templates"].join(path.sep),
+      publicPath: "public",
+      port: 80,
+      env: "production"
+    };
+  }
 
-  options:
-    routePath: "app/config/server/routes"
-    controllerPath: "app/controllers/server"
-    mailerPath: "app/mailers"
-    modelPath: "app/models/server"
-    configPath: "app/config/server/config"
-    templatePath: ["app", "templates"].join(path.sep)
-    publicPath: "public"
-    port: 80
-    env: "production"
+  init(options, callback) {
+    this.constructor.before("init", this.initConfig);
+    this.constructor.before("init", this.initLogger);
+    this.constructor.before("init", this.initControllers);
+    this.constructor.before("init", this.initMailers);
+    this.constructor.before("init", this.initRoutes);
+    this.constructor.before("init", this.initHelpers);
+    this.constructor.before("init", this.initDatabase);
+    this.constructor.before("init", this.initModels);
+    this.constructor.before("init", this.initTemplates);
+    this.constructor.before("init", this.initExpress);
 
-  init: (options, callback) ->
-    @constructor.before "init", @initConfig
-    @constructor.before "init", @initLogger
-    @constructor.before "init", @initControllers
-    @constructor.before "init", @initMailers
-    @constructor.before "init", @initRoutes
-    @constructor.before "init", @initHelpers
-    @constructor.before "init", @initDatabase
-    @constructor.before "init", @initModels
-    @constructor.before "init", @initTemplates
-    @constructor.before "init", @initExpress
+    this.options.port = options.port || 80;
+    this.options.env = (Salad.env = options.env || "production");
+    this.options.isCakefile = (Salad.isCakefile = options.isCakefile || false);
 
-    @options.port = options.port || 80
-    @options.env = Salad.env = options.env || "production"
-    @options.isCakefile = Salad.isCakefile = options.isCakefile || false
+    return async.series([
+      cb => this.runTriggers("before:init", cb),
+      cb => this.runTriggers("after:init", cb)
+    ], err => {
+      if (err) {
+        App.Logger.error(err);
+      }
 
-    async.series [
-      (cb) => @runTriggers "before:init", cb
-      (cb) => @runTriggers "after:init", cb
-    ], (err) =>
-      if err
-        App.Logger.error err
+      if (callback) { return callback(err); }
+    });
+  }
 
-      callback err if callback
+  run(options) {
+    return this.init(options, err => {
+      if (err) { return; }
 
-  run: (options) ->
-    @init options, (err) =>
-      return if err
+      return this.start(options.cb);
+    });
+  }
 
-      @start options.cb
+  static run(options) {
+    if (!options) { options = {}; }
 
-  @run: (options) ->
-    options or= {}
+    return Salad.Bootstrap.instance().run(options);
+  }
 
-    Salad.Bootstrap.instance().run options
+  initConfig(cb) {
+    // Salad.Config = require("require-all")
+    //   dirname: "#{Salad.root}/#{@options.configPath}"
 
-  initConfig: (cb) ->
-    # Salad.Config = require("require-all")
-    #   dirname: "#{Salad.root}/#{@options.configPath}"
+    // TODO: Allow more than one file and external configuration, i.e.
+    // in the /etc folder
+    Salad.Config = require(`${Salad.root}/${this.options.configPath}`);
 
-    # TODO: Allow more than one file and external configuration, i.e.
-    # in the /etc folder
-    Salad.Config = require "#{Salad.root}/#{@options.configPath}"
+    return cb();
+  }
 
-    cb()
+  initLogger(cb) {
+    this.metadata().logger = new winston.Logger();
+    this.metadata().logger.setLevels(winston.config.syslog.levels);
 
-  initLogger: (cb) ->
-    @metadata().logger = new winston.Logger()
-    @metadata().logger.setLevels(winston.config.syslog.levels)
-
-    @metadata().logger.add winston.transports.Console,
-      handleExceptions: false
-      prettyPrint: true
-      colorize: true
-      timestamp: true
+    this.metadata().logger.add(winston.transports.Console, {
+      handleExceptions: false,
+      prettyPrint: true,
+      colorize: true,
+      timestamp: true,
       level: "error"
+    }
+    );
 
-    App.Logger = @metadata().logger
+    App.Logger = this.metadata().logger;
 
-    App.Logger.log = =>
-      for key, val of arguments
-        if val instanceof Salad.Model
-          arguments[key] = val.inspect()
+    App.Logger.log = function() {
+      for (let key in arguments) {
+        const val = arguments[key];
+        if (val instanceof Salad.Model) {
+          arguments[key] = val.inspect();
+        }
+      }
 
-      @metadata().logger.info.apply @, arguments
+      return this.metadata().logger.info.apply(this, arguments);
+    }.bind(this);
 
-    App.Logger.error = =>
-      for key, val of arguments
-        if val instanceof Salad.Model
-          arguments[key] = val.inspect()
+    App.Logger.error = function() {
+      for (let key in arguments) {
+        const val = arguments[key];
+        if (val instanceof Salad.Model) {
+          arguments[key] = val.inspect();
+        }
+      }
 
-      @metadata().logger.error.apply @, arguments
+      return this.metadata().logger.error.apply(this, arguments);
+    }.bind(this);
 
-    if Salad.env isnt "test" and not Salad.isCakefile
-      console.log = App.Logger.log
-      console.error = App.Logger.error
+    if ((Salad.env !== "test") && !Salad.isCakefile) {
+      console.log = App.Logger.log;
+      console.error = App.Logger.error;
+    }
 
-    cb()
+    return cb();
+  }
 
-  initRoutes: (cb) ->
-    require "#{Salad.root}/#{@options.routePath}"
+  initRoutes(cb) {
+    require(`${Salad.root}/${this.options.routePath}`);
 
-    cb()
+    return cb();
+  }
 
-  # This helps to set up hot loading of changed files
-  #
-  # It works by deleting the cached require entry for the file and then
-  # requiring it again.
-  #
-  # Afterwards we change the prototype of the old class, so that existing
-  # instances get changed, too
-  setupHotloadingInFolder: (folder, options, callback) =>
-    if typeof(options) is "function"
-      callback = options
-      options = {}
+  // This helps to set up hot loading of changed files
+  //
+  // It works by deleting the cached require entry for the file and then
+  // requiring it again.
+  //
+  // Afterwards we change the prototype of the old class, so that existing
+  // instances get changed, too
+  setupHotloadingInFolder(folder, options, callback) {
+    if (typeof(options) === "function") {
+      callback = options;
+      options = {};
+    }
 
-    options or= {}
+    if (!options) { options = {}; }
 
-    gaze ["#{folder}/**/*.coffee", "#{folder}/**/*.js"], (err, watcher) =>
-      watcher.on "changed", (file) =>
-        if options.exclude and file.indexOf(options.exclude) isnt -1
-          return
+    return gaze([`${folder}/**/*.coffee`, `${folder}/**/*.js`], (err, watcher) => {
+      return watcher.on("changed", file => {
+        let oldApp;
+        if (options.exclude && (file.indexOf(options.exclude) !== -1)) {
+          return;
+        }
 
-        console.log "File changed!", file
+        console.log("File changed!", file);
 
-        # reload file. Map this in a try block because we are messing with
-        # the global App variable
-        try
-          # save current global App state in temporary variable
-          oldApp = global.App
-          global.App = {}
+        // reload file. Map this in a try block because we are messing with
+        // the global App variable
+        try {
+          // save current global App state in temporary variable
+          oldApp = global.App;
+          global.App = {};
 
-          delete require.cache[require.resolve(file)]
-          require file
+          delete require.cache[require.resolve(file)];
+          require(file);
 
-          # detect which classes where changed. By requiring the file, it gets
-          # a new entry in App and we can find out which class was changed
-          changedClasses =  _.keys global.App
+          // detect which classes where changed. By requiring the file, it gets
+          // a new entry in App and we can find out which class was changed
+          const changedClasses =  _.keys(global.App);
 
-          # Iterate over all changed classes and detect if a method was deleted.
-          for newClassName in changedClasses
-            oldClass = oldApp[newClassName]
-            newClass = global.App[newClassName]
+          // Iterate over all changed classes and detect if a method was deleted.
+          for (let newClassName of Array.from(changedClasses)) {
+            const oldClass = oldApp[newClassName];
+            const newClass = global.App[newClassName];
 
-            oldMethods = _.keys oldClass.prototype
-            newMethods = _.keys newClass.prototype
+            let oldMethods = _.keys(oldClass.prototype);
+            let newMethods = _.keys(newClass.prototype);
 
-            # If this is the case, delete the method from the existing instances
-            for currentMethod in oldMethods when currentMethod not in newMethods
-              # console.log "Deleting instance method #{currentMethod}"
-              delete oldClass::[currentMethod]
+            // If this is the case, delete the method from the existing instances
+            for (var currentMethod of Array.from(oldMethods)) {
+              // console.log "Deleting instance method #{currentMethod}"
+              if (!Array.from(newMethods).includes(currentMethod)) {
+                delete oldClass.prototype[currentMethod];
+              }
+            }
 
-            oldMethods = _.keys oldClass
-            newMethods = _.keys newClass
+            oldMethods = _.keys(oldClass);
+            newMethods = _.keys(newClass);
 
-            # Do the same with static methods
-            for currentMethod in oldMethods when currentMethod not in newMethods
-              # console.log "Deleting static method #{currentMethod}"
-              delete oldClass[currentMethod]
+            // Do the same with static methods
+            for (currentMethod of Array.from(oldMethods)) {
+              // console.log "Deleting static method #{currentMethod}"
+              if (!Array.from(newMethods).includes(currentMethod)) {
+                delete oldClass[currentMethod];
+              }
+            }
 
-            # Replace every old prototype method with the new version
-            for methodName in _.keys newClass.prototype when typeof(newClass::[methodName]) is "function"
-              # console.log "Replacing instance method #{methodName}"
-              oldClass::[methodName] = newClass::[methodName]
+            // Replace every old prototype method with the new version
+            for (var methodName of Array.from(_.keys(newClass.prototype))) {
+              // console.log "Replacing instance method #{methodName}"
+              if (typeof(newClass.prototype[methodName]) === "function") {
+                oldClass.prototype[methodName] = newClass.prototype[methodName];
+              }
+            }
 
-            # Do the same with static methods
-            for methodName in _.keys newClass when typeof(newClass[methodName]) is "function"
-              # console.log "Replacing static method #{methodName}"
-              oldClass[methodName] = newClass[methodName]
+            // Do the same with static methods
+            for (methodName of Array.from(_.keys(newClass))) {
+              // console.log "Replacing static method #{methodName}"
+              if (typeof(newClass[methodName]) === "function") {
+                oldClass[methodName] = newClass[methodName];
+              }
+            }
+          }
 
-            # FIXME: fat arrow functions don't seem to work.
-            # I have no solution how to replace the bound methods, as they
-            # are bound per instance when instantiating and I have no way to
-            # access every instance
-            #
-            # Reference: http://stackoverflow.com/a/13687261/9535
+            // FIXME: fat arrow functions don't seem to work.
+            // I have no solution how to replace the bound methods, as they
+            // are bound per instance when instantiating and I have no way to
+            // access every instance
+            //
+            // Reference: http://stackoverflow.com/a/13687261/9535
 
-          global.App = oldApp
+          global.App = oldApp;
 
-        catch e
-          global.App = oldApp
-          console.log "Error ocurred. Just reload file"
+        } catch (e) {
+          global.App = oldApp;
+          console.log("Error ocurred. Just reload file");
 
-          delete require.cache[require.resolve(file)]
-          require file
+          delete require.cache[require.resolve(file)];
+          require(file);
+        }
 
-        return callback null, file if callback
+        if (callback) { return callback(null, file); }
+      });
+    });
+  }
 
 
-  initControllers: (cb) ->
-    directory = "#{Salad.root}/#{@options.controllerPath}"
-    require("require-all")
-      dirname: directory
+  initControllers(cb) {
+    const directory = `${Salad.root}/${this.options.controllerPath}`;
+    require("require-all")({
+      dirname: directory,
       filter: /\.coffee$/
+    });
 
-    if Salad.env is "development"
-      @setupHotloadingInFolder directory
+    if (Salad.env === "development") {
+      this.setupHotloadingInFolder(directory);
+    }
 
-    return cb()
+    return cb();
+  }
 
 
-  initMailers: (cb) ->
-    directory = "#{Salad.root}/#{@options.mailerPath}"
-    require("require-all")
-      dirname: directory
+  initMailers(cb) {
+    const directory = `${Salad.root}/${this.options.mailerPath}`;
+    require("require-all")({
+      dirname: directory,
       filter: /\.coffee$/
+    });
 
-    if Salad.env is "development"
-      @setupHotloadingInFolder directory
+    if (Salad.env === "development") {
+      this.setupHotloadingInFolder(directory);
+    }
 
-    cb()
+    return cb();
+  }
 
-  initHelpers: (cb) ->
-    cb()
+  initHelpers(cb) {
+    return cb();
+  }
 
-  initModels: (cb) ->
-    directory = "#{Salad.root}/#{@options.modelPath}"
-    require("require-all")
-      dirname: directory
+  initModels(cb) {
+    const directory = `${Salad.root}/${this.options.modelPath}`;
+    require("require-all")({
+      dirname: directory,
       filter: /\.coffee$/
+    });
 
-    if Salad.env is "development"
-      @setupHotloadingInFolder directory
+    if (Salad.env === "development") {
+      this.setupHotloadingInFolder(directory);
+    }
 
-    cb()
+    return cb();
+  }
 
-  initTemplates: (callback) ->
-    # find all templates and save their content in a hash
-    files = []
-    @metadata().templates = {}
+  initTemplates(callback) {
+    // find all templates and save their content in a hash
+    const files = [];
+    this.metadata().templates = {};
 
-    dirname = [Salad.root, @options.templatePath].join(path.sep)
+    const dirname = [Salad.root, this.options.templatePath].join(path.sep);
 
-    unless fs.existsSync dirname
-      throw new Error "Templates folder does not exist! #{dirname}"
+    if (!fs.existsSync(dirname)) {
+      throw new Error(`Templates folder does not exist! ${dirname}`);
+    }
 
-    loadTemplateFile = (file, cb) =>
-      fs.readFile file, (err, content) =>
-        return cb err if err
+    const loadTemplateFile = (file, cb) => {
+      return fs.readFile(file, (err, content) => {
+        if (err) { return cb(err); }
 
-        file = path.normalize(file)
-        index = file
+        file = path.normalize(file);
+        const index = file
           .replace(path.normalize(dirname), "")
           .replace(/\\/g, "/")
-          .replace(/\/(server|shared)\//, "")
+          .replace(/\/(server|shared)\//, "");
 
-        @metadata().templates[index] = content.toString()
+        this.metadata().templates[index] = content.toString();
 
-        cb err, index
+        return cb(err, index);
+      });
+    };
 
-    async.series [
-      (cb) =>
-        finder = findit dirname
+    async.series([
+      cb => {
+        const finder = findit(dirname);
 
-        # we received a file
-        finder.on "file", (file, stat) =>
-          files.push file
+        // we received a file
+        finder.on("file", (file, stat) => {
+          return files.push(file);
+        });
 
-        # we received all files.
-        finder.on "end", cb
+        // we received all files.
+        return finder.on("end", cb);
+      },
 
-      (cb) =>
-        async.eachSeries files, loadTemplateFile, cb
-    ], (err) =>
-      return callback err
+      cb => {
+        return async.eachSeries(files, loadTemplateFile, cb);
+      }
+    ], err => {
+      return callback(err);
+    });
 
-    # watch for changes and automatically reload files
-    if Salad.env is "development"
-      gaze "#{dirname}/*/*/*.hbs", (err, watcher) =>
-        watcher.on "changed", (file) =>
-          loadTemplateFile file, (err, index) =>
-            content = @metadata().templates[index]
-            Salad.Template.Handlebars.registerPartial index, content
+    // watch for changes and automatically reload files
+    if (Salad.env === "development") {
+      return gaze(`${dirname}/*/*/*.hbs`, (err, watcher) => {
+        return watcher.on("changed", file => {
+          return loadTemplateFile(file, (err, index) => {
+            const content = this.metadata().templates[index];
+            Salad.Template.Handlebars.registerPartial(index, content);
 
-            App.Logger.info "Template #{index} reloaded"
+            return App.Logger.info(`Template ${index} reloaded`);
+          });
+        });
+      });
+    }
+  }
 
-  initDatabase: (cb) ->
-    dbConfig =
-      dialect: "postgres"
+  initDatabase(cb) {
+    let dbConfig = {
+      dialect: "postgres",
       logging: false
+    };
 
-    dbConfig = _.extend dbConfig, Salad.Config.database[Salad.env]
+    dbConfig = _.extend(dbConfig, Salad.Config.database[Salad.env]);
 
-    # don't pass secret information to the extraConfig object
-    extraConfig = _.omit dbConfig, "database", "username", "password"
-    extraConfig.logging = if dbConfig.logging then console.log else false
+    // don't pass secret information to the extraConfig object
+    const extraConfig = _.omit(dbConfig, "database", "username", "password");
+    extraConfig.logging = dbConfig.logging ? console.log : false;
 
-    App.sequelize = new Sequelize dbConfig.database, dbConfig.username, dbConfig.password,
-      extraConfig
+    App.sequelize = new Sequelize(dbConfig.database, dbConfig.username, dbConfig.password,
+      extraConfig);
 
-    cb()
+    return cb();
+  }
 
-  initExpress: (cb) ->
-    express = require "express"
-    @metadata().app = express()
+  initExpress(cb) {
+    const express = require("express");
+    this.metadata().app = express();
 
-    @metadata().app.use responseTime()
+    this.metadata().app.use(responseTime());
 
-    # put the static handler before the request logger because we don't want
-    # to show all assets. In production environments static assets are probably
-    # handled by nginx or something similar anyways
-    @metadata().app.use express.static("#{Salad.root}/public")
+    // put the static handler before the request logger because we don't want
+    // to show all assets. In production environments static assets are probably
+    // handled by nginx or something similar anyways
+    this.metadata().app.use(express.static(`${Salad.root}/public`));
 
-    if Salad.env is "development"
-      @metadata().app.use express.logger("dev")
+    if (Salad.env === "development") {
+      this.metadata().app.use(express.logger("dev"));
 
-    else if Salad.env is "production"
-      @metadata().app.use express.logger()
+    } else if (Salad.env === "production") {
+      this.metadata().app.use(express.logger());
+    }
 
-    @metadata().app.use cookieParser()
-    @metadata().app.use bodyParser.urlencoded(extended: false)
-    @metadata().app.use bodyParser.json()
-    @metadata().app.use methodOverride()
+    this.metadata().app.use(cookieParser());
+    this.metadata().app.use(bodyParser.urlencoded({extended: false}));
+    this.metadata().app.use(bodyParser.json());
+    this.metadata().app.use(methodOverride());
 
-    return cb()
+    return cb();
+  }
 
-  start: (callback) =>
-    async.series [
-      (cb) => @runTriggers "before:start", cb
-      (cb) =>
-        router = new Salad.Router
-        @metadata().app.all "*", router.dispatch
+  start(callback) {
+    return async.series([
+      cb => this.runTriggers("before:start", cb),
+      cb => {
+        const router = new Salad.Router;
+        this.metadata().app.all("*", router.dispatch);
 
-        @metadata().app.use (err, req, res, next) ->
-          console.error err.stack
+        this.metadata().app.use(function(err, req, res, next) {
+          console.error(err.stack);
 
-          if Salad.env is "production"
-            res.send 500, "Internal server error!"
-          else
-            res.type "text"
-            res.send 500, err.stack
+          if (Salad.env === "production") {
+            return res.send(500, "Internal server error!");
+          } else {
+            res.type("text");
+            return res.send(500, err.stack);
+          }
+        });
 
-        @metadata().expressServer = @metadata().app.listen @options.port
+        this.metadata().expressServer = this.metadata().app.listen(this.options.port);
 
-        console.log "Started salad. Environment: #{Salad.env}" if Salad.env isnt "test"
-        cb()
+        if (Salad.env !== "test") { console.log(`Started salad. Environment: ${Salad.env}`); }
+        return cb();
+      },
 
-      (cb) => @runTriggers "after:start", cb
-    ], (err) =>
-      callback.apply @ if callback
+      cb => this.runTriggers("after:start", cb)
+    ], err => {
+      if (callback) { return callback.apply(this); }
+    });
+  }
 
-  @destroy: (callback) ->
-    @instance().destroy callback
+  static destroy(callback) {
+    return this.instance().destroy(callback);
+  }
 
-  destroy: (callback) ->
-    async.series [
-      (cb) => @runTriggers "before:destroy", cb
-      (cb) =>
-        @metadata().expressServer.close cb
-        cb()
+  destroy(callback) {
+    return async.series([
+      cb => this.runTriggers("before:destroy", cb),
+      cb => {
+        this.metadata().expressServer.close(cb);
+        return cb();
+      },
 
-      (cb) => @runTriggers "after:destroy", cb
-    ], (err) =>
-      callback.apply @ if callback
+      cb => this.runTriggers("after:destroy", cb)
+    ], err => {
+      if (callback) { return callback.apply(this); }
+    });
+  }
+});
+Cls.initClass();

@@ -1,116 +1,159 @@
-module.exports =
-  InstanceMethods:
-    getAssociations: ->
-      _.clone @eagerlyLoadedAssociations
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS104: Avoid inline assignments
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  InstanceMethods: {
+    getAssociations() {
+      return _.clone(this.eagerlyLoadedAssociations);
+    },
 
-    hasAssociation: (key) ->
-      @constructor.hasAssociation key
+    hasAssociation(key) {
+      return this.constructor.hasAssociation(key);
+    },
 
-    getAssociation: (key) ->
-      @constructor.getAssociation key
+    getAssociation(key) {
+      return this.constructor.getAssociation(key);
+    },
 
-    getAssociationType: (key) ->
-      @constructor.getAssociationType key
+    getAssociationType(key) {
+      return this.constructor.getAssociationType(key);
+    },
 
-    setAssociation: (key, serializedModel) ->
-      unless serializedModel instanceof Array
-        serializedModel = [serializedModel]
+    setAssociation(key, serializedModel) {
+      if (!(serializedModel instanceof Array)) {
+        serializedModel = [serializedModel];
+      }
 
-      # Make sure that the serialized models are all resolved to model instances
-      models = serializedModel.map (model) =>
-        return model if model instanceof Salad.Model
-        return @getAssociation(key).build model
+      // Make sure that the serialized models are all resolved to model instances
+      const models = serializedModel.map(model => {
+        if (model instanceof Salad.Model) { return model; }
+        return this.getAssociation(key).build(model);
+      });
 
-      if @getAssociationType(key) is "hasMany"
-        @eagerlyLoadedAssociations[key] = models
+      if (this.getAssociationType(key) === "hasMany") {
+        return this.eagerlyLoadedAssociations[key] = models;
 
-      else
-        @eagerlyLoadedAssociations[key] = models[0]
+      } else {
+        return this.eagerlyLoadedAssociations[key] = models[0];
+      }
+    }
+  },
 
-  ClassMethods:
-    # register a hasMany association for this mdoel
-    # Usage
-    #   App.Parent.hasMany App.Children, as: "Children", foreignKey: "parentId"
-    hasMany: (targetModel, options) ->
-      # this is the method that we will create in this model
-      getterName = "get#{options.as}"
+  ClassMethods: {
+    // register a hasMany association for this mdoel
+    // Usage
+    //   App.Parent.hasMany App.Children, as: "Children", foreignKey: "parentId"
+    hasMany(targetModel, options) {
+      // this is the method that we will create in this model
+      const getterName = `get${options.as}`;
 
-      # this is the foreignKey field
-      foreignKey = options.foreignKey
+      // this is the foreignKey field
+      const { foreignKey } = options;
 
-      # register the association
-      @_registerAssociation options.as, targetModel,
-        isOwning: false
-        type: "hasMany"
-        foreignKey: foreignKey
+      // register the association
+      this._registerAssociation(options.as, targetModel, {
+        isOwning: false,
+        type: "hasMany",
+        foreignKey
+      }
+      );
 
-      # register the method in this model
-      # Don't bind to this context, because we want the method to be run in the
-      # context of the instance
-      @::[getterName] = ->
-        conditions = {}
-        conditions[foreignKey] = @get "id"
+      // register the method in this model
+      // Don't bind to this context, because we want the method to be run in the
+      // context of the instance
+      return this.prototype[getterName] = function() {
+        const conditions = {};
+        conditions[foreignKey] = this.get("id");
 
-        scope = targetModel.scope()
+        const scope = targetModel.scope();
 
-        scope.where(conditions)
+        return scope.where(conditions);
+      };
+    },
 
-    # register a reverse-association in this model
-    belongsTo: (targetModel, options) ->
-      # this is the method that we will create in this model
-      getterName = "get#{options.as}"
+    // register a reverse-association in this model
+    belongsTo(targetModel, options) {
+      // this is the method that we will create in this model
+      const getterName = `get${options.as}`;
 
-      foreignKey = options.foreignKey
+      const { foreignKey } = options;
 
-      # register the association
-      @_registerAssociation options.as, targetModel,
-        isOwning: true
-        type: "belongsTo"
-        isWeak: options.isWeak
-        foreignKey: foreignKey
+      // register the association
+      this._registerAssociation(options.as, targetModel, {
+        isOwning: true,
+        type: "belongsTo",
+        isWeak: options.isWeak,
+        foreignKey
+      }
+      );
 
-      @attribute foreignKey
+      this.attribute(foreignKey);
 
-      # register the method in this model.
-      # Don't bind to this context, because we want the method to be run in the
-      # context of the instance
-      @::[getterName] = ->
-        conditions =
-          id: @get foreignKey
+      // register the method in this model.
+      // Don't bind to this context, because we want the method to be run in the
+      // context of the instance
+      return this.prototype[getterName] = function() {
+        const conditions =
+          {id: this.get(foreignKey)};
 
-        scope = targetModel.scope()
+        const scope = targetModel.scope();
 
-        scope.where(conditions)
+        return scope.where(conditions);
+      };
+    },
 
-    # return the model class for the association key name
-    getAssociation: (key) ->
-      key = key[0].toLowerCase() + key.substr(1)
-      return @metadata().associations[key].model
+    // return the model class for the association key name
+    getAssociation(key) {
+      key = key[0].toLowerCase() + key.substr(1);
+      return this.metadata().associations[key].model;
+    },
 
-    getAssociationType: (key) ->
-      key = key[0].toLowerCase() + key.substr(1)
-      return @metadata().associations[key].type
+    getAssociationType(key) {
+      key = key[0].toLowerCase() + key.substr(1);
+      return this.metadata().associations[key].type;
+    },
 
-    getForeignKeys: ->
-      foreignKeys = (elm.foreignKey for key, elm of @metadata().associations)
-      foreignKeys = _.uniq(foreignKeys)
+    getForeignKeys() {
+      let foreignKeys = ((() => {
+        const result = [];
+        const object = this.metadata().associations;
+        for (let key in object) {
+          const elm = object[key];
+          result.push(elm.foreignKey);
+        }
+        return result;
+      })());
+      foreignKeys = _.uniq(foreignKeys);
 
-      return foreignKeys
+      return foreignKeys;
+    },
 
-    hasAssociation: (key) ->
-      key = key[0].toLowerCase() + key.substr(1)
-      return @metadata().associations[key] isnt undefined
+    hasAssociation(key) {
+      key = key[0].toLowerCase() + key.substr(1);
+      return this.metadata().associations[key] !== undefined;
+    },
 
-    _registerAssociation: (as, model, options = {}) ->
-      key = as[0].toLowerCase() + as.substr(1)
+    _registerAssociation(as, model, options) {
+      let base;
+      if (options == null) { options = {}; }
+      const key = as[0].toLowerCase() + as.substr(1);
 
-      @metadata().associations or= {}
-      @metadata().associations[key] =
-        as: as
-        model: model
-        isOwning: options.isOwning
-        type: options.type
-        isWeak: options.isWeak
+      if (!(base = this.metadata()).associations) { base.associations = {}; }
+      this.metadata().associations[key] = {
+        as,
+        model,
+        isOwning: options.isOwning,
+        type: options.type,
+        isWeak: options.isWeak,
         foreignKey: options.foreignKey
+      };
 
-      return true
+      return true;
+    }
+  }
+};

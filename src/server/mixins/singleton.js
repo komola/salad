@@ -1,7 +1,14 @@
-module.exports =
-  _instance: null
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  _instance: null,
 
-  instance: ->
-    @_instance = new @ unless @_instance
+  instance() {
+    if (!this._instance) { this._instance = new (this); }
 
-    @_instance
+    return this._instance;
+  }
+};

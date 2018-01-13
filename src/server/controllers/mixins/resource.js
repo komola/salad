@@ -1,119 +1,155 @@
-module.exports =
-  ClassMethods:
-    resource: (options) ->
-      @resourceOptions or= {}
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  ClassMethods: {
+    resource(options) {
+      if (!this.resourceOptions) { this.resourceOptions = {}; }
 
-      unless options
-        throw new Error "@resource() can not be called without options!"
+      if (!options) {
+        throw new Error("@resource() can not be called without options!");
+      }
 
-      if typeof(options) is "string"
+      if (typeof(options) === "string") {
         options =
-          name: options
+          {name: options};
+      }
 
-      klass = _.capitalize options.name
+      const klass = _.capitalize(options.name);
 
-      defaultOptions =
-        name: options.name
-        resourceClass: klass
-        collectionName: _.pluralize options.name
+      const defaultOptions = {
+        name: options.name,
+        resourceClass: klass,
+        collectionName: _.pluralize(options.name),
         idParameter: options.name+"Id"
+      };
 
-      options = _.extend defaultOptions, options
+      options = _.extend(defaultOptions, options);
 
-      @resourceOptions = options
+      return this.resourceOptions = options;
+    },
 
-    belongsTo: (options) ->
-      @parentResourceOptions or= []
+    belongsTo(options) {
+      if (!this.parentResourceOptions) { this.parentResourceOptions = []; }
 
-      unless options
-        unless @parentResourceOptions.resourceClass
-          throw new Error "No resource registered!"
+      if (!options) {
+        if (!this.parentResourceOptions.resourceClass) {
+          throw new Error("No resource registered!");
+        }
 
-        return App[@parentResourceOptions.resourceClass]
+        return App[this.parentResourceOptions.resourceClass];
+      }
 
-      if typeof(options) is "string"
+      if (typeof(options) === "string") {
         options =
-          name: options
+          {name: options};
+      }
 
-      klass = _.capitalize options.name
+      const klass = _.capitalize(options.name);
 
-      defaultOptions =
-        name: options.name
-        resourceClass: klass
+      const defaultOptions = {
+        name: options.name,
+        resourceClass: klass,
         idParameter: options.name+"Id"
+      };
 
-      options = _.extend defaultOptions, options
+      options = _.extend(defaultOptions, options);
 
-      @parentResourceOptions.push options
+      return this.parentResourceOptions.push(options);
+    }
+  },
 
 
-  InstanceMethods:
-    findParentRelation: ->
-      belongsTo = @constructor.parentResourceOptions
-      params = @params
+  InstanceMethods: {
+    findParentRelation() {
+      const belongsTo = this.constructor.parentResourceOptions;
+      const { params } = this;
 
-      unless belongsTo?.length > 0
-        return null
+      if (!((belongsTo != null ? belongsTo.length : undefined) > 0)) {
+        return null;
+      }
 
-      for relation in belongsTo
-        if params.hasOwnProperty relation.idParameter
-          return relation
+      for (let relation of Array.from(belongsTo)) {
+        if (params.hasOwnProperty(relation.idParameter)) {
+          return relation;
+        }
+      }
 
-      return null
+      return null;
+    },
 
-    parentResource: ->
-      relation = @findParentRelation()
+    parentResource() {
+      const relation = this.findParentRelation();
 
-      unless relation
-        return false
+      if (!relation) {
+        return false;
+      }
 
-      App[relation.resourceClass]
+      return App[relation.resourceClass];
+    },
 
-    findParent: (callback) ->
-      parent = @parentResource()
-      relation = @findParentRelation()
+    findParent(callback) {
+      const parent = this.parentResource();
+      const relation = this.findParentRelation();
 
-      unless parent
-        return callback.call @, null, false if callback
-        return false
+      if (!parent) {
+        if (callback) { return callback.call(this, null, false); }
+        return false;
+      }
 
-      parent.find @params[relation.idParameter], (err, parent) =>
-        @parent = parent
-        return callback.call @, err, parent if callback
+      parent.find(this.params[relation.idParameter], (err, parent) => {
+        this.parent = parent;
+        if (callback) { return callback.call(this, err, parent); }
+      });
 
-      false
+      return false;
+    },
 
-    resourceClass: ->
-      unless @resourceOptions?.resourceClass
-        throw new Error "No resource registered!"
+    resourceClass() {
+      if (!(this.resourceOptions != null ? this.resourceOptions.resourceClass : undefined)) {
+        throw new Error("No resource registered!");
+      }
 
-      return App[@resourceOptions.resourceClass]
+      return App[this.resourceOptions.resourceClass];
+    },
 
-    findResource: (callback) ->
-      paramKey = @resourceOptions.idParameter
-      @scoped (err, scope) =>
-        scope.find @params[paramKey], (err, resource) =>
-          if err
-            return callback.apply @, [error]
+    findResource(callback) {
+      const paramKey = this.resourceOptions.idParameter;
+      return this.scoped((err, scope) => {
+        return scope.find(this.params[paramKey], (err, resource) => {
+          if (err) {
+            return callback.apply(this, [error]);
+          }
 
-          callback.apply @, [null, resource]
+          return callback.apply(this, [null, resource]);
+      });
+    });
+    },
 
-    scoped: (callback) ->
-      @findParent (err, parent) =>
-        if parent
-          collectionGetter = "get#{_.capitalize(@resourceOptions.collectionName)}"
-          scope = parent[collectionGetter]()
+    scoped(callback) {
+      return this.findParent((err, parent) => {
+        let scope;
+        if (parent) {
+          const collectionGetter = `get${_.capitalize(this.resourceOptions.collectionName)}`;
+          scope = parent[collectionGetter]();
 
-        else
-          scope = @resourceClass()
+        } else {
+          scope = this.resourceClass();
+        }
 
-        conditions = @buildConditionsFromParameters @params
+        const conditions = this.buildConditionsFromParameters(this.params);
 
-        scope = @applyConditionsToScope scope, conditions
+        scope = this.applyConditionsToScope(scope, conditions);
 
-        callback.call @, null, scope
+        return callback.call(this, null, scope);
+      });
+    },
 
-    ###
+    /*
       This builds conditions by URL params. Possible condtions are:
         Where:
           Equality:
@@ -126,132 +162,170 @@ module.exports =
           ?sort=createdAt,-title
 
           This would sort ascending by createdAt and descending by title. Ascending is assumed by default
-    ###
-    buildConditionsFromParameters: (parameters) ->
-      # Some parameter names are reserved and have a special meaning
-      reservedParams = ["sort","include","includes","limit","offset","method","controller","action","format"]
+    */
+    buildConditionsFromParameters(parameters) {
+      // Some parameter names are reserved and have a special meaning
+      const reservedParams = ["sort","include","includes","limit","offset","method","controller","action","format"];
 
-      # only accept parameters that represent an attribute for where conditions
-      allowedWhereAttributes = _.keys(App[@resourceOptions.resourceClass].metadata().attributes)
+      // only accept parameters that represent an attribute for where conditions
+      const allowedWhereAttributes = _.keys(App[this.resourceOptions.resourceClass].metadata().attributes);
 
-      conditions = {}
+      let conditions = {};
 
-      for key,value of parameters
-        # check if the parameter name needs special handling
-        value = decodeURIComponent(value)
+      for (let key in parameters) {
+        // check if the parameter name needs special handling
+        let value = parameters[key];
+        value = decodeURIComponent(value);
 
-        if key in reservedParams
-          if key is "sort"
-            conditions = @_buildSortConditions value, conditions
+        if (Array.from(reservedParams).includes(key)) {
+          if (key === "sort") {
+            conditions = this._buildSortConditions(value, conditions);
+          }
 
-          if key is "limit" or key is "offset"
-            # limit and offset are simple params
-            conditions[key] = value
+          if ((key === "limit") || (key === "offset")) {
+            // limit and offset are simple params
+            conditions[key] = value;
+          }
 
-          if key is "includes"
-            conditions = @_buildIncludesConditions value, conditions
+          if (key === "includes") {
+            conditions = this._buildIncludesConditions(value, conditions);
+          }
 
-          continue
+          continue;
+        }
 
-        if key not in allowedWhereAttributes
-          continue
-        # all other parameter names are treated as where conditions
-        conditions = @_buildFilterConditions key, value, conditions
+        if (!Array.from(allowedWhereAttributes).includes(key)) {
+          continue;
+        }
+        // all other parameter names are treated as where conditions
+        conditions = this._buildFilterConditions(key, value, conditions);
+      }
 
-      conditions
+      return conditions;
+    },
 
-    _buildSortConditions: (paramValue, conditions) ->
-      # sorting supports multiple attributes to sort by
-      sortParams = paramValue.split(",")
+    _buildSortConditions(paramValue, conditions) {
+      // sorting supports multiple attributes to sort by
+      const sortParams = paramValue.split(",");
 
-      for value in sortParams
-        firstChar = value[0]
-        # we sort ascending by default
-        # a minus in front of the attribute sorts descending
-        if firstChar isnt "-"
-          conditions.asc or= []
-          conditions.asc.push value
-        else if firstChar is "-"
-          conditions.desc or= []
-          conditions.desc.push value[1..-1]
-      conditions
+      for (let value of Array.from(sortParams)) {
+        const firstChar = value[0];
+        // we sort ascending by default
+        // a minus in front of the attribute sorts descending
+        if (firstChar !== "-") {
+          if (!conditions.asc) { conditions.asc = []; }
+          conditions.asc.push(value);
+        } else if (firstChar === "-") {
+          if (!conditions.desc) { conditions.desc = []; }
+          conditions.desc.push(value.slice(1));
+        }
+      }
+      return conditions;
+    },
 
-    _buildIncludesConditions: (paramValue, conditions) ->
-      # includes can contain multiple classes
+    _buildIncludesConditions(paramValue, conditions) {
+      // includes can contain multiple classes
 
-      includeParams = paramValue.split(",")
-      for value in includeParams
-        conditions.includes or= []
-        conditions.includes.push value
+      const includeParams = paramValue.split(",");
+      for (let value of Array.from(includeParams)) {
+        if (!conditions.includes) { conditions.includes = []; }
+        conditions.includes.push(value);
+      }
 
-      conditions
+      return conditions;
+    },
 
-    _buildFilterConditions: (key, value, conditions) ->
-      conditions.where or= {}
-      conditions.contains or= []
-      firstChar = value[0]
-      checksForEquality = firstChar not in [">", "<", ":"]
-      if not checksForEquality
-        if firstChar is ":"
-          holder = {}
-          holder[key] or= []
-          filterParams = value[1..-1].split(",")
-          for param in filterParams
-            holder[key].push param
-          conditions.contains.push holder
-        else
-          if firstChar is ">"
-            # we search values which are greater as the specified value
-            bindingElm = "gt"
-          else if firstChar is "<"
-            bindingElm = "lt"
+    _buildFilterConditions(key, value, conditions) {
+      if (!conditions.where) { conditions.where = {}; }
+      if (!conditions.contains) { conditions.contains = []; }
+      const firstChar = value[0];
+      const checksForEquality = ![">", "<", ":"].includes(firstChar);
+      if (!checksForEquality) {
+        if (firstChar === ":") {
+          const holder = {};
+          if (!holder[key]) { holder[key] = []; }
+          const filterParams = value.slice(1).split(",");
+          for (let param of Array.from(filterParams)) {
+            holder[key].push(param);
+          }
+          conditions.contains.push(holder);
+        } else {
+          let bindingElm;
+          if (firstChar === ">") {
+            // we search values which are greater as the specified value
+            bindingElm = "gt";
+          } else if (firstChar === "<") {
+            bindingElm = "lt";
+          }
 
-          conditions.where[key] = {}
-          conditions.where[key][bindingElm] = value[1..-1]
-      else
-        conditions.where[key] = value
+          conditions.where[key] = {};
+          conditions.where[key][bindingElm] = value.slice(1);
+        }
+      } else {
+        conditions.where[key] = value;
+      }
 
-      for key, val of conditions when _.isEmpty val
-        delete conditions[key]
+      for (key in conditions) {
+        const val = conditions[key];
+        if (_.isEmpty(val)) {
+          delete conditions[key];
+        }
+      }
 
-      conditions
+      return conditions;
+    },
 
-    applyConditionsToScope: (scope, conditions) ->
-      # some conditions do not need special handling
-      simpleKeys = ["limit","offset","where"]
+    applyConditionsToScope(scope, conditions) {
+      // some conditions do not need special handling
+      const simpleKeys = ["limit","offset","where"];
 
-      for key,value of conditions
-        # iterate by key over the conditions object
-        if key not in simpleKeys
-          # includes, asc and desc need special handling
-          # includes takes an array as parameter
-          includesClassArray = []
+      for (let key in conditions) {
+        // iterate by key over the conditions object
+        let value = conditions[key];
+        if (!Array.from(simpleKeys).includes(key)) {
+          // includes, asc and desc need special handling
+          // includes takes an array as parameter
+          const includesClassArray = [];
 
-          for value in conditions[key]
-            if key is "includes"
-              # the param is a string, from which we need to construct the class name
-              associations = App[@resourceOptions.resourceClass].metadata().associations
-              theClass = associations[value]?.model
-              if theClass
-                includesClassArray.push theClass
-              scope = scope.includes includesClassArray
+          for (value of Array.from(conditions[key])) {
+            if (key === "includes") {
+              // the param is a string, from which we need to construct the class name
+              const { associations } = App[this.resourceOptions.resourceClass].metadata();
+              const theClass = associations[value] != null ? associations[value].model : undefined;
+              if (theClass) {
+                includesClassArray.push(theClass);
+              }
+              scope = scope.includes(includesClassArray);
+            }
 
-            if key is "asc"
-              scope = scope.asc value
+            if (key === "asc") {
+              scope = scope.asc(value);
+            }
 
-            if key is "desc"
-              scope = scope.desc value
+            if (key === "desc") {
+              scope = scope.desc(value);
+            }
 
-            if key is "contains"
-              for containKey,paramArray of value
-                for param in paramArray
-                  scope = scope.contains containKey, param
+            if (key === "contains") {
+              for (let containKey in value) {
+                const paramArray = value[containKey];
+                for (let param of Array.from(paramArray)) {
+                  scope = scope.contains(containKey, param);
+                }
+              }
+            }
+          }
 
 
 
-        else
-          # apply calls the method key on the object scope with the values given in the array
-          scope = scope[key].apply(scope,[value])
+        } else {
+          // apply calls the method key on the object scope with the values given in the array
+          scope = scope[key].apply(scope,[value]);
+        }
+      }
 
-      # return the scope, so it can be used
-      scope
+      // return the scope, so it can be used
+      return scope;
+    }
+  }
+};

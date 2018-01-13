@@ -1,5 +1,39 @@
-class Salad.Template
-  ###
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const Cls = (Salad.Template = class Template {
+  static initClass() {
+  
+    // transform class representations of models to JSON data
+    // otherwise handlebars can't handle them
+    this.serialize = elm => {
+      // if elm has a toJSON method it's easy
+      if (elm != null ? elm.toJSON : undefined) {
+        return elm.toJSON();
+      }
+  
+      // call serialize on the array
+      if (_.isArray(elm)) {
+        elm = elm.map(this.serialize);
+        return elm;
+      }
+  
+      // call serialize on all properties of the object
+      if (_.isObject(elm)) {
+        for (let key in elm) {
+          const val = elm[key];
+          elm[key] = this.serialize(val);
+        }
+      }
+  
+      return elm;
+    };
+  }
+  /*
   Render a template
 
   Mostly used in Salads Controllers and Mailers.
@@ -7,46 +41,32 @@ class Salad.Template
   Usage:
     Salad.Template.render "user/show", user: userModel
 
-    # with layout:
+    * with layout:
     Salad.Template.render "user/show", user: userModel, layout: "application"
-  ###
-  @render: (file, options) ->
-    defaultOptions =
-      env: Salad.env
+  */
+  static render(file, options) {
+    const defaultOptions =
+      {env: Salad.env};
 
-    options = _.extend defaultOptions, options
+    options = _.extend(defaultOptions, options);
 
-    options = @serialize options
+    options = this.serialize(options);
 
-    content = @_render file, options
+    let content = this._render(file, options);
 
-    if options.layout
-      layoutOptions = _.extend options, content: content
+    if (options.layout) {
+      const layoutOptions = _.extend(options, {content});
 
-      content = @_render "layouts/#{options.layout}", layoutOptions
+      content = this._render(`layouts/${options.layout}`, layoutOptions);
+    }
 
-    content
+    return content;
+  }
 
-  @_render: (file, options) ->
-    Salad.Template.Handlebars.render file, options
+  static _render(file, options) {
+    return Salad.Template.Handlebars.render(file, options);
+  }
+});
+Cls.initClass();
 
-  # transform class representations of models to JSON data
-  # otherwise handlebars can't handle them
-  @serialize: (elm) =>
-    # if elm has a toJSON method it's easy
-    if elm?.toJSON
-      return elm.toJSON()
-
-    # call serialize on the array
-    if _.isArray elm
-      elm = elm.map @serialize
-      return elm
-
-    # call serialize on all properties of the object
-    if _.isObject elm
-      for key, val of elm
-        elm[key] = @serialize val
-
-    elm
-
-require "./templates/handlebars"
+require("./templates/handlebars");

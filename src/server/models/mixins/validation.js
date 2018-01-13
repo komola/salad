@@ -1,21 +1,30 @@
-module.exports =
-  InstanceMethods:
-    validate: (done) ->
-      result = @isValid @getAttributes()
-      error = null
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+module.exports = {
+  InstanceMethods: {
+    validate(done) {
+      const result = this.isValid(this.getAttributes());
+      let error = null;
 
-      if result isnt true
-        error = new Error "ValidationError"
-        error.isValid = false
-        error.errors = result
+      if (result !== true) {
+        error = new Error("ValidationError");
+        error.isValid = false;
+        error.errors = result;
+      }
 
-      done error
+      return done(error);
+    },
 
-    # Check if the passed attributes are valid
-    #
-    # This method should return true if the data is valid.
-    #
-    # Otherwise it should return an object containing detailed errors
-    # for each field.
-    isValid: (attributes) -> true
+    // Check if the passed attributes are valid
+    //
+    // This method should return true if the data is valid.
+    //
+    // Otherwise it should return an object containing detailed errors
+    // for each field.
+    isValid(attributes) { return true; }
+  }
+};
 
