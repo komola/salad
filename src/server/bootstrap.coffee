@@ -5,7 +5,6 @@ findit = require "findit2"
 fs = require "fs"
 gaze = require "gaze"
 path = require "path"
-# require "longjohn"
 
 class Salad.Bootstrap extends Salad.Base
   @extend require "./mixins/singleton"

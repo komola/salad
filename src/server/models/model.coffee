@@ -71,6 +71,7 @@ class Salad.Model extends Salad.Base
     @setAttributes attributes
 
     @save callback
+    return null
 
   save: (callback) =>
     resource = null
@@ -103,6 +104,8 @@ class Salad.Model extends Salad.Base
       (err) =>
         if callback
           callback err, resource
+
+    return null
 
   ###
   Helper function that is called when calling save.
@@ -138,6 +141,7 @@ class Salad.Model extends Salad.Base
         return cb error
 
     async.eachSeries _.keys(associations), checkForeignKey, callback
+    return null
 
   ###
   Increment the field or fields of a model
@@ -174,6 +178,8 @@ class Salad.Model extends Salad.Base
 
       callback err, model
 
+    return null
+
   ###
   Decrement the field of a model.
 
@@ -196,9 +202,11 @@ class Salad.Model extends Salad.Base
         @set key, model.get(key)
 
       callback err, model
+    return null
 
   destroy: (callback) ->
     @daoInstance.destroy @, callback
+    return null
 
   ## Misc stuff #########################################
   toJSON: ->

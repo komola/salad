@@ -172,6 +172,7 @@ class Salad.Scope
       options.order = []
 
     @daoContext.count options, callback
+    return null
 
   all: (callback) ->
     options = @data
@@ -180,6 +181,7 @@ class Salad.Scope
       return callback null, []
 
     @daoContext.findAll options, callback
+    return null
 
   first: (callback) ->
     options = @data
@@ -191,8 +193,11 @@ class Salad.Scope
 
       return callback err, resources
 
+    return null
+
   find: (id, callback) ->
     @where(id: id).first callback
+    return null
 
   findAndCountAll: (callback) ->
 
@@ -203,12 +208,14 @@ class Salad.Scope
           rows: resources
 
         callback err, result
+    return null
 
   # create object
   create: (data, callback) ->
     attributes = _.extend @data.conditions, data
 
     @context.create attributes, callback
+    return null
 
   # build an instance
   build: (data) ->
@@ -220,6 +227,7 @@ class Salad.Scope
     options = @data
 
     @daoContext.destroy options, callback
+    return null
 
   # remove associations
   remove: (model, callback) ->
@@ -228,3 +236,4 @@ class Salad.Scope
     model.set key, null for key in keys
 
     model.save callback
+    return null

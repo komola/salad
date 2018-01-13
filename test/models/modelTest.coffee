@@ -129,7 +129,7 @@ describe "Salad.Model", ->
             done()
 
       it "only saves the changed values", (done) ->
-        App.Location.first (err, res1) =>
+        value = App.Location.first (err, res1) =>
           App.Location.first (err, res2) =>
             async.series [
               (cb) =>
@@ -272,7 +272,6 @@ describe "Salad.Model", ->
             done()
 
 
-
       it "should not run into concurrency issues", (done) ->
         async.parallel [
           (cb) => model.increment "counter", 1, cb
@@ -335,7 +334,6 @@ describe "Salad.Model", ->
         location.set "title", "Foo"
 
         location.get("title").should.equal "Foo"
-        return null
 
     describe "#get", ->
       it "returns an attribute", ->
@@ -589,25 +587,25 @@ describe "Salad.Model", ->
           done()
 
       it "returns undefined on #first", (done) ->
-          App.Location.nil().first (err, res) ->
-            assert.isUndefined res
-            done()
+        App.Location.nil().first (err, res) ->
+          assert.isUndefined res
+          done()
 
       it "returns empty array on #all", (done) ->
-          App.Location.nil().all (err, res) ->
-            res.length.should.equal 0
+        App.Location.nil().all (err, res) ->
+          res.length.should.equal 0
 
-            App.Location.all (err, res) ->
-              res.length.should.equal 1
-              done()
+          App.Location.all (err, res) ->
+            res.length.should.equal 1
+            done()
 
       it "returns undefined on #find", (done) ->
-          App.Location.nil().find 1, (err, res) ->
-            assert.isUndefined res
+        App.Location.nil().find 1, (err, res) ->
+          assert.isUndefined res
 
-            App.Location.find 1, (err, res) ->
-              assert.ok res
-              done()
+          App.Location.find 1, (err, res) ->
+            assert.ok res
+            done()
 
     describe "#remove", ->
       it "removes the association but does not delete the object", (done) ->

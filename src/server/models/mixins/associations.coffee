@@ -93,7 +93,7 @@ module.exports =
 
     getForeignKeys: ->
       foreignKeys = (elm.foreignKey for key, elm of @metadata().associations)
-      foreignKeys = _.unique foreignKeys
+      foreignKeys = _.uniq(foreignKeys)
 
       return foreignKeys
 
