@@ -9,6 +9,7 @@ responseTime = require("response-time")
 cookieParser = require("cookie-parser")
 bodyParser = require("body-parser")
 methodOverride = require("method-override")
+morgan = require("morgan")
 
 class Salad.Bootstrap extends Salad.Base
   @extend require "./mixins/singleton"
@@ -312,10 +313,10 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().app.use express.static("#{Salad.root}/public")
 
     if Salad.env is "development"
-      @metadata().app.use express.logger("dev")
+      @metadata().app.use morgan("dev")
 
     else if Salad.env is "production"
-      @metadata().app.use express.logger()
+      @metadata().app.use morgan("combined")
 
     @metadata().app.use cookieParser()
     @metadata().app.use bodyParser.urlencoded(extended: false)
