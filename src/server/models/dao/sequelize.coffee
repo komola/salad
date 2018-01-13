@@ -119,13 +119,6 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
 
       options = {}
 
-      # when no conditions are supplied we have to delete *every* object.
-      # Sequelize does not seem to allow this, since it creates a faulty SQL
-      # statement when passing {} as conditions.
-      # so we add a where statement that matches every row
-      if _.keys(model.conditions).length is 0
-        model.conditions = "true = true"
-
       if App.transaction
         options.transaction = App.transaction
 
@@ -274,19 +267,12 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if options.contains.length > 0
       tableName = @modelClass.daoInstance.daoModelInstance.name
 
-      attribs = ("'#{contains.value}' = ANY(\"#{tableName}\".\"#{contains.field}\")" for contains in options.contains)
+      params.where or= {}
 
-      if params.where
-        for key, val of params.where
-          queryGenerator = @daoModelInstance.daoFactoryManager.sequelize.queryInterface.QueryGenerator
-          # quote column
-          key = queryGenerator.quoteIdentifier key
-          # make sure to escape the value
-          val = queryGenerator.escape val
-
-          attribs.push "#{key} = #{val}"
-
-      params.where = attribs.join " AND "
+      for contains in options.contains
+        params.where[contains.field] = {
+          "$contains": [contains.value]
+        }
 
     if params.limit is -1
       delete params.limit
