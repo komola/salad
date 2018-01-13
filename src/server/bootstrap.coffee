@@ -5,6 +5,10 @@ findit = require "findit2"
 fs = require "fs"
 gaze = require "gaze"
 path = require "path"
+responseTime = require("response-time")
+cookieParser = require("cookie-parser")
+bodyParser = require("body-parser")
+methodOverride = require("method-override")
 
 class Salad.Bootstrap extends Salad.Base
   @extend require "./mixins/singleton"
@@ -300,7 +304,7 @@ class Salad.Bootstrap extends Salad.Base
     express = require "express"
     @metadata().app = express()
 
-    @metadata().app.use express.responseTime()
+    @metadata().app.use responseTime()
 
     # put the static handler before the request logger because we don't want
     # to show all assets. In production environments static assets are probably
@@ -313,9 +317,10 @@ class Salad.Bootstrap extends Salad.Base
     else if Salad.env is "production"
       @metadata().app.use express.logger()
 
-    @metadata().app.use express.cookieParser()
-    @metadata().app.use express.bodyParser()
-    @metadata().app.use express.methodOverride()
+    @metadata().app.use cookieParser()
+    @metadata().app.use bodyParser.urlencoded(extended: false)
+    @metadata().app.use bodyParser.json()
+    @metadata().app.use methodOverride()
 
     return cb()
 
