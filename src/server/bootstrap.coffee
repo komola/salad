@@ -86,7 +86,7 @@ class Salad.Bootstrap extends Salad.Base
       timestamp: true
       level: "error"
 
-    App.Logger = @metadata().logger
+    App.Logger = {}
 
     App.Logger.log = =>
       for key, val of arguments
