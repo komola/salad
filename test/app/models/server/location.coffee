@@ -4,7 +4,8 @@ attributes =
   messages: Sequelize.INTEGER
   parentId:
     type: Sequelize.INTEGER
-    references: "locations"
+    references: 
+      model: "locations"
     onDelete: "restrict"
     onUpdate: "cascade"
 
