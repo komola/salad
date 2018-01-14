@@ -39,7 +39,11 @@ describe "App.RestfulController", ->
             res.redirects.length.should.equal 1
             res.text.should.equal "1"
 
-            done()
+            App.Todo.first (err, todo) =>
+              assert.ok todo.get("title")
+              todo.get("title").should.equal "test"
+
+              done()
 
         return null
 
@@ -50,8 +54,12 @@ describe "App.RestfulController", ->
             .send(todo: { title: "A"})
             .end (err, res) ->
               res.redirects.length.should.equal 1
+              App.Todo.first (err, todo) =>
+                assert.ok todo.get("title")
+                todo.get("title").should.equal "A"
 
-              done()
+                done()
+
         return null
 
       it "accepts form data", (done) ->
@@ -60,8 +68,11 @@ describe "App.RestfulController", ->
             .send("todo[title]=A")
             .end (err, res) ->
               res.redirects.length.should.equal 1
+              App.Todo.first (err, todo) =>
+                assert.ok todo.get("title")
+                todo.get("title").should.equal "A"
 
-              done()
+                done()
 
           return null
 

@@ -2,11 +2,13 @@ handlebars = require "handlebars"
 
 class Salad.Template.Handlebars
   registeredPartials: false
+  registeredHelpers: false
 
   # render a template, passing the options to the template and returning an
   # html string
   @render: (template, options) ->
     @_registerPartials()
+    @_registerHelpers()
 
     template = @compile template
     renderedTemplate = template options
@@ -45,3 +47,14 @@ class Salad.Template.Handlebars
 
     for file, content of Salad.Bootstrap.metadata().templates
       @registerPartial file, content
+
+  @_registerHelpers: ->
+    return if @registeredHelpers
+
+    @registeredHelpers = true
+
+    unless App?.Helpers?.Handlebars
+      return
+
+    for name, method of App.Helpers.Handlebars
+      handlebars.registerHelper name, method

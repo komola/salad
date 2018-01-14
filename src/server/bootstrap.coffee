@@ -326,7 +326,7 @@ class Salad.Bootstrap extends Salad.Base
       @metadata().app.use morgan("combined")
 
     @metadata().app.use cookieParser()
-    @metadata().app.use bodyParser.urlencoded(extended: false)
+    @metadata().app.use bodyParser.urlencoded(extended: true)
     @metadata().app.use bodyParser.json()
     @metadata().app.use methodOverride()
 
