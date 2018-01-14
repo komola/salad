@@ -84,11 +84,18 @@ class Salad.Bootstrap extends Salad.Base
       prettyPrint: true
       colorize: true
       timestamp: true
-      level: "error"
+      level: "info"
 
-    App.Logger = _.clone @metadata().logger
+    App.Logger = {}
 
-    App.Logger.log = =>
+    App.Logger.debug = =>
+      for key, val of arguments
+        if val instanceof Salad.Model
+          arguments[key] = val.inspect()
+
+      @metadata().logger.debug.apply @, arguments
+
+    App.Logger.log = App.Logger.info = =>
       for key, val of arguments
         if val instanceof Salad.Model
           arguments[key] = val.inspect()
