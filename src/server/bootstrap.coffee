@@ -3,13 +3,13 @@ global.async = require "async"
 winston = require "winston"
 findit = require "findit2"
 fs = require "fs"
-gaze = require "gaze"
 path = require "path"
 responseTime = require("response-time")
 cookieParser = require("cookie-parser")
 bodyParser = require("body-parser")
 methodOverride = require("method-override")
 morgan = require("morgan")
+chokidar = require "chokidar"
 
 class Salad.Bootstrap extends Salad.Base
   @extend require "./mixins/singleton"
@@ -208,13 +208,8 @@ class Salad.Bootstrap extends Salad.Base
       "#{folder}/**/*.js"
     ]
 
-    options =
-      interval: 5007
-
-    gaze paths, options, (err, watcher) =>
-      watcher.on "changed", applyReload
-      watcher.on "added", applyReload
-
+    watcher = chokidar.watch paths
+    watcher.on "change", applyReload
 
   initControllers: (cb) ->
     directory = "#{Salad.root}/#{@options.controllerPath}"
@@ -305,8 +300,8 @@ class Salad.Bootstrap extends Salad.Base
       options =
         interval: 5007
 
-      gaze "#{dirname}/*/*/*.hbs", options, (err, watcher) =>
-        watcher.on "changed", reloadTemplate
+      watcher = chokidar.watch "#{dirname}/*/*/*.hbs"
+      watcher.on "change", reloadTemplate
 
   initDatabase: (cb) ->
     dbConfig =
