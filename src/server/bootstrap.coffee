@@ -134,75 +134,86 @@ class Salad.Bootstrap extends Salad.Base
 
     options or= {}
 
-    gaze ["#{folder}/**/*.coffee", "#{folder}/**/*.js"], (err, watcher) =>
-      watcher.on "changed", (file) =>
-        if options.exclude and file.indexOf(options.exclude) isnt -1
-          return
+    applyReload = (file) =>
+      if options.exclude and file.indexOf(options.exclude) isnt -1
+        return
 
-        console.log "File changed!", file
+      console.log "File changed!", file
 
-        # reload file. Map this in a try block because we are messing with
-        # the global App variable
-        try
-          # save current global App state in temporary variable
-          oldApp = global.App
-          global.App = {}
+      # reload file. Map this in a try block because we are messing with
+      # the global App variable
+      try
+        # save current global App state in temporary variable
+        oldApp = global.App
+        global.App = {}
 
-          delete require.cache[require.resolve(file)]
-          require file
+        delete require.cache[require.resolve(file)]
+        require file
 
-          # detect which classes where changed. By requiring the file, it gets
-          # a new entry in App and we can find out which class was changed
-          changedClasses =  _.keys global.App
+        # detect which classes where changed. By requiring the file, it gets
+        # a new entry in App and we can find out which class was changed
+        changedClasses =  _.keys global.App
 
-          # Iterate over all changed classes and detect if a method was deleted.
-          for newClassName in changedClasses
-            oldClass = oldApp[newClassName]
-            newClass = global.App[newClassName]
+        # Iterate over all changed classes and detect if a method was deleted.
+        for newClassName in changedClasses
+          oldClass = oldApp[newClassName]
+          newClass = global.App[newClassName]
 
-            oldMethods = _.keys oldClass.prototype
-            newMethods = _.keys newClass.prototype
+          oldMethods = _.keys oldClass.prototype
+          newMethods = _.keys newClass.prototype
 
-            # If this is the case, delete the method from the existing instances
-            for currentMethod in oldMethods when currentMethod not in newMethods
-              # console.log "Deleting instance method #{currentMethod}"
-              delete oldClass::[currentMethod]
+          # If this is the case, delete the method from the existing instances
+          for currentMethod in oldMethods when currentMethod not in newMethods
+            # console.log "Deleting instance method #{currentMethod}"
+            delete oldClass::[currentMethod]
 
-            oldMethods = _.keys oldClass
-            newMethods = _.keys newClass
+          oldMethods = _.keys oldClass
+          newMethods = _.keys newClass
 
-            # Do the same with static methods
-            for currentMethod in oldMethods when currentMethod not in newMethods
-              # console.log "Deleting static method #{currentMethod}"
-              delete oldClass[currentMethod]
+          # Do the same with static methods
+          for currentMethod in oldMethods when currentMethod not in newMethods
+            # console.log "Deleting static method #{currentMethod}"
+            delete oldClass[currentMethod]
 
-            # Replace every old prototype method with the new version
-            for methodName in _.keys newClass.prototype when typeof(newClass::[methodName]) is "function"
-              # console.log "Replacing instance method #{methodName}"
-              oldClass::[methodName] = newClass::[methodName]
+          # Replace every old prototype method with the new version
+          for methodName in _.keys newClass.prototype when typeof(newClass::[methodName]) is "function"
+            # console.log "Replacing instance method #{methodName}"
+            oldClass::[methodName] = newClass::[methodName]
 
-            # Do the same with static methods
-            for methodName in _.keys newClass when typeof(newClass[methodName]) is "function"
-              # console.log "Replacing static method #{methodName}"
-              oldClass[methodName] = newClass[methodName]
+          # Do the same with static methods
+          for methodName in _.keys newClass when typeof(newClass[methodName]) is "function"
+            # console.log "Replacing static method #{methodName}"
+            oldClass[methodName] = newClass[methodName]
 
-            # FIXME: fat arrow functions don't seem to work.
-            # I have no solution how to replace the bound methods, as they
-            # are bound per instance when instantiating and I have no way to
-            # access every instance
-            #
-            # Reference: http://stackoverflow.com/a/13687261/9535
+          # FIXME: fat arrow functions don't seem to work.
+          # I have no solution how to replace the bound methods, as they
+          # are bound per instance when instantiating and I have no way to
+          # access every instance
+          #
+          # Reference: http://stackoverflow.com/a/13687261/9535
 
-          global.App = oldApp
+        global.App = oldApp
 
-        catch e
-          global.App = oldApp
-          console.log "Error ocurred. Just reload file"
+      catch e
+        global.App = oldApp
+        console.log "Error ocurred. Just reload file"
 
-          delete require.cache[require.resolve(file)]
-          require file
+        delete require.cache[require.resolve(file)]
+        require file
 
-        return callback null, file if callback
+      return callback null, file if callback
+
+    paths = [
+      "#{folder}/**/*.coffee"
+      "#{folder}/**/*.js"
+    ]
+
+    options =
+      interval: 5007
+
+    gaze paths, options, (err, watcher) =>
+      watcher.on "changed", applyReload
+      watcher.on "added", applyReload
 
 
   initControllers: (cb) ->
@@ -282,15 +293,20 @@ class Salad.Bootstrap extends Salad.Base
     ], (err) =>
       return callback err
 
+    reloadTemplate = (file) =>
+      loadTemplateFile file, (err, index) =>
+        content = @metadata().templates[index]
+        Salad.Template.Handlebars.registerPartial index, content
+
+        App.Logger.info "Template #{index} reloaded"
+
     # watch for changes and automatically reload files
     if Salad.env is "development"
-      gaze "#{dirname}/*/*/*.hbs", (err, watcher) =>
-        watcher.on "changed", (file) =>
-          loadTemplateFile file, (err, index) =>
-            content = @metadata().templates[index]
-            Salad.Template.Handlebars.registerPartial index, content
+      options =
+        interval: 5007
 
-            App.Logger.info "Template #{index} reloaded"
+      gaze "#{dirname}/*/*/*.hbs", options, (err, watcher) =>
+        watcher.on "changed", reloadTemplate
 
   initDatabase: (cb) ->
     dbConfig =
