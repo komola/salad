@@ -358,10 +358,10 @@ class Salad.Bootstrap extends Salad.Base
           console.error err.stack
 
           if Salad.env is "production"
-            res.send 500, "Internal server error!"
+            res.status(500).send("Internal server error!")
           else
             res.type "text"
-            res.send 500, err.stack
+            res.status(500).send err.stack
 
         @metadata().expressServer = @metadata().app.listen @options.port
 
