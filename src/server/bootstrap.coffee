@@ -339,7 +339,11 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().app.use cookieParser()
     @metadata().app.use bodyParser.urlencoded(extended: true)
     @metadata().app.use bodyParser.json()
-    @metadata().app.use methodOverride()
+    @metadata().app.use methodOverride (req, res) =>
+      if req.body and typeof req.body == 'object' and '_method' of req.body
+        method = req.body._method
+        delete req.body._method
+        return method
 
     return cb()
 

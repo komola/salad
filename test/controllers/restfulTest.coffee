@@ -76,6 +76,22 @@ describe "App.RestfulController", ->
 
           return null
 
+      it "handles methodOverride correctly", (done) ->
+        App.Todo.create title: "Test", (err, model) =>
+          agent.post("http://localhost:3001/todos/1")
+            .send("_method=PUT")
+            .send("todo[title]=A")
+            .end (err, res) ->
+              console.log res
+              res.redirects.length.should.equal 1
+              App.Todo.first (err, todo) =>
+                assert.ok todo.get("title")
+                todo.get("title").should.equal "A"
+
+                done()
+
+          return null
+
       it "returns 404 for non-existent resource", (done) ->
         agent.put("http://localhost:3001/todos/1")
           .send("todo[title]=A")
