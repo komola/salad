@@ -82,7 +82,21 @@ describe "App.RestfulController", ->
             .send("_method=PUT")
             .send("todo[title]=A")
             .end (err, res) ->
-              console.log res
+              res.redirects.length.should.equal 1
+              App.Todo.first (err, todo) =>
+                assert.ok todo.get("title")
+                todo.get("title").should.equal "A"
+
+                done()
+
+          return null
+
+      it "handles methodOverride correctly in multi-part requests", (done) ->
+        App.Todo.create title: "Test", (err, model) =>
+          agent.post("http://localhost:3001/todos/1")
+            .field("_method", "PUT")
+            .field("todo[title]", "A")
+            .end (err, res) ->
               res.redirects.length.should.equal 1
               App.Todo.first (err, todo) =>
                 assert.ok todo.get("title")

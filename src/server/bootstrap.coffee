@@ -10,6 +10,8 @@ bodyParser = require("body-parser")
 methodOverride = require("method-override")
 morgan = require("morgan")
 chokidar = require "chokidar"
+multer = require "multer"
+os = require "os"
 
 class Salad.Bootstrap extends Salad.Base
   @extend require "./mixins/singleton"
@@ -339,6 +341,7 @@ class Salad.Bootstrap extends Salad.Base
     @metadata().app.use cookieParser()
     @metadata().app.use bodyParser.urlencoded(extended: true)
     @metadata().app.use bodyParser.json()
+    @metadata().app.use multer(dest: os.tmpdir()).any()
     @metadata().app.use methodOverride (req, res) =>
       if req.body and typeof req.body == 'object' and '_method' of req.body
         method = req.body._method

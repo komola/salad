@@ -21,6 +21,7 @@ build: clean
 	@$(BIN)/grunt compile
 
 test: clean
+	docker-compose build --force-rm
 	@$(call docker-exec-or-run,npm test)
 
 clean:
