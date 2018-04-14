@@ -137,6 +137,10 @@ module.exports =
       conditions = {}
 
       for key,value of parameters
+        # don't allow objects
+        if _.isObject(value)
+          continue
+
         # check if the parameter name needs special handling
         value = decodeURIComponent(value)
 
