@@ -4,7 +4,7 @@ config.database =
   test:
     username: "testing"
     password: "testing"
-    host: "localhost"
+    host: "postgres"
     database: "salad-testing"
     port: 5432
     logging: false

@@ -2,6 +2,17 @@ BIN = ./node_modules/.bin
 TESTS = $(shell find test -name "*Test.coffee")
 .PHONY: test clean
 
+define docker-exec-or-run
+	if docker-compose exec salad echo "" &> /dev/null; then docker-compose exec salad $(1); else docker-compose run --service-ports --rm salad $(1); fi
+endef
+
+define docker-exec
+	docker-compose exec salad $(1) || echo "Please start the docker container with 'make run-dev' seperately"
+endef
+
+shell: ## Grants you shell access to the currently running application container.
+	$(call docker-exec-or-run,/bin/bash)
+
 build: clean
 	@echo "Creating folders"
 	@mkdir -p lib
@@ -9,8 +20,8 @@ build: clean
 
 	@$(BIN)/grunt compile
 
-test: build
-	@npm test
+test: clean
+	@$(call docker-exec-or-run,npm test)
 
 clean:
 	@rm -rf lib

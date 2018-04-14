@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  salad:
+    build: .
+    command: npm test
+    links:
+      - postgres
+    ports:
+      - '3001:3000'
+    volumes:
+      - .:/opt/salad
+      - /opt/salad/node_modules
+
+  postgres:
+    image: postgres:9.6
+    environment:
+      POSTGRES_USER: testing
+      POSTGRES_PASSWORD: testing
+      POSTGRES_DB: salad-testing
+    ports:
+      - '5433:5432'
+
+#  redis:
+#    image: redis:3.2
+#    command: redis-server --appendonly yes
+#    volumes:
+#      - ./redis-data:/data
