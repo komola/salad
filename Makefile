@@ -45,7 +45,7 @@ define release
 	git tag "$$NEXT_VERSION" -m "release $$NEXT_VERSION"
 endef
 
-release-patch: build
+release-patch: build test
 	@$(call release,patch)
 
 release-minor: build test

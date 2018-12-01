@@ -2,6 +2,9 @@ services: postgresql
 before_script:
   - psql -c "create user testing password 'testing';" -U postgres
   - psql -c 'create database "salad-testing" owner testing;' -U postgres
+
+script:
+  - make test
 language: node_js
 node_js:
   - 8
