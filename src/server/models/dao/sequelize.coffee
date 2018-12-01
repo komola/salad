@@ -245,6 +245,16 @@ class Salad.DAO.Sequelize extends Salad.DAO.Base
     if _.keys(options.conditions).length > 0
       params.where = options.conditions
 
+    # Apply search parameters
+    if _.keys(options.searches).length > 0
+      for field, matchString of options.searches
+        searchCondition = {}
+        searchCondition[field] = {
+          # DEPRECATED: This is deprecated in future sequelize versions
+          $iLike: "%#{matchString}%"
+        }
+        params.where = Object.assign(params.where || {}, searchCondition)
+
     if options.limit > 0
       params.limit = options.limit
 

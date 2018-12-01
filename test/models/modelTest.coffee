@@ -783,6 +783,33 @@ describe "Salad.Model", ->
 
               done()
 
+    describe "#search", ->
+      it "can match fields", (done) ->
+        App.Shop.create otherField: "Long text", (err, resource) ->
+          App.Shop.create otherField: "Short", (err, _) ->
+            App.Shop.search("otherField", "Long").all (err, resources) ->
+              resources.length.should.equal 1
+              resources[0].get("id").should.equal resource.get("id")
+
+              done()
+
+      it "is case insensitive", (done) ->
+        App.Shop.create otherField: "Long text", (err, resource) ->
+          App.Shop.create otherField: "Short", (err, _) ->
+            App.Shop.search("otherField", "long").all (err, resources) ->
+              resources.length.should.equal 1
+              resources[0].get("id").should.equal resource.get("id")
+
+              done()
+
+      it "plays along with other where conditions", (done) ->
+        App.Location.create title: "Long text", description: "FOO", (err, resource) ->
+          App.Location.create title: "Short", description: "FOO", (err, _) ->
+            App.Location.where(description: "FOO").search("title", "Long").all (err, resources) ->
+              resources.length.should.equal 1
+              resources[0].get("id").should.equal resource.get("id")
+
+              done()
 
     describe "#contains", ->
       it "searches in array fields", (done) ->

@@ -3,6 +3,7 @@ class Salad.Scope
     @daoContext = @context.daoInstance
     @data =
       conditions: {}
+      searches: {}
       contains: []
       includes: []
       order: []
@@ -23,6 +24,11 @@ class Salad.Scope
 
     for key, val of attributes
       @data.conditions[key] = val
+
+    @
+
+  search: (field, value) ->
+    @data.searches[field] = value
 
     @
 

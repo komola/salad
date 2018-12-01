@@ -11,6 +11,9 @@ module.exports =
     where: (attributes) ->
       @scope().where attributes
 
+    search: (field, value) ->
+      @scope().search field, value
+
     limit: (limit) ->
       @scope().limit limit
 
