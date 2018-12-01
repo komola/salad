@@ -2,6 +2,7 @@ services: postgresql
 before_script:
   - psql -c "create user testing password 'testing';" -U postgres
   - psql -c 'create database "salad-testing" owner testing;' -U postgres
+  - export DB_HOST='localhost'
 
 script:
   - npm test

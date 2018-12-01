@@ -4,7 +4,7 @@ config.database =
   test:
     username: "testing"
     password: "testing"
-    host: "postgres"
+    host: "#{process.env.DB_HOST || 'postgres'}"
     database: "salad-testing"
     port: 5432
     logging: false
