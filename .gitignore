@@ -24,3 +24,5 @@ pkg
 /bower_components
 
 npm-debug.log
+
+build
